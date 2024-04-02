@@ -4592,6 +4592,7 @@ textarea:focus {
 .main-menu.menu-lh-1 > nav > ul > li > a {
   line-height: 100px;
   height: 99px;
+  font-weight: 600;
 }
 
 .main-menu.menu-lh-2 > nav > ul > li > a {
@@ -30351,6 +30352,7 @@ h3.cart-page-title {
 .login-register-wrap .login-register-form .sin-login-register input {
   background: transparent;
   border: 1px solid #CDCDCD;
+  border-radius: 7px;
   height: 50px;
   padding: 5px 10px;
 }
@@ -30398,7 +30400,7 @@ h3.cart-page-title {
 }
 
 .login-register-wrap .login-register-form a:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .login-register-wrap .login-register-form p {
@@ -30428,15 +30430,57 @@ h3.cart-page-title {
   }
 }
 
+.login-register-btn{
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
 .login-register-btn button {
+  align-items: center;
+  justify-content: center;
   border: none;
   width: 25vw;
+  height: 45px;
   background-color: #262626;
   color: #fff;
   font-size: 16px;
   border-radius: 75px;
-  padding: 17px 50px 20px;
+  padding:  10px 20px;
   line-height: 1;
+}
+
+.google.text-center button {
+  background-color: rgba(0, 0, 0, 0.83);
+  width: 25vw;
+  height: 45px;
+  font-size: 16px;
+  border-radius: 75px;
+  
+}
+
+.google.text-center button:hover {
+  text-decoration-line: none;
+  background-color: brown;
+}
+
+
+.or-container {
+  align-items: center;
+  color:#8d8d8d;
+  display: flex;
+  margin: 25px 0;
+}
+
+.line-separator {
+  background-color:#D0D0D0;
+  flex-grow: 5;
+  height: 1px;
+}
+
+.or-label {
+  flex-grow: 1;
+  margin: 0 15px;
+  text-align: center;
 }
 
 @media only screen and (max-width: 767px) {
@@ -30446,7 +30490,12 @@ h3.cart-page-title {
 }
 
 .login-register-btn button:hover {
-  background-color: #fc4f4f;
+  background-color: brown;
+}
+
+.otpbtns {
+  display: flex;
+  justify-content: center;
 }
 
 /*-------- 27. My account style ---------*/

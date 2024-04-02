@@ -27,7 +27,7 @@ const showShop = async (req, res) => {
 
 const showProductDetail = async (req, res) => {
     try {
-        const id = req.params.id
+        const { id } = req.params
         const product = await products.findById(id)
 
         res.render('users/productDetail', {product})
@@ -66,20 +66,20 @@ let otpExpiration = null;
 const insertUser = async (req, res) => {
     try {
 
-        // const email = req.body.email
+        const { name, email, phone, password } = req.body
 
-        // const existingEmail = await User.findOne({email:email})
+        const existingEmail = await User.findOne({email:email})
 
-        // if(existingEmail){
-        //     return res.render('users/signup',{emessage:'Email already exists'})
-        // }
+        if(existingEmail){
+            return res.render('users/signup',{emessage:'Email already exists'})
+        }
 
-        const encryptPass = await securePassword(req.body.password)
+        const encryptPass = await securePassword(password)
 
         const user = new User({
-            name: req.body.name,
-            email: req.body.email,
-            phone: req.body.phone,
+            name: name,
+            email: email,
+            phone: phone,
             password: encryptPass,
         })
 
@@ -119,8 +119,8 @@ const verifyEmail = async (email, req) => {
             service: "gmail",
 
             auth: {
-                user: process.env.userEmail,
-                pass: process.env.userPassword
+                user: process.env.USEREMAIL,
+                pass: process.env.USERPASSWORD
             }
         });
 
@@ -181,7 +181,7 @@ const verifyOtp = async (req, res) => {
 
         if (otpExpiration && Date.now() > otpExpiration) {
             delete req.session.otp; // Clear OTP from session
-            return res.render('users/otp', { emessage: 'OTP expired. Please request a new one.' });
+            res.render('users/otp', { emessage: 'OTP expired. Please request a new one.' });
         }
 
         if (userOtp == req.session.otp) {
@@ -238,9 +238,9 @@ const showLogin = async (req, res) => {
 }
 
 // ----------- Google login -----------
-const loadAuth = async(req,res)=>{
-    res.render('users/login')
-}
+// const loadAuth = async(req,res)=>{
+//     res.render('users/login')
+// }
 
 const successGoogleLogin = async(req,res)=>{
     try{
@@ -269,8 +269,8 @@ passport.deserializeUser((user, done) => {
 
 passport.use(
     new googleStrategy({
-        clientID : process.env.Google_Client_ID,
-        clientSecret : process.env.Google_Client_Secret,
+        clientID : process.env.GOOGLECLIENTID,
+        clientSecret : process.env.GOOGLECLIENTSECRET,
         callbackURL : "http://localhost:4001/auth/google/callback",
         passReqToCallback : true
     },
@@ -285,12 +285,11 @@ passport.use(
 // Verifying User Login
 const verifyLogin = async (req, res) => {
     try {
-        const email = req.body.email
-        const password = req.body.password
+        const { email, password} = req.body
 
         const userData = await User.findOne({ email: email })
 
-        if (userData) {
+        if (!userData.isBlocked) {
             const passwordMatch = await bcrypt.compare(password, userData.password)
 
             if (passwordMatch) {
@@ -347,7 +346,6 @@ module.exports = {
     showProductDetail,
     loadMyAccount,
     userLogout,
-    loadAuth,
     successGoogleLogin,
     failureLogin,
 }

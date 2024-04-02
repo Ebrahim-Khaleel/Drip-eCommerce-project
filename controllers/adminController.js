@@ -13,7 +13,7 @@ const loadLogin = async (req, res) => {
 
 const verifyAdmin = async (req, res) => {
     try {
-        const {email,password} = req.body
+        const { email, password } = req.body
 
         const adminData = await admin.findOne({ email: email })
 
@@ -45,7 +45,7 @@ const showSignUp = async (req, res) => {
 
 const insertAdmin = async(req,res) => {
     try{
-        const {email,password} = req.body
+        const { email, password } = req.body
 
         const newAdmin = new admin({
             email : email,
@@ -92,6 +92,25 @@ const loadUsers = async (req, res) => {
     }
 }
 
+const userBlocking = async(req,res) =>{
+    try{
+        const { userId } = req.body
+        const userData = await User.findOne({_id:userId})
+
+        if(!userData.isBlocked){
+            await User.findByIdAndUpdate({_id:userId},{$set:{isBlocked:true}})
+            console.log('User Blocked');
+        } else {
+            await User.findByIdAndUpdate({_id:userId},{$set:{isBlocked:false}})
+            console.log('User Unblocked');
+        }
+
+        res.json({res:true})
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
 
 module.exports = {
     loadLogin,
@@ -101,4 +120,5 @@ module.exports = {
     adminLogout,
     showSignUp,
     insertAdmin,
+    userBlocking,
 }

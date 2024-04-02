@@ -527,7 +527,7 @@
                     <div class="d-flex">
                         <!-- LOGO -->
                         <div class="navbar-brand-box">
-                            <a href="index.html" class="logo logo-dark">
+                            <a href="/admin/home" class="logo logo-dark">
                                 <span class="logo-sm">
                                     <img src="assets/images/logo-sm.svg" alt="" height="22">
                                 </span>
@@ -536,7 +536,7 @@
                                 </span>
                             </a>
 
-                            <a href="index.html" class="logo logo-light">
+                            <a href="/admin/home" class="logo logo-light">
                                 <span class="logo-sm">
                                     <img src="assets/images/logo-sm.svg" alt="" height="22">
                                 </span>
@@ -566,61 +566,25 @@
                                         <li class="nav-item dropdown">
                                             <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-pages" role="button">
                                                 <i class='bx bx-grid-alt'></i>
-                                                <span data-key="t-apps">Apps</span> <div class="arrow-down"></div>
+                                                <span data-key="t-apps">Users & Category</span> <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-pages">
     
                                                 <a href="/admin/users" class="dropdown-item" data-key="t-calendar">Users</a>
-                                                <a href="/admin/products" class="dropdown-item" data-key="t-chat">Products</a>
                                                 <a href="/admin/category" class="dropdown-item" data-key="t-chat">Category</a>
+    
                                             </div>
                                         </li>
 
                                         <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-uielement" role="button"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <i class='bx bxl-bootstrap'></i>
-                                               <span data-key="t-bootstrap">Bootstrap</span> <div class="arrow-down"></div>
+                                            <a class="nav-link dropdown-toggle arrow-none" href="/admin/products" id="topnav-pages" role="button">
+                                                <i class='bx bx-grid-alt'></i>
+                                                <span data-key="t-apps">Products</span> <div class="arrow-down"></div>
                                             </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-pages">
     
-                                            <div class="dropdown-menu mega-dropdown-menu px-2 dropdown-mega-menu-xl" aria-labelledby="topnav-uielement">
-                                                <div class="ps-2 p-lg-0">
-                                                    <div class="row">
-                                                        <div class="col-lg-12">
-                                                            <div>
-                                                                <div class="menu-title">Components</div>
-                                                                <div class="row g-0">
-                                                                    <div class="col-lg-4">
-                                                                        <div>
-                                                                            <a href="ui-alerts.html" class="dropdown-item" data-key="t-alerts">Alerts</a>
-                                                                            <a href="ui-buttons.html" class="dropdown-item" data-key="t-buttons">Buttons</a>
-                                                                            <a href="ui-cards.html" class="dropdown-item" data-key="t-cards">Cards</a>
-                                                                            <a href="ui-carousel.html" class="dropdown-item" data-key="t-carousel">Carousel</a>
-                                                                            <a href="ui-dropdowns.html" class="dropdown-item" data-key="t-dropdowns">Dropdowns</a>
-                                                                            <a href="ui-grid.html" class="dropdown-item" data-key="t-grid">Grid</a>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-lg-4">
-                                                                        <div>
-                                                                            <a href="ui-images.html" class="dropdown-item" data-key="t-images">Images</a>
-                                                                            <a href="ui-modals.html" class="dropdown-item" data-key="t-modals">Modals</a>
-                                                                            <a href="ui-offcanvas.html" class="dropdown-item" data-key="t-offcanvas">Offcanvas</a>
-                                                                            <a href="ui-placeholders.html" class="dropdown-item" data-key="t-placeholders">Placeholders</a>
-                                                                            <a href="ui-progressbars.html" class="dropdown-item" data-key="t-progress-bars">Progress Bars</a>
-                                                                            <a href="ui-tabs-accordions.html" class="dropdown-item" data-key="t-tabs-accordions">Tabs & Accordions</a>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-lg-4">
-                                                                        <a href="ui-typography.html" class="dropdown-item" data-key="t-typography">Typography</a>
-                                                                        <a href="ui-video.html" class="dropdown-item" data-key="t-video">Video</a>
-                                                                        <a href="ui-general.html" class="dropdown-item" data-key="t-general">General</a>
-                                                                        <a href="ui-colors.html" class="dropdown-item" data-key="t-colors">Colors</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <a href="/admin/products" class="dropdown-item" data-key="t-calendar">List Products</a>
+                                                <a href="/admin/addProducts" class="dropdown-item" data-key="t-chat">Add Products</a>
                                             </div>
                                         </li>
         
@@ -951,8 +915,8 @@
 
                         <div class="row">
                             <div class="col-12">
-                                <div class="card">
-                                    <div class="card-body">
+                                <div class="card" >
+                                    <div class="card-body" >
                                         <div class="row mb-2">
                                             <div class="col-sm-4">
                                                 <div class="search-box me-2 mb-2 d-inline-block">
@@ -964,16 +928,17 @@
                                             </div>
                                             <div class="col-sm-8">
                                                 <div class="text-sm-end">
-                                                    <button type="button" class="btn btn-success btn-rounded waves-effect waves-light mb-2 me-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                                        <i class="mdi mdi-plus me-1"></i> New Products
+                                                    <button type="submit" class="btn btn-success btn-rounded waves-effect waves-light mb-2 me-2">
+                                                        <a class="text-white" href="/admin/addProducts"><i class="mdi mdi-plus me-1 text-white"></i> New Products</a>
                                                     </button>
                                                 </div>
                                             </div><!-- end col-->
                                         </div>
                                         <!-- Button trigger modal -->
                                             
+                                            <script defer src="https://cdn.crop.guide/loader/l.js?c=NTBDZJ"></script>
                                             
-                                            <!-- Modal -->
+                                            <!-- Add Product Modal -->
                                             <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
@@ -1005,7 +970,7 @@
                                                                 </div>  
                                                                 <div class="mb-3">
                                                                     <label for="image1" class="form-label">Image 1:</label>
-                                                                    <input type="file" class="form-control" id="image1" name="image">
+                                                                    <input type="file" class="form-control" id="image1" name="image" onchange="previewImage(event)" accept="image/*" type="file" multiple/> 
                                                                 </div>                                                              
                                                                 <div class="mb-3">
                                                                     <label for="image2" class="form-label">Image 2:</label>
@@ -1035,10 +1000,10 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!-- Modal End -->
+                                            <!-- Add Product Modal End -->
 
 
-                                        <div class="table-responsive">
+                                        <div class="table-responsive" id="reloadDiv">
                                             <table class="table align-middle table-nowrap">
                                                 <thead>
                                                     <tr>
@@ -1053,9 +1018,10 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <% products.forEach((product,index)=> { %>
+                                                    <% products.forEach((product,i)=> { %>
+                                                        <% if(!product.category.isBlocked) { %>
                                                         <tr>
-                                                            <td><%= index+1 %></td>
+                                                            <td><%= i+1 %></td>
                                                             <td><%= product.name %></td>
                                                             <td><%= product.description %></td>
                                                             <td><%= product.price %></td>
@@ -1067,10 +1033,15 @@
                                                             </td>
                                                             <td><%= product.quantity %></td> 
                                                             <td>
-                                                                <button type="button" class="btn btn-outline-success">Unlist</button>
-                                                                <button type="button" class="btn btn-outline-danger">List</button>
+                                                                <a href="/admin/editProducts?id=<%= product._id %>" class="btn btn-outline-primary ">Edit</a>
+                                                                <% if(!product.isBlocked) { %>
+                                                                <button type="button" onclick="UnlistCategory('<%= product._id %>')" class="btn btn-outline-danger">Unlist</button>
+                                                                <% } else { %>
+                                                                <button type="button" onclick="UnlistCategory('<%= product._id %>')" class="btn btn-outline-success">List</button>
+                                                                <% } %>
                                                             </td>
                                                         </tr>
+                                                        <% } %>
                                                     <% }); %>
                                                 </tbody>
                                             </table>
@@ -1097,6 +1068,71 @@
                             </div>
                         </div>
                         <!-- end row -->
+
+                        <!-- Edit Product Modal -->
+                    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Product</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Name:</label>
+                                    <input type="text" class="form-control" id="editName" name="editname">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description:</label>
+                                    <textarea class="form-control" id="editDescription" name="editdescription"
+                                        rows="3" placeholder="Enter description"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Price:</label>
+                                    <input type="text" class="form-control" id="editPrice" name="editprice">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Category:</label>
+                                    <select class="form-select" id="editCategory1" name="editcategory">
+                                    </select>
+                                </div>
+                                <div>
+                                    <div class="mb-3">
+                                        <label for="image1" class="form-label">Image 1:</label>
+                                        <input type="file" class="form-control"  name="editimage">
+                                    </div>                                                              
+                                    <div class="mb-3">
+                                        <label for="image2" class="form-label">Image 2:</label>
+                                        <input type="file" class="form-control" id="editImage2" name="editimage">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="image3" class="form-label">Image 3:</label>
+                                        <input type="file" class="form-control" id="editImage3" name="editimage">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="image4" class="form-label">Image 4:</label>
+                                        <input type="file" class="form-control" id="editImage4" name="editimage">
+                                    </div>
+                                    
+                                </div>
+                                <div class="mb-3">
+                                    <label for="quantity" class="form-label">Quantity:</label>
+                                    <input type="number" class="form-control" id="editQuantity" name="editquantity">
+                                </div>  
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="saveEditCategory">Save
+                                    changes</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- Edit Product Modal End -->
 
                     </div> <!-- container-fluid -->
                 </div>
@@ -1266,6 +1302,101 @@
         <div class="rightbar-overlay"></div>
 
         <!-- JAVASCRIPT -->
+
+        <!-- jQuery CDN -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <!-- SweetAlert CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+        <!-- Axios CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <!-- Crop CDN -->
+
+        <script>
+        
+        // crop image
+        function previewImage(event) {
+        
+        let input = event.target;
+        let images = document.querySelectorAll('[id^="preview-"]');
+
+
+        if (input.files) {
+            for (let i = 0; i < input.files.length; i++) {
+                let reader = new FileReader();
+                let image = images[i];  
+
+                reader.onload = function (e) {
+                    image.src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[i]);
+                }
+            }
+        }
+
+        // edit product 
+        async function openEditModal(productId){
+            const name = document.getElementById('editName')
+            const description = document.getElementById('editDescription')
+            const price = document.getElementById('editPrice')
+            const category = document.getElementById('editCategory1')
+            const image1 = document.getElementById('editImage1')
+            const image2 = document.getElementById('editImage2')
+            const image3 = document.getElementById('editImage3')
+            const image4 = document.getElementById('editImage4')
+            const quantity = document.getElementById('editQuantity')
+
+
+            try{
+                const response = await axios.post('/admin/editProduct',{productId});
+                const data = response.data.findingProduct;
+                const data1 = response.data.categories;
+
+                const option = [
+                `<option value="${data.category._id}">${data.category.name}</option>`,
+                ]
+
+                data1.forEach(element => {
+                    option.push(`<option value="${element._id}">${element.name}</option>`)
+                });
+                
+                if(data){
+                    name.value = data.name;
+                    description.value = data.description;
+                    price.value = data.price;
+                    category.innerHTML=option;
+                    image1.value = data.images;
+                    quantity.value = data.quantity;
+                }
+            }catch(error){
+                console.log(error.message);
+            }
+        }
+
+
+        // catergory list or unlist
+        function UnlistCategory(productId){
+            
+            fetch('/admin/unlistProduct',{
+                method : 'PATCH',
+                headers : {
+                    "content-type" : "application/json"
+                },
+                body: JSON.stringify({productId})                
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.res){
+                    $('#reloadDiv').load('/admin/products #reloadDiv')
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            })
+
+        }
+
+        </script>
+
         <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
         <script src="assets/libs/metismenujs/metismenujs.min.js"></script>
         <script src="assets/libs/simplebar/simplebar.min.js"></script>

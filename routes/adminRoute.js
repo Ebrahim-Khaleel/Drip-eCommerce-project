@@ -26,23 +26,36 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 adminRoute.use(session({
-    secret : process.env.sessionSecret,
+    secret : process.env.SESSIONSECRET,
     resave: true,
     saveUninitialized : true
 }))
 
+// Admin routes
 adminRoute.get('/login', isLogout , adminController.loadLogin)
 adminRoute.post('/login', adminController.verifyAdmin)
-adminRoute.get('/signup', adminController.showSignUp)
+adminRoute.get('/signup', isLogin,adminController.showSignUp)
 adminRoute.post('/signup', adminController.insertAdmin)
 adminRoute.get('/home', isLogin, adminController.loadHome)
-adminRoute.get('/logout',adminController.adminLogout)
-adminRoute.get('/users', adminController.loadUsers)
-adminRoute.get('/products', productController.loadProducts)
-adminRoute.get('/category', categoryController.loadCategory)
+adminRoute.get('/logout',isLogin,adminController.adminLogout)
+
+// Users routes
+adminRoute.get('/users', isLogin,adminController.loadUsers)
+adminRoute.patch('/userBlock',adminController.userBlocking)
+
+// Category routes
+adminRoute.get('/category',isLogin, categoryController.loadCategory)
 adminRoute.post('/category', categoryController.addCategory)
 adminRoute.post('/editCategory', categoryController.editCategory)
 adminRoute.patch('/editCategoryDone', categoryController.editCategoryDone)
+adminRoute.patch('/categoryBlock',categoryController.categoryBlocking)
+
+// Product routes
+adminRoute.get('/products', isLogin,productController.loadProducts)
+adminRoute.get('/addProducts',isLogin, productController.loadAddProduct)
 adminRoute.post('/addProducts', upload.array('image'), productController.addProduct)
+adminRoute.get('/editProducts',isLogin, productController.loadEditProduct)
+adminRoute.post('/editProducts', upload.array('image[]'), productController.editProduct)
+adminRoute.patch('/unlistProduct',productController.unlistingProduct)
 
 module.exports = adminRoute

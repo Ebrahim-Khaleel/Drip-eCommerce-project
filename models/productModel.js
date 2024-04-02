@@ -33,7 +33,7 @@ const productSchema = new mongoose.Schema({
         required :  true
     },
 
-    isDeleted : {
+    isBlocked : {
         type : Boolean,
         default : false
     }

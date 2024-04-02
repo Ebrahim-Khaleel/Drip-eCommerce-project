@@ -41,57 +41,14 @@
 
     <div class="main-wrapper">
         <header class="header-area section-padding-1">
-            <div class="container-fluid bg-black ">
-                <div class="row align-items-center">
-                    <div class="col-xl-2 col-lg-2">
-                        <div class="logo logo-width">
-                            <a href="index.html">
-                                <img src="user/assets/images/logo/logo.png" alt="logo">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-xl-8 col-lg-8 d-flex justify-content-center position-static">
+            <div class="container-fluid ">
+                <div class="row align-items-center justify-content-between ">
+                    <div class="col-xl-4  col-lg-4  d-flex position-static">
                         <div class="main-menu menu-lh-1 main-menu-padding-1">
                             <nav>
                                 <ul>
-                                    <li class="position-static"><a class="active" href="index.html">Home <i class="fa fa-angle-down"></i></a>
-                                        <div class="mega-menu-style-1">
-                                            <div class="mega-menu-inner">
-                                                <div class="demo-item mb-40">
-                                                    <div class="demo-item-img">
-                                                        <a href="index.html">
-                                                            <img src="user/assets/images/menu/h-1.jpg" alt="demo-img">
-                                                            <span>View Demo</span>
-                                                        </a>
-                                                    </div>
-                                                    <div class="demo-item-content">
-                                                        <h4><a href="index.html">Home Demo 01</a></h4>
-                                                    </div>
-                                                </div>
-                                                <div class="demo-item mb-40">
-                                                    <div class="demo-item-img">
-                                                        <a href="index-2.html">
-                                                            <img src="user/assets/images/menu/h-2.jpg" alt="demo-img">
-                                                            <span>View Demo</span>
-                                                        </a>
-                                                    </div>
-                                                    <div class="demo-item-content">
-                                                        <h4><a href="index-2.html">Home Demo 02</a></h4>
-                                                    </div>
-                                                </div>
-                                                <div class="demo-item mb-40">
-                                                    <div class="demo-item-img">
-                                                        <a href="index-3.html">
-                                                            <img src="user/assets/images/menu/h-3.jpg" alt="demo-img">
-                                                            <span>View Demo</span>
-                                                        </a>
-                                                    </div>
-                                                    <div class="demo-item-content">
-                                                        <h4><a href="index-3.html">Home Demo 03</a></h4>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <li class="position-static">
+                                        <a class="active" href="/">Home <i class="fa fa-angle-down"></i></a>
                                     </li>
                                     <li><a href="#">Pages <i class="fa fa-angle-down"></i></a>
                                         <ul class="sub-menu-width">
@@ -103,7 +60,7 @@
                                             <li><a href="faq.html">FAQ</a></li>
                                         </ul>
                                     </li>
-                                    <li><a href="shop-fullwide.html">Shop <i class="fa fa-angle-down"></i></a>
+                                    <li><a href="/shop">Shop <i class="fa fa-angle-down"></i></a>
                                         <ul class="mega-menu-style-2 mega-menu-width2 menu-negative-mrg1">
                                             <li class="mega-menu-sub-width20"><a class="menu-title" href="#">Shop Layout</a>
                                                 <ul>
@@ -157,26 +114,19 @@
                                             <li><a href="shop-metro.html">Shop Metro Layout</a></li>
                                         </ul>
                                     </li>
-                                    <li><a href="blog.html">Blog <i class="fa fa-angle-down"></i></a>
-                                        <ul class="sub-menu-width">
-                                            <li><a href="blog.html">Blog Style 01</a></li>
-                                            <li><a href="blog-2.html">Blog Style 02</a></li>
-                                            <li><a href="blog-3.html">Blog Style 03</a></li>
-                                            <li><a href="#">Single Posts <i class="fa fa-angle-right"></i></a>
-                                                <ul class="lavel-menu">
-                                                    <li><a href="blog-details.html">Single Post Style 01</a></li>
-                                                    <li><a href="blog-details-2.html">Single Post Style 02</a></li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="shop-instagram.html">Instagram Shop </a></li>
                                 </ul>
                             </nav>
                         </div>
                     </div>
-                    <div class="col-xl-2 col-lg-2">
-                        <div class="header-right-wrap header-right-flex">
+                    <div class="col-xl-4 col-lg-2">
+                        <div class="logo logo-width ms-4 ps-3">
+                            <a href="/">
+                                <img src="user/assets/images/logo/logo-no-background.png" alt="logo">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 align-content-end">
+                        <div class="header-right-wrap header-right-flex  ">
                             <div class="same-style header-wishlist">
                                 <a href="wishlist.html"><i class="fa fa-heart-o"></i></a>
                             </div>
@@ -191,9 +141,9 @@
                                     <i class="dlicon ui-1_zoom"></i>
                                 </a>
                             </div>
-                            <div class="same-style header-off-canvas">
-                                <a class="header-aside-button" href="#">
-                                    <i class="dlicon ui-3_menu-left"></i>
+                            <div class="same-style">
+                                <a class="" href="/login">
+                                    <i class="ri-user-line"></i>
                                 </a>
                             </div>
                         </div>
@@ -496,41 +446,36 @@
                                     <div class="sin-login-register">
                                         <label>Name<span>*</span></label>
                                         <input type="text" id="nameid" name="name">
-                                        <p id="nameerr"></p>
+                                        <p class="text-danger" id="nameerr"></p>
                                     </div>
                                     <div class="sin-login-register">
                                         <label>Email address <span>*</span></label>
-                                        <h4 style="color: red; font-size: medium;"><%= locals.emmessage %></h4>
+                                        <h4 style="color: red; font-size: medium;"><%= locals.emessage %></h4>
                                         <input type="text" id="emailid" name="email">
-                                        <p id="emailerr"></p>
+                                        <p class="text-danger" id="emailerr"></p>
                                     </div>
                                     <div class="sin-login-register">
                                         <label>Phone<span>*</span></label>
                                         <input type="number" id="phoneid" name="phone">
-                                        <p id="phoneerr"></p>
+                                        <p class="text-danger" id="phoneerr"></p>
                                     </div>
                                     <div class="sin-login-register">
                                         <label>Password <span>*</span></label>
                                         <input type="password" id="passwordid" name="password">
-                                        <p id="passworderr"></p>
+                                        <p class="text-danger" id="passworderr"></p>
                                     </div>
                                     <div class="sin-login-register">
                                         <label>Confirm Password <span>*</span></label>
                                         <input type="password" id="confirmpasswordid" name="confirmpassword">
-                                        <p id="confirmpassworderror"></p>
+                                        <p class="text-danger" id="confirmpassworderror"></p>
                                     </div>
-                                    <div class="login-register-btn-remember">
-                                        <div class="login-register-btn">
-                                            <button type="submit">Sign Up</button>
+                                        <div class="login-register-btn d-flex">
+                                            <button class="text-center " type="submit">Sign Up</button>
                                         </div>
-                                        <div class="login-register-remember">
-                                            <input type="checkbox">
-                                            <label>Remember me</label>
-                                        </div>
-                                    </div>
                                     <div>
                                         <h4 style="color: red; font-size: medium;"><%= locals.ermessage %></h4>
                                     </div>
+                                    <div class="text-center "><h3></h3>Already have an account? <a href="/login">Login</a></div>
                                 </form>
                             </div>
                         </div>
@@ -632,10 +577,10 @@
             document.getElementById("confirmpassworderror").innerHTML = '';
         
             // Name validation
-            if (name === '') {
+            if (name === '' || /\d/.test(name) || /[^\w\s]/.test(name)) {
                 document.getElementById("nameerr").innerHTML = 'Enter Your Name';
                 return false;
-            }
+            } 
         
             // Email validation
             if (email === '' || !/\S+@\S+\.\S+/.test(email)) {
@@ -647,6 +592,8 @@
             if (phone === '') {
                 document.getElementById("phoneerr").innerHTML = 'Please enter Your Phone Number';
                 return false;
+            } else if(phone.length < 10){
+                document.getElementById("phoneerr").innerHTML = 'Phone must be at least 10 numbers';
             }
         
             // Password validation
@@ -655,6 +602,11 @@
                 return false;
             } else if(password.length < 7){
                 document.getElementById('passworderr').innerHTML = 'Password must be at least 7 characters';
+                return false;
+            }
+
+            if(confirmPassword === ''){
+                document.getElementById('confirmpassworderror').innerHTML = 'Confirm your password'
                 return false;
             }
 

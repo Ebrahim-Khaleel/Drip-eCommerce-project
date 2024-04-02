@@ -22,8 +22,20 @@ const isLogout = async (req, res, next) => {
     }
 }
 
+const userAuthorize = async (req, res, next) => {
+    try {
+        if (req.session.user_id) {
+            res.render('users/error-404')
+        } else {
+            next()
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 
 module.exports = {
     isLogin,
     isLogout,
+    userAuthorize,
 }
