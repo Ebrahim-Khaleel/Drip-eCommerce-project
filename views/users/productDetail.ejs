@@ -130,7 +130,7 @@
                                 <a href="wishlist.html"><i class="fa fa-heart-o"></i></a>
                             </div>
                             <div class="same-style cart-wrap">
-                                <a href="#" class="cart-active">
+                                <a href="/cart" class="">
                                     <i class="dlicon shopping_bag-20"></i>
                                     <span class="count-style">02</span>
                                 </a>
@@ -529,11 +529,11 @@
                                     <div class="product-details-action-wrap">
                                         <div class="product-details-quality">
                                             <div class="cart-plus-minus">
-                                                <input class="cart-plus-minus-box" type="text" name="qtybutton" value="2">
+                                                <input class="cart-plus-minus-box" type="text" id="quantity" name="qtybutton" value="1" min="1" max="<%= product.quantity %>" required>
                                             </div>
                                         </div>
                                         <div class="product-details-cart">
-                                            <a title="Add to cart" href="/login">Add to cart</a>
+                                            <a  title="Add to cart" onclick="addToCart('<%= product._id %>')">Add to cart</a>
                                         </div>
                                         <div class="product-details-wishlist">
                                             <a title="Add to wishlist" href="#"><i class="fa fa-heart"></i></a>
@@ -1207,6 +1207,78 @@
     <!-- All JS is here
 ============================================ -->
 
+    <!-- SweetAlert CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script>
+        function addToCart(productId){
+
+            const quantity = document.getElementById('quantity').value
+
+            fetch(`/addToCart?id=${productId}`, {
+                method : 'post',
+                headers : {
+                    'Content-Type' : 'application/json'
+                },
+                body : JSON.stringify({quantity})
+            })
+            .then(res=> res.json())
+            .then(data=> {
+
+                if(data.exist){
+                    
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+
+                    didOpen: (toast) => {
+
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+
+                    });
+
+                    Toast.fire({
+
+                        icon: "warning",
+                        title: "Already Added"
+
+                    });
+
+                }else if(data.success){
+                    
+                    const Toast = Swal.mixin({
+
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+
+                    Toast.fire({
+
+                        icon: "success",
+                        title: "Item added to cart"
+                        
+                    });
+                }
+            })
+
+            .catch(error=>{
+                console.log('Error', error);
+            })
+        }
+    </script>
     <!-- Modernizer JS -->
     <script src="/user/assets/js/vendor/modernizr-3.11.7.min.js"></script>
     <!-- jquery -->

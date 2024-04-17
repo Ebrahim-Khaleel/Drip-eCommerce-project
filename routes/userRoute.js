@@ -1,6 +1,7 @@
 const express = require('express')
 const userRoute = express()
 const userController = require('../controllers/userController')
+const cartController = require('../controllers/cartController')
 const session = require('express-session')
 const { isLogin, isLogout, userAuthorize, } = require('../middlewares/userAuth')
 require('dotenv').config
@@ -31,6 +32,11 @@ userRoute.get('/resendOtp',userAuthorize, userController.resendOtp)
 // shop and detail page
 userRoute.get('/shop', userController.showShop)
 userRoute.get('/productDetail/:id', userController.showProductDetail)
+// cart
+userRoute.get('/cart',isLogin, cartController.loadCart)
+userRoute.post('/addToCart',cartController.addToCart)
+userRoute.put('/cartUpdate',cartController.updateCart)
+userRoute.post('/removeItem',cartController.removeFromCart)
 // logout
 userRoute.get('/logout',isLogin, userController.userLogout)
 

@@ -29542,11 +29542,13 @@ h3.cart-page-title {
 
 .cart-table-content table tbody > tr td.product-name {
   width: 370px;
+  padding-left: 10px;
 }
 
 @media only screen and (min-width: 768px) and (max-width: 991px) {
   .cart-table-content table tbody > tr td.product-name {
     width: 250px;
+    
   }
 }
 
@@ -29756,6 +29758,15 @@ h3.cart-page-title {
 .grand-total-wrap .grand-btn a:hover {
   background-color: #fc4f4f;
 }
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
+
 
 /*-------- 24. Checkout style ---------*/
 .customer-zone > p {
@@ -30507,7 +30518,7 @@ h3.cart-page-title {
   -webkit-box-pack: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
-          justify-content: center;
+          justify-content: space-around;
   width: 100%;
   background: #f7f7f7;
 }
@@ -30659,6 +30670,16 @@ h3.cart-page-title {
   padding: 17px 32px;
   color: #fff;
   font-size: 14px;
+  display: flex;
+  justify-content: center;
+  padding-left: 135px;
+  padding-right: 135px;
+}
+
+.editProfDiv{
+  border-radius: 0.5px;
+  border-style: solid;
+  border-color:#CDCDCD;
 }
 
 .myaccount-content .account-details-form .single-input-item button:hover {
@@ -30667,7 +30688,7 @@ h3.cart-page-title {
 
 .myaccount-table {
   white-space: nowrap;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .myaccount-table table th,

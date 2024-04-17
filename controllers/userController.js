@@ -29,7 +29,6 @@ const showProductDetail = async (req, res) => {
     try {
         const { id } = req.params
         const product = await products.findById(id)
-
         res.render('users/productDetail', {product})
 
     } catch (error) {
@@ -289,16 +288,25 @@ const verifyLogin = async (req, res) => {
 
         const userData = await User.findOne({ email: email })
 
-        if (!userData.isBlocked) {
+        if (userData) {
             const passwordMatch = await bcrypt.compare(password, userData.password)
 
             if (passwordMatch) {
-                req.session.user_id = userData._id;
-                console.log(userData);
-                res.redirect('/')
+
+                if(!userData.isBlocked){
+
+                    req.session.user_id = userData._id;
+                    console.log(userData);
+                    res.redirect('/')
+
+                } else {
+                    res.render('users/login', { Lmessage: "Sorry we can't find an account with that email and password" })
+                }
+                
             } else {
                 res.render('users/login', { Pmessage: "Incorrect Passowrd" })
             }
+            
         } else {
             res.render('users/login', { Lmessage: "Sorry we can't find an account with that email and password" })
         }
