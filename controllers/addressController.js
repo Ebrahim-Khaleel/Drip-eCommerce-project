@@ -44,9 +44,9 @@ const saveEditAddress = async(req,res) => {
     try{
         const { addressId } = req.body
         const {name, mobile, pincode, state, streetAddress, locality, city} = req.body
-        const addressUpdated = await address.findOneAndUpdate({_id : addressId},{ $set : {name : name, mobile: mobile, pincode: pincode, state:state, streetAddress: streetAddress, locality: locality, city: city}})
-
+        const addressUpdated = await address.findOneAndUpdate({_id : addressId},{ $set : {name : name, mobile: mobile, pincode: pincode, state:state, streetAddress: streetAddress, locality: locality, city: city}},{new:true})
         if(addressUpdated){
+            console.log('Address Updated');
             res.json({success:true})
         }
 

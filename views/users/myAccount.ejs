@@ -703,7 +703,7 @@
                                             </tbody>
                                         </table>
                                         <div>
-                                            <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editUserModal" onclick="editUser()">Edit</button>
+                                            <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editUserModal">Edit</button>
                                         </div>
                                     </div>
                             </div>
@@ -721,19 +721,19 @@
                                                         <label for="name" class="form-label">Name :</label>
                                                         <input type="text" class="form-control" id="editNameId"
                                                             name="editName" value="<%= userData.name %>" >
-                                                            <p id="editNameError" class="text-danger "></p>
+                                                            <p id="editNameErr" class="text-danger "></p>
                                                     </div>
                                                     <div class="mb-3">
                                                         <label for="pincode" class="form-label">Phone :</label>
                                                         <input type="number" class="form-control" id="editPhoneId"
                                                             name="editPhone" value="<%= userData.phone %>">
-                                                            <p id="editPhoneError" class="text-danger "></p>
+                                                            <p id="editPhoneErr" class="text-danger "></p>
                                                     </div>
                                                     <p id="emptyError" class="text-danger"></p>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <button type="submit" id="saveEditUser" data-bs-dismiss="modal" class="btn btn-primary">Save changes</button>
+                                            <button type="button" class="btn btn-secondary" id="close" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" id="saveEditUser"  class="btn btn-primary" onclick="editUser(this)">Save changes</button>
                                         </div>
                                     </div>
                                 </div>
@@ -855,21 +855,8 @@
                                 <div class="myaccount-content">
                                     <div class="account-details-form">
                                         <form action="#" class="editProfDiv p-5">
-                                            <div class="single-input-item">
-                                                <label for="display-name" class="required">Name
-                                                    <span>*</span></label>
-                                                <input type="text" id="display-name" />
-                                            </div>
-                                            <div class="single-input-item">
-                                                <label for="email" class="required">Email Address <span>*</span></label>
-                                                <input type="email" id="email" />
-                                            </div>
-                                            <div class="single-input-item">
-                                                <label for="phone" class="required">Phone Number <span>*</span></label>
-                                                <input type="number" id="phone" />
-                                            </div>
                                             <fieldset>
-                                                <legend>Password change</legend>
+                                                <legend>Change Password</legend>
                                                 <div class="single-input-item">
                                                     <label for="current-pwd" class="required">Current password (leave
                                                         blank to leave unchanged)</label>
@@ -980,6 +967,7 @@
                 <div class="modal-body p-4">
                     
                             <div class="mb-3">
+                                <p id="addresId" hidden></p>
                                 <label for="name" class="form-label">Name :</label>
                                 <input type="text" class="form-control" id="editAdNameId"
                                     name="editName">
@@ -1021,11 +1009,11 @@
                                     name="editCity" >
                                     <p id="editCityError" class="text-danger "></p>
                             </div>
-                            
+                            <p id="editEmptyError" class="text-danger"></p>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit"  class="btn btn-primary" data-bs-dismiss="modal" id="saveEditAddressId">Save changes</button>
+                  <button type="button" class="btn btn-secondary" id="closeEdit" data-bs-dismiss="modal">Close</button>
+                  <button type="submit"  class="btn btn-primary" onclick="saveEditAddress()" id="saveEditAddressId">Save changes</button>
                 </div>
              
               </div>
@@ -1126,29 +1114,43 @@
             const name = document.getElementById('editNameId')
             const phone = document.getElementById('editPhoneId')
 
-            document.getElementById('saveEditUser').addEventListener('click',async ()=>{
-                const response = await axios.patch('/editProfile',{name : name.value, phone : phone.value})
-                if(response.data.success){
-                    Swal.fire({
-                        position: "center",
-                        icon: "success",
-                        title: "Profile Edited!",
-                        showConfirmButton: false,
-                        timer: 1800
-                    }).then(()=>{
-                        $('#dashboad').load('/myAccount #dashboad')
-                    })
-                }
-            }).catch(error => {
-                if(error.response && error.response.data && error.response.data.error){
-                    Swal.fire({
-                        position: "center",
-                        icon: 'error',
-                        title: 'Error',
-                        text: error.response.data.error
-                    })
-                }
-            })
+            document.getElementById('editPhoneErr').innerHTML = ''
+            document.getElementById('editNameErr').innerHTML = ''
+
+            if(name.value.trim() === ''){
+                document.getElementById('editNameErr').innerHTML = 'Enter a name'
+                return false
+            }
+            
+            if(phone.value.trim() === ''){
+                console.log('phone');
+                document.getElementById('editPhoneErr').innerHTML = 'Enter phone number'
+                return false
+            } else if (phone.value.length < 10){
+                document.getElementById('editPhoneErr').innerHTML = 'Phone must be atleast 10 numbers'
+                return false
+            }
+
+            document.getElementById('editPhoneErr').innerHTML = ''
+            document.getElementById('editNameErr').innerHTML = ''
+
+            const response = await axios.patch('/editProfile',{name : name.value, phone : phone.value})
+            console.log('aaa');
+            if(response.data.success){
+                const close=document.getElementById('close')
+                close.click()
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Profile Edited!",
+                    showConfirmButton: false,
+                    timer: 1800
+                }).then(()=>{
+
+                    $('#dashboad').load('/myAccount #dashboad')
+                })
+            }
+            
         }
 
         function validateForm(){
@@ -1214,6 +1216,14 @@
 
         async function editAddress(addressId) {
             try{
+                document.getElementById('addresId').dataset.addresId=addressId
+                const name = document.getElementById('editAdNameId')
+                const mobile = document.getElementById('editMobileId')
+                const pincode = document.getElementById('editPincodeId')
+                const state = document.getElementById('editStateId')
+                const streetAddress = document.getElementById('editStreetId')
+                const locality = document.getElementById('editLocalityId')
+                const city = document.getElementById('editCityId')
 
                 const response = await axios.post('/loadEditAddress',{addressId})
                 const data = response.data
@@ -1230,92 +1240,88 @@
             }catch(error){
                 console.log(error.message);
             }
+        }
+       async function saveEditAddress() {
+            const addressId=document.getElementById('addresId').dataset.addresId
+            const name = document.getElementById('editAdNameId').value.trim()
+            const mobile = document.getElementById('editMobileId').value.trim()
+            const pincode = document.getElementById('editPincodeId').value.trim()
+            const state = document.getElementById('editStateId').value.trim()
+            const streetAddress = document.getElementById('editStreetId').value.trim()
+            const locality = document.getElementById('editLocalityId').value.trim()
+            const city = document.getElementById('editCityId').value.trim()
 
-            document.getElementById('saveEditAddressId').addEventListener('click', async () => {
+            document.getElementById('editNameError').innerHTML = '';
+            document.getElementById('editMobileError').innerHTML = '';
+            document.getElementById('editPincodeError').innerHTML = '';
+            document.getElementById('editStateError').innerHTML = '';
+            document.getElementById('editStreetAddressError').innerHTML = '';
+            document.getElementById('editLocalityError').innerHTML = '';
+            document.getElementById('editCityError').innerHTML = '';
+
+            if(name === '' && mobile === '' && pincode === '' && state === '' && streetAddress === '' && locality === '' && city === ''){
+                document.getElementById('editEmptyError').innerHTML = 'Please fill all the fields';
+                return false
+            } 
+
+            if(name === '' || /\d/.test(name) || /[^\w\s]/.test(name)){
+                document.getElementById('editNameError').innerHTML = 'Please enter a name';
+                return false
+            } 
+
+            if (mobile === '') {
+                document.getElementById("editMobileError").innerHTML = 'Please enter your Mobile Number';
+                return false;
+            } else if(mobile.length < 10){
+                document.getElementById("editMobileError").innerHTML = 'Phone must be at least 10 numbers';
+            }
+
+            if (pincode === '') {
+                document.getElementById("editPincodeError").innerHTML = 'Please enter your Pincode';
+                return false;
+            }
+
+            if (state === '') {
+                document.getElementById("editStateError").innerHTML = 'Please enter your state';
+                return false;
+            }
+
+            if (streetAddress === '') {
+                document.getElementById("editStreetAddressError").innerHTML = 'Please enter your street Address';
+                return false;
+            }
+
+            if (locality === '') {
+                document.getElementById("editLocalityError").innerHTML = 'Please enter your locality';
+                return false;
+            }
+
+            if (city === '') {
+                document.getElementById("editCityError").innerHTML = 'Please enter your city';
+                return false;
+            }
+
             
-                const name = document.getElementById('editAdNameId').value.trim()
-                const mobile = document.getElementById('editMobileId').value.trim()
-                const pincode = document.getElementById('editPincodeId').value.trim()
-                const state = document.getElementById('editStateId').value.trim()
-                const streetAddress = document.getElementById('editStreetId').value.trim()
-                const locality = document.getElementById('editLocalityId').value.trim()
-                const city = document.getElementById('editCityId').value.trim()
+            const response = await axios.patch('/saveEditAddress', { addressId, name: name, mobile: mobile, pincode: pincode,
+                state: state, streetAddress: streetAddress, locality: locality,city: city});
 
-                document.getElementById('editNameError').innerHTML = '';
-                document.getElementById('editMobileError').innerHTML = '';
-                document.getElementById('editPincodeError').innerHTML = '';
-                document.getElementById('editStateError').innerHTML = '';
-                document.getElementById('editStreetAddressError').innerHTML = '';
-                document.getElementById('editLocalityError').innerHTML = '';
-                document.getElementById('editCityError').innerHTML = '';
-
-                if(name === '' && mobile === '' && pincode === '' && state === '' && streetAddress === '' && locality === '' && city === ''){
-                    document.getElementById('emptyError').innerHTML = 'Please fill all the fields';
-                    return false
-                } 
-
-                if(name === '' || /\d/.test(name) || /[^\w\s]/.test(name)){
-                    document.getElementById('nameError').innerHTML = 'Please enter a name';
-                    return false
-                } 
-
-                if (mobile === '') {
-                    document.getElementById("mobileError").innerHTML = 'Please enter your Mobile Number';
-                    return false;
-                } else if(phone.length < 10){
-                    document.getElementById("mobileError").innerHTML = 'Phone must be at least 10 numbers';
-                }
-
-                if (pincode === '') {
-                    document.getElementById("pincodeError").innerHTML = 'Please enter your Pincode';
-                    return false;
-                }
-
-                if (state === '') {
-                    document.getElementById("stateError").innerHTML = 'Please enter your state';
-                    return false;
-                }
-
-                if (streetAddress === '') {
-                    document.getElementById("streetError").innerHTML = 'Please enter your street Address';
-                    return false;
-                }
-
-                if (locality === '') {
-                    document.getElementById("localityError").innerHTML = 'Please enter your locality';
-                    return false;
-                }
-
-                if (city === '') {
-                    document.getElementById("cityError").innerHTML = 'Please enter your city';
-                    return false;
-                }
-
-                const response = await axios.patch('/saveEditAddress', { addressId, name: name.value, mobile: mobile.value, pincode: pincode.value,
-                    state: state.value, streetAddress: streetAddress.value, locality: locality.value,city: city.value});
-                    if (response.data.success) {
-                        Swal.fire({
-                            position: "center",
-                            icon: "success",
-                            title: "Address Edited!",
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then((result)=>{
-                            $('#reloadaddress').load('/myAccount #reloadaddress');
-                        })
-                    }
-                }).catch(error => {
-                if(error.response && error.response.data && error.response.data.error){
+                if (response.data.success) {
+                    const closeEdit = document.getElementById('closeEdit')
+                    closeEdit.click()
                     Swal.fire({
                         position: "center",
-                        icon: 'error',
-                        title: 'Error',
-                        text: error.response.data.error
+                        icon: "success",
+                        title: "Address Edited!",
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then((result)=>{
+                        $('#reloadaddress').load('/myAccount #reloadaddress');
                     })
                 }
-            })
-        }
+         
 
+        }
+            
 
         function removeAddress(addressId) {
             Swal.fire({
