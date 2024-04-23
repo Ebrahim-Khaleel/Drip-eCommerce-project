@@ -687,7 +687,7 @@
                                                     <td class="cart-quality">
                                                         <div class="product-details-quality quality-width-cart">
                                                             <div onclick="cartUpdate(this, '<%= product.productId._id %>','<%= cartItems._id %>')" class="cart-plus-minus">
-                                                                <input class="cart-plus-minus-box" type="number" name="quantity" value="<%= product.quantity %>" min="1" max="<%= product.productId.quantity %>" data-decimals="0" >
+                                                                <input class="cart-plus-minus-box" type="number" name="quantity" value="<%= product.quantity %>" min="1" max="<%= product.productId.quantity %>" step="1" data-decimals="0" required>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -713,6 +713,7 @@
                                         <div class="grand-total-content">
                                             <ul>
                                                 <li>Subtotal <span><%= cartItems.totalPrice %></span></li>
+                                                <li>Vat <span>00</span></li>
                                                 <li>Total <span><%= cartItems.totalPrice %></span> </li>
                                             </ul>
                                         </div>
@@ -830,19 +831,31 @@
         // cartUpdate function
         function cartUpdate(e, prodId, cartId){
             const inp = e.querySelector('input')
+            const updatedQuantity = parseInt(inp.value);
+            const maxQuantity = parseInt(inp.getAttribute('max'));
          
-            fetch('/cartUpdate',{
-                method : 'PUT',
-                headers : { 'Content-Type':'application/json' },
-                body : JSON.stringify({updtdQuantity :  inp.value, prodId, cartId})
-            }).then(res=> res.json())
-            .then(data => {
-                if(data.success){
-                    window.location.href = '/cart'
-                }
-            }).catch(err=>{
-                console.log(err);
-            })
+            // Ensure quantity is within stock limits
+            if (updatedQuantity > maxQuantity) {
+                inp.value = maxQuantity;
+            } else if (updatedQuantity < 1) {
+                inp.value = 1;
+            }
+
+            if(updatedQuantity >= 1 && updatedQuantity <= maxQuantity){
+                fetch('/cartUpdate',{
+                    method : 'PUT',
+                    headers : { 'Content-Type':'application/json' },
+                    body : JSON.stringify({updtdQuantity :  updatedQuantity, prodId, cartId})
+                }).then(res=> res.json())
+                .then(data => {
+                    if(data.success){
+                        window.location.href = '/cart'
+                    }
+                }).catch(err=>{
+                    console.log(err);
+                })
+            }
+            
         }
 
         // delete item function

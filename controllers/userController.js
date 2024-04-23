@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const products = require('../models/productModel');
+const address = require('../models/addressModel');
 const passport = require('passport');
 const googleStrategy = require('passport-google-oauth20').Strategy
 require('dotenv').config()
@@ -318,15 +319,29 @@ const verifyLogin = async (req, res) => {
 
 const loadMyAccount = async (req, res) => {
     try {
+        const userId = req.session.user_id
         const userData = await User.findById({ _id: req.session.user_id })
+        const addresses = await address.find({userId:userId})
+        
         if(userData){
-            res.render('users/myAccount',{userData})
+            res.render('users/myAccount',{userData,addresses})
         } else {
             res.redirect('/login')
         }
 
     } catch (error) {
         console.log(error.message);
+    }
+}
+
+const editProfile = async(req,res) => {
+    try{
+        const {name, phone} = req.body
+        await User.findOneAndUpdate({_id:req.session.user_id},{$set:{name:name, phone:phone}})
+        res.json({success:true})
+    }catch(error){
+        console.log(error.message);
+        res.json({error : 'Error while updating Profile'})
     }
 }
 
@@ -353,6 +368,7 @@ module.exports = {
     verifyEmail,
     showProductDetail,
     loadMyAccount,
+    editProfile,
     userLogout,
     successGoogleLogin,
     failureLogin,

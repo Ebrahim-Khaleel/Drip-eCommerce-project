@@ -2,6 +2,7 @@ const express = require('express')
 const userRoute = express()
 const userController = require('../controllers/userController')
 const cartController = require('../controllers/cartController')
+const addressController = require('../controllers/addressController')
 const session = require('express-session')
 const { isLogin, isLogout, userAuthorize, } = require('../middlewares/userAuth')
 require('dotenv').config
@@ -20,8 +21,6 @@ userRoute.get('/', userController.showHome)
 // login page
 userRoute.get('/login', isLogout, userController.showLogin)
 userRoute.post('/login', userController.verifyLogin)
-// my account page
-userRoute.get('/myAccount',isLogin, userController.loadMyAccount)
 // signup page
 userRoute.get('/signup',userAuthorize, userController.showSignUp)
 userRoute.post('/signup', userController.insertUser)
@@ -37,6 +36,14 @@ userRoute.get('/cart',isLogin, cartController.loadCart)
 userRoute.post('/addToCart',cartController.addToCart)
 userRoute.put('/cartUpdate',cartController.updateCart)
 userRoute.post('/removeItem',cartController.removeFromCart)
+// Profile
+userRoute.get('/myAccount',isLogin, userController.loadMyAccount)
+userRoute.patch('/editProfile',userController.editProfile)
+userRoute.post('/addAddress',addressController.addAddress)
+userRoute.post('/loadEditAddress',addressController.loadEditAddress)
+userRoute.patch('/saveEditAddress',addressController.saveEditAddress)
+userRoute.patch('/removeAddress',addressController.removeAddress)
+
 // logout
 userRoute.get('/logout',isLogin, userController.userLogout)
 
