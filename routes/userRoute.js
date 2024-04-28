@@ -3,8 +3,9 @@ const userRoute = express()
 const userController = require('../controllers/userController')
 const cartController = require('../controllers/cartController')
 const addressController = require('../controllers/addressController')
+const orderController = require('../controllers/orderController')
 const session = require('express-session')
-const { isLogin, isLogout, userAuthorize, } = require('../middlewares/userAuth')
+const userAuth = require('../middlewares/userAuth')
 require('dotenv').config
 const passport = require('passport')
 require('../passport')
@@ -19,33 +20,41 @@ userRoute.use(session({
 // home page
 userRoute.get('/', userController.showHome)
 // login page
-userRoute.get('/login', isLogout, userController.showLogin)
+userRoute.get('/login', userAuth.isLogout, userController.showLogin)
 userRoute.post('/login', userController.verifyLogin)
 // signup page
-userRoute.get('/signup',userAuthorize, userController.showSignUp)
+userRoute.get('/signup',userAuth.userAuthorize, userController.showSignUp)
 userRoute.post('/signup', userController.insertUser)
 // otp
-userRoute.get('/otp',userAuthorize, userController.showOtp)
+userRoute.get('/otp',userAuth.userAuthorize, userController.showOtp)
 userRoute.post('/otp', userController.verifyOtp)
-userRoute.get('/resendOtp',userAuthorize, userController.resendOtp)
+userRoute.get('/resendOtp',userAuth.userAuthorize, userController.resendOtp)
 // shop and detail page
 userRoute.get('/shop', userController.showShop)
 userRoute.get('/productDetail/:id', userController.showProductDetail)
 // cart
-userRoute.get('/cart',isLogin, cartController.loadCart)
+userRoute.get('/cart',userAuth.isLogin, cartController.loadCart)
 userRoute.post('/addToCart',cartController.addToCart)
 userRoute.put('/cartUpdate',cartController.updateCart)
 userRoute.post('/removeItem',cartController.removeFromCart)
 // Profile
-userRoute.get('/myAccount',isLogin, userController.loadMyAccount)
+userRoute.get('/myAccount',userAuth.isLogin, userController.loadMyAccount)
 userRoute.patch('/editProfile',userController.editProfile)
+userRoute.get('/orderDetails/:id',orderController.loadOrderDetails)
+userRoute.post('/changePassword',userController.changePassword)
 userRoute.post('/addAddress',addressController.addAddress)
 userRoute.post('/loadEditAddress',addressController.loadEditAddress)
 userRoute.patch('/saveEditAddress',addressController.saveEditAddress)
 userRoute.patch('/removeAddress',addressController.removeAddress)
+//checkout
+userRoute.get('/checkout',cartController.loadCheckout)
+// order
+userRoute.post('/placeOrder',orderController.placeOrder)
+userRoute.get('/successMessage',orderController.thankYou)
+
 
 // logout
-userRoute.get('/logout',isLogin, userController.userLogout)
+userRoute.get('/logout',userAuth.isLogin, userController.userLogout)
 
 // google login
 userRoute.use(passport.initialize());

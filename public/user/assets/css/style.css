@@ -19076,6 +19076,12 @@ body.body-menu-overlay::before {
   width: 600px;
 }
 
+.modal-dialog-viewOrder {
+  margin: 9% auto 8%;
+  max-width: 1400px;
+  width: 1200px;
+}
+
 .modal-body{
   overflow: auto;
   height: 85%;
@@ -19104,7 +19110,7 @@ body.body-menu-overlay::before {
 }
 
 .modal-dialog .modal-content {
-  border-radius: 0;
+  border-radius: 8px;
 }
 
 .modal-dialog .modal-content .modal-header {
@@ -20315,18 +20321,6 @@ body.body-menu-overlay::before {
 @media only screen and (max-width: 767px) {
   .error-content img {
     width: 280px;
-  }
-}
-
-.error-content h3 {
-  font-weight: 200;
-  font-size: 46px;
-  margin: 3px 0 0;
-}
-
-@media only screen and (min-width: 992px) and (max-width: 1199px) {
-  .error-content h3 {
-    font-size: 40px;
   }
 }
 
@@ -30028,6 +30022,52 @@ input[type=number]::-webkit-outer-spin-button {
   border-color: rgba(52, 53, 56, 0.1);
 }
 
+.checkout-addressDiv {  
+  padding: 20px;
+  padding-left: 40px;
+  border-width: 2px;
+  border-style: solid;
+  position: relative;
+  border-color: rgba(52, 53, 56, 0.1);
+}
+
+.checkout-addNew-Add{
+  padding: 15px;
+  border-width: 2px;
+  border-style: dashed;
+  position: relative;
+  border-color: rgba(52, 53, 56, 0.1);
+}
+
+.checkout-editAdd-btn{
+  padding: 0px 10px 0px 10px;
+  margin-right: 7px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  background-color: white;
+}
+
+.paymntRadioBox{
+  width: 10%;
+  height: 15px;
+}
+
+.placeOrderBtn{
+  background-color: #262626;
+  display: block;
+  cursor: pointer;
+  padding: 22px 50px 21px;
+  width: 100%;
+  color: #fff;
+  text-align: center;
+}
+
+.placeOrderBtn :hover{
+  background-color: white;
+  color: white;
+}
+
 @media only screen and (min-width: 992px) and (max-width: 1199px) {
   .your-order-area {
     padding: 40px 25px 50px;
@@ -30756,13 +30796,6 @@ input[type=number]::-webkit-outer-spin-button {
   border-style: solid;
   border-color: #BDBDBD;
   border-radius: 3px;
-}
-
-.addressActionButton{
-  border: 0px;
-  border-top: 1px;
-  border-style: solid;
-  border-color: #BDBDBD;
 }
 
 /*-------- 28. Order tracking style ---------*/

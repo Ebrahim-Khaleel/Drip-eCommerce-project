@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const products = require('../models/productModel');
 const address = require('../models/addressModel');
+const cart = require('../models/cartModel');
+const order = require('../models/orderModel');
 const passport = require('passport');
 const googleStrategy = require('passport-google-oauth20').Strategy
 require('dotenv').config()
@@ -11,7 +13,11 @@ require('dotenv').config()
 // Loading Home Page
 const showHome = async (req, res) => {
     try {
-        res.render('users/home')
+        // loading cart quantity
+        const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+
+        res.render('users/home',{cartItems})
     } catch (error) {
         console.log(error.message);
     }
@@ -19,8 +25,12 @@ const showHome = async (req, res) => {
 
 const showShop = async (req, res) => {
     try {
+        // loading cart quantity
+        const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+
         const showproducts = await products.find().populate('category')
-        res.render('users/shop', { showproducts })
+        res.render('users/shop', { showproducts,cartItems})
     } catch (error) {
         console.log(error);
     }
@@ -28,9 +38,13 @@ const showShop = async (req, res) => {
 
 const showProductDetail = async (req, res) => {
     try {
+        // loading cart quantity
+        const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+
         const { id } = req.params
         const product = await products.findById(id)
-        res.render('users/productDetail', {product})
+        res.render('users/productDetail', {product, cartItems})
 
     } catch (error) {
         console.log(error);
@@ -319,12 +333,16 @@ const verifyLogin = async (req, res) => {
 
 const loadMyAccount = async (req, res) => {
     try {
+        // loading cart quantity
         const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+
         const userData = await User.findById({ _id: req.session.user_id })
         const addresses = await address.find({userId:userId})
+        let orders = await order.find({userId:userId}).populate('products.productId')
         
         if(userData){
-            res.render('users/myAccount',{userData,addresses})
+            res.render('users/myAccount',{userData,addresses,cartItems,orders})
         } else {
             res.redirect('/login')
         }
@@ -342,6 +360,29 @@ const editProfile = async(req,res) => {
     }catch(error){
         console.log(error.message);
         res.json({error : 'Error while updating Profile'})
+    }
+}
+
+const changePassword = async(req,res) => {
+    try{
+        const {existingPassword,newPassword} = req.body
+
+        const newSecured = await securePassword(newPassword)
+        const user = await User.findOne({_id:req.session.user_id})
+        const checkedPass = await bcrypt.compare(existingPassword,user.password)
+
+        if(checkedPass){
+
+            if(user.password === newPassword){
+                console.log('entered password is same as existing one');
+            } else {
+                await User.findOneAndUpdate({_id:req.session.user_id},{$set:{password : newSecured}})
+                console.log('password changed successfully');
+                res.redirect('/myAccount');
+            }
+        }
+    }catch(error){
+        console.log(error.message);
     }
 }
 
@@ -369,6 +410,7 @@ module.exports = {
     showProductDetail,
     loadMyAccount,
     editProfile,
+    changePassword,
     userLogout,
     successGoogleLogin,
     failureLogin,

@@ -129,12 +129,25 @@
                             <div class="same-style header-wishlist">
                                 <a href="wishlist.html"><i class="fa fa-heart-o"></i></a>
                             </div>
-                            <div class="same-style cart-wrap">
-                                <a href="/cart" class="">
-                                    <i class="dlicon shopping_bag-20"></i>
-                                    <span class="count-style">02</span>
-                                </a>
-                            </div>
+                            <% if(!cartItems || cartItems.products.length == 0) { %>
+                                <div class="same-style ">
+                                    <a href="/cart" class="cart">
+                                        <i class="dlicon shopping_bag-20"></i>
+                                        <span class="count-style">
+                                            
+                                        </span>
+                                    </a>
+                                </div>
+                            <% }else{ %>
+                                <div class="same-style cart-wrap">
+                                    <a href="/cart" class="cart ">
+                                        <i class="dlicon shopping_bag-20"></i>
+                                        <span class="count-style">
+                                            <%= cartItems.products.length %>
+                                        </span>
+                                    </a>
+                                </div>
+                            <% } %>
                             <div class="same-style header-search">
                                 <a class="search-active" href="#">
                                     <i class="dlicon ui-1_zoom"></i>
@@ -1224,54 +1237,60 @@
             })
             .then(res=> res.json())
             .then(data=> {
+                
+                if(data.noUser){
+                    window.location.href = '/login'
+                } else {
 
-                if(data.exist){
+                    if(data.exist){
                     
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: "top-end",
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-
-                    didOpen: (toast) => {
-
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-
-                    });
-
-                    Toast.fire({
-
-                        icon: "warning",
-                        title: "Already Added"
-
-                    });
-
-                }else if(data.success){
-                    
-                    const Toast = Swal.mixin({
-
-                        toast: true,
-                        position: "top-end",
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
 
                         didOpen: (toast) => {
+
                             toast.onmouseenter = Swal.stopTimer;
                             toast.onmouseleave = Swal.resumeTimer;
                         }
-                    });
 
-                    Toast.fire({
+                        });
 
-                        icon: "success",
-                        title: "Item added to cart"
+                        Toast.fire({
+
+                            icon: "warning",
+                            title: "Already Added"
+
+                        });
+
+                    }else if(data.success){
                         
-                    });
+                        const Toast = Swal.mixin({
+
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+
+                            didOpen: (toast) => {
+                                toast.onmouseenter = Swal.stopTimer;
+                                toast.onmouseleave = Swal.resumeTimer;
+                            }
+                        });
+
+                        Toast.fire({
+
+                            icon: "success",
+                            title: "Item added to cart"
+                            
+                        });
+                    }
                 }
+
             })
 
             .catch(error=>{

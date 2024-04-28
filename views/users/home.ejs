@@ -47,7 +47,7 @@
                             <nav>
                                 <ul>
                                     <li class="position-static">
-                                        <a class="active" href="/">Home <i class="fa fa-angle-down"></i></a>
+                                        <a class="active" href="/">Home</a>
                                     </li>
                                     <li><a href="#">Pages <i class="fa fa-angle-down"></i></a>
                                         <ul class="sub-menu-width">
@@ -59,7 +59,7 @@
                                             <li><a href="faq.html">FAQ</a></li>
                                         </ul>
                                     </li>
-                                    <li><a href="/shop">Shop <i class="fa fa-angle-down"></i></a>
+                                    <li><a href="/shop">Shop</a>
                                         <ul class="mega-menu-style-2 mega-menu-width2 menu-negative-mrg1">
                                             <li class="mega-menu-sub-width20"><a class="menu-title" href="#">Shop Layout</a>
                                                 <ul>
@@ -129,12 +129,25 @@
                             <div class="same-style header-wishlist">
                                 <a href="wishlist.html"><i class="fa fa-heart-o"></i></a>
                             </div>
-                            <div class="same-style cart-wrap">
-                                <a href="/cart" class="cart">
-                                    <i class="dlicon shopping_bag-20"></i>
-                                    <span class="count-style">02</span>
-                                </a>
-                            </div>
+                            <% if(!cartItems || cartItems.products.length == 0) { %>
+                                <div class="same-style ">
+                                    <a href="/cart" class="cart">
+                                        <i class="dlicon shopping_bag-20"></i>
+                                        <span class="count-style">
+                                            
+                                        </span>
+                                    </a>
+                                </div>
+                            <% }else{ %>
+                                <div class="same-style cart-wrap">
+                                    <a href="/cart" class="cart ">
+                                        <i class="dlicon shopping_bag-20"></i>
+                                        <span class="count-style">
+                                            <%= cartItems.products.length %>
+                                        </span>
+                                    </a>
+                                </div>
+                            <% } %>
                             <div class="same-style header-search">
                                 <a class="search-active" href="#">
                                     <i class="dlicon ui-1_zoom"></i>

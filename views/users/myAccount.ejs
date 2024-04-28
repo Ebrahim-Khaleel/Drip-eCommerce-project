@@ -350,12 +350,25 @@
                             <div class="same-style header-wishlist">
                                 <a href="wishlist.html"><i class="fa fa-heart-o"></i></a>
                             </div>
-                            <div class="same-style cart-wrap">
-                                <a href="#" class="cart-active">
-                                    <i class="dlicon shopping_bag-20"></i>
-                                    <span class="count-style">02</span>
-                                </a>
-                            </div>
+                            <% if(!cartItems || cartItems.products.length == 0) { %>
+                                <div class="same-style ">
+                                    <a href="/cart" class="cart">
+                                        <i class="dlicon shopping_bag-20"></i>
+                                        <span class="count-style">
+                                            
+                                        </span>
+                                    </a>
+                                </div>
+                            <% }else{ %>
+                                <div class="same-style cart-wrap">
+                                    <a href="/cart" class="cart ">
+                                        <i class="dlicon shopping_bag-20"></i>
+                                        <span class="count-style">
+                                            <%= cartItems.products.length %>
+                                        </span>
+                                    </a>
+                                </div>
+                            <% } %>
                             <div class="same-style header-search">
                                 <a class="search-active" href="#">
                                     <i class="dlicon ui-1_zoom"></i>
@@ -743,42 +756,29 @@
                             <!-- Single Tab Content Start -->
                             <div class="tab-pane fade" id="orders" role="tabpanel">
                                 <div class="myaccount-content">
+                                    <% if(orders.length >= 1){ %>
                                     <div class="myaccount-table table-responsive text-center">
-                                        <table class="table table-bordered">
-                                            <thead class="thead-light">
-                                                <!-- <tr>
-                                                    <th>Order</th>
-                                                    <th>Date</th>
-                                                    <th>Status</th>
-                                                    <th>Total</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Aug 22, 2023</td>
-                                                    <td>Pending</td>
-                                                    <td>$3000</td>
-                                                    <td><a href="cart.html" class="check-btn sqr-btn ">View</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2</td>
-                                                    <td>July 22, 2023</td>
-                                                    <td>Approved</td>
-                                                    <td>$200</td>
-                                                    <td><a href="cart.html" class="check-btn sqr-btn ">View</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>3</td>
-                                                    <td>June 12, 2023</td>
-                                                    <td>On Hold</td>
-                                                    <td>$990</td>
-                                                    <td><a href="cart.html" class="check-btn sqr-btn ">View</a></td>
-                                                </tr> -->
-                                            </tbody>
-                                        </table>
+                                        <% orders.forEach((order)=>{ %>
+                                            <div class="d-flex mb-4 bg-light border  justify-content-between p-3">
+                                                <div class="d-block ps-3">
+                                                    <h4 class="fw-semibold "><%= order.orderStatus %></h4>
+                                                    <p><%= order.products.length%> Items</p>
+                                                </div>
+                                                <div >
+                                                    <p><%= order.orderDate.toLocaleDateString() %></p>
+                                                    <p>Rs. <%= order.orderAmount %>.00</p>
+                                                </div>
+                                                <div class="pe-2">
+                                                    <a type="button" class="btn btn-dark" href="/orderDetails/<%= order._id %>">View</a>
+                                                </div>                
+                                            </div>
+                                        <% }) %>
                                     </div>
+                                    <% }else{ %>
+                                        <div>
+                                            <p class="text-center text-danger ">No Orders</p>
+                                        </div>
+                                    <% } %>
                                 </div>
                             </div>
                             <!-- Single Tab Content End -->
@@ -826,15 +826,13 @@
                                     <address>
                                         <% if(addresses.length >= 1) { %>
                                             <% addresses.forEach(address => { %>
-                                                <div class="EachaddressDiv mb-3">
-                                                    <p class="p-3 mb-0  "><%= address.name %><br>
-                                                        <%= address.mobile %><br>
-                                                        <%= address.pincode %><br>
-                                                        <%= address.state %><br>
-                                                        <%= address.streetAddress %><br>
-                                                        <%= address.locality %><br>
-                                                        <%= address.city %><br></p>
-                                                        <div class="addressActionButton">
+                                                <div class="EachaddressDiv p-3 mb-3">
+                                                    <h5 class="fw-bold"><%= address.name %></h5>
+                                                    <p>
+                                                        <%= address.streetAddress %>, <%= address.locality %><br>
+                                                    <%= address.city %>, <%= address.state %> - <%= address.pincode %><br>
+                                                    Mobile : <span class="fw-bold "><%= address.mobile %></span><br></p>
+                                                        <div class="">
                                                             <button class="check-btn sqr-btn editAdress" data-bs-toggle="modal" data-bs-target="#editAddressModal" onclick="editAddress('<%= address._id %>')"><i class="fa fa-edit"></i> Edit Address</button>
                                                             <button class="check-btn sqr-btn editAdress" onclick="removeAddress('<%= address._id %>')"><i class="fa fa-remove"></i> Remove Address</button>
                                                         </div>
@@ -854,33 +852,37 @@
                             <div class="tab-pane fade" id="account-info" role="tabpanel">
                                 <div class="myaccount-content">
                                     <div class="account-details-form">
-                                        <form action="#" class="editProfDiv p-5">
+                                        <form action="/changePassword" class="editProfDiv p-5" method="post" onsubmit="return validateChangePass()">
                                             <fieldset>
                                                 <legend>Change Password</legend>
                                                 <div class="single-input-item">
-                                                    <label for="current-pwd" class="required">Current password (leave
+                                                    <label for="current-pwd">Current password (leave
                                                         blank to leave unchanged)</label>
-                                                    <input type="password" id="current-pwd" />
+                                                    <input type="password" name="existingPassword" id="current-pwd" />
+                                                    <p id="current-pwdErr" class="text-danger "></p>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <div class="single-input-item">
-                                                            <label for="new-pwd" class="required">New password (leave
+                                                            <label for="new-pwd">New password (leave
                                                                 blank to leave unchanged)</label>
-                                                            <input type="password" id="new-pwd" />
+                                                            <input type="password" name="newPassword" id="new-pwd" />
+                                                            <p id="new-pwdErr" class="text-danger "></p>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-12">
                                                         <div class="single-input-item">
-                                                            <label for="confirm-pwd" class="required">Confirm new
+                                                            <label for="confirm-pwd" >Confirm new
                                                                 password</label>
                                                             <input type="password" id="confirm-pwd" />
+                                                            <p id="confirm-pwdErr" class="text-danger "></p>
                                                         </div>
                                                     </div>
+                                                    <p id="changeEmptyErr" class="text-danger "></p>
                                                 </div>
                                             </fieldset>
                                             <div class="single-input-item d-flex  justify-content-center ">
-                                                <button class="check-btn sqr-btn">Save Changes</button>
+                                                <button type="submit" class="check-btn sqr-btn">Save Changes</button>
                                             </div>
                                         </form>
                                     </div>
@@ -944,7 +946,7 @@
                                     name="city" placeholder="Enter City">
                                     <p id="cityError" class="text-danger "></p>
                             </div>
-                            <p id="emptyError" class="text-danger"></p>
+                            <p id="adEmptyError" class="text-danger"></p>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -1153,6 +1155,51 @@
             
         }
 
+        function validateChangePass(){
+            const currentPass = document.getElementById('current-pwd').value
+            const newPass = document.getElementById('new-pwd').value
+            const confirmPass = document.getElementById('confirm-pwd').value
+
+            document.getElementById('current-pwdErr').innerHTML = '';
+            document.getElementById('new-pwdErr').innerHTML = '';
+            document.getElementById('confirm-pwdErr').innerHTML = '';
+
+            if(currentPass === '' && newPass === '' && confirmPass === ''){
+                document.getElementById('changeEmptyErr').innerHTML = 'Fill all the fields';
+                return false
+            }
+
+            if(currentPass === ''){
+                document.getElementById('current-pwdErr').innerHTML = 'Enter Current Password';
+                return false
+            }
+
+            if(newPass === ''){
+                document.getElementById('new-pwdErr').innerHTML = 'Enter New Password';
+                return false
+            } else if(newPass.length < 7){
+                document.getElementById('new-pwdErr').innerHTML = 'Password must be at least 7 characters';
+                return false;
+            }
+
+            if(confirmPass === ''){
+                document.getElementById('confirm-pwdErr').innerHTML = 'Enter Confirm Password';
+                return false
+            }
+            
+            if(newPass !== confirmPass){
+                document.getElementById('confirm-pwdErr').innerHTML = 'Password does not match';
+                return false
+            }
+
+            document.getElementById('current-pwdErr').innerHTML = '';
+            document.getElementById('new-pwdErr').innerHTML = '';
+            document.getElementById('confirm-pwdErr').innerHTML = '';
+            document.getElementById('changeEmptyErr').innerHTML = '';
+
+            return true
+        }
+
         function validateForm(){
             const name = document.getElementById('nameId').value.trim()
             const mobile = document.getElementById('mobileId').value.trim()
@@ -1171,7 +1218,7 @@
             document.getElementById('cityError').innerHTML = '';
 
             if(name === '' && mobile === '' && pincode === '' && state === '' && streetAddress === '' && locality === '' && city === ''){
-                document.getElementById('emptyError').innerHTML = 'Please fill all the fields';
+                document.getElementById('adEmptyError').innerHTML = 'Please fill all the fields';
                 return false
             } 
 

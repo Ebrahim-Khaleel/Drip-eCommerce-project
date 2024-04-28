@@ -1080,11 +1080,12 @@
                                                         aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form action="/admin/category" method="post">
+                                                    <form action="/admin/category" method="post" onsubmit="return validateAddCategory()">
                                                         <div class="mb-3">
                                                             <label for="name" class="form-label">Name:</label>
                                                             <input type="text" class="form-control" id="name"
                                                                 name="name" placeholder="Enter category name">
+                                                                <p id="nameError" class="text-danger "></p>
                                                         </div>
                                                         <div class="mb-3">
                                                             <label for="description"
@@ -1092,6 +1093,7 @@
                                                             <textarea class="form-control" id="description"
                                                                 name="description" rows="3"
                                                                 placeholder="Enter description"></textarea>
+                                                                <p id="descriptionError" class="text-danger "></p>
                                                         </div>
                                                 </div>
                                                 <div class="modal-footer">
@@ -1185,20 +1187,23 @@
                                 </div>
                                 <div class="modal-body">
 
+                                    <p id="categoryid" hidden></p>
                                     <div class="mb-3">
                                         <label for="name" class="form-label">Name:</label>
                                         <input type="text" class="form-control" id="editName" name="editname">
+                                        <p id="editNameError" class="text-danger"></p>
                                     </div>
                                     <div class="mb-3">
                                         <label for="description" class="form-label">Description:</label>
                                         <textarea class="form-control" id="editDescription" name="editdescription"
                                             rows="3" placeholder="Enter description"></textarea>
+                                            <p id="editDescriptionError" class="text-danger "></p>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"
                                         data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary" id="saveEditCategory">Save
+                                    <button type="submit" class="btn btn-primary" onclick="saveEditCategory()" id="saveEditCategory">Save
                                         changes</button>
                                 </div>
 
@@ -1383,53 +1388,38 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-                    // function addCategory(){
+        function validateAddCategory(){
+            const name = document.getElementById('name').value
+            const description = document.getElementById('description').value
 
-                    // }
-                    // const swalWithBootstrapButtons = Swal.mixin({
-                    //     customClass: {
-                    //         confirmButton: "btn btn-success",
-                    //         cancelButton: "btn btn-danger"
-                    //     },
-                    //     buttonsStyling: false
-                    // });
+            document.getElementById('nameError').innerHTML = ''
+            document.getElementById('descriptionError').innerHTML = ''
 
-                    // swalWithBootstrapButtons.fire({
-                    //     title: "Are you sure?",
-                    //     text: "You won't be able to revert this!",
-                    //     icon: "warning",
-                    //     showCancelButton: true,
-                    //     confirmButtonText: "Yes, delete it!",
-                    //     cancelButtonText: "No, cancel!",
-                    //     reverseButtons: true
-                    // }).then((result) => {
-                    //     if (result.isConfirmed) {
-                        
-                    //     swalWithBootstrapButtons.fire({
-                    //         title: "Deleted!",
-                    //         text: "Your file has been deleted.",
-                    //         icon: "success"
-                    //     });
+            if(name === ''){
+                document.getElementById('nameError').innerHTML = 'Enter Category';
+                return false
+            }
 
-                    // } else if (
-                    //     /* Read more about handling dismissals below */
-                    //     result.dismiss === Swal.DismissReason.cancel
-                    // ) {
-                    //     swalWithBootstrapButtons.fire({
-                    //     title: "Cancelled",
-                    //     text: "Your imaginary file is safe :)",
-                    //     icon: "error"
-                    //     });
-                    // }
-                    // });
+            if(description === ''){
+                document.getElementById('descriptionError').innerHTML = 'Enter description'
+                return false
+            }
 
+            document.getElementById('nameError').innerHTML = ''
+            document.getElementById('descriptionError').innerHTML = ''
+
+            return true
+            
+        }
 
         // Function to open the edit modal with existing data
         async function openEditModal(categoryId) {
 
+            document.getElementById('categoryid').dataset.categoryid = categoryId
+
             // Set the existing data to the form fields
-            const name = document.getElementById('editName');
-            const description = document.getElementById('editDescription');
+            const name = document.getElementById('editName')
+            const description = document.getElementById('editDescription')
 
             try {
                 const response = await axios.post('/admin/editCategory', { categoryId });
@@ -1444,30 +1434,39 @@
                 console.log(error.message)
             }
 
-            document.getElementById('saveEditCategory').addEventListener('click', async () => {
-                const response = await axios.patch('/admin/editCategoryDone', { categoryId, name: name.value, description: description.value });
-                if (response.data.status) {
-                    Swal.fire({
-                        position: "center",
-                        icon: "success",
-                        title: "Category Edited!",
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then((result)=>{
-                        window.location.href='/admin/category';
-                    })
-                }
-            }).catch(error => {
-                if(error.response && error.response.data && error.response.data.error){
-                    Swal.fire({
-                        position: "center",
-                        icon: 'error',
-                        title: 'Error',
-                        text: error.response.data.error
-                    })
-                }
-            })
+        }
 
+        async function saveEditCategory () {
+
+            const categoryId = document.getElementById('categoryid').dataset.categoryid
+            const name = document.getElementById('editName').value
+            const description = document.getElementById('editDescription').value
+
+            document.getElementById('editNameError').innerHTML = ''
+            document.getElementById('editDescriptionError').innerHTML = ''
+
+            if(name === ''){
+                document.getElementById('editNameError').innerHTML = 'Enter Category';
+                return false
+            }
+
+            if(description === ''){
+                document.getElementById('editDescriptionError').innerHTML = 'Enter description'
+                return false
+            }
+
+            const response = await axios.patch('/admin/editCategoryDone', { categoryId, name: name, description: description });
+            if (response.data.status) {
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Category Edited!",
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then((result)=>{
+                    window.location.href='/admin/category';
+                })
+            }
         }
 
 
