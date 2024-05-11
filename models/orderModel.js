@@ -25,7 +25,22 @@ const orderSchema = new mongoose.Schema({
             type : Number,
             required : true,
             default : 0
-        }
+        },
+
+        orderStatus : {
+            type : String,
+            enum : ['Pending', 'Shipped', 'Delivered', 'Cancelled','Returned'],
+            required : true,
+            default : 'Pending'
+        },
+
+        cancelled : {type : Boolean, default : false},
+
+        cancelReason : {type : String, default : ''},
+
+        returned : {type : Boolean, default : false},
+
+        returnReason : {type : String, default : ''}
     }],
 
     deliveryAddress : {
@@ -52,12 +67,6 @@ const orderSchema = new mongoose.Schema({
         type : Date,
         required : true,
         default : Date.now
-    },
-
-    orderStatus : {
-        type : String,
-        enum : ['Pending', 'Shipped', 'Delivered', 'Canceled'],
-        default : 'Pending'
     },
     
 })

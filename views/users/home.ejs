@@ -49,7 +49,7 @@
                                     <li class="position-static">
                                         <a class="active" href="/">Home</a>
                                     </li>
-                                    <li><a href="#">Pages <i class="fa fa-angle-down"></i></a>
+                                    <!-- <li><a href="#">Pages <i class="fa fa-angle-down"></i></a>
                                         <ul class="sub-menu-width">
                                             <li><a href="about-us.html">About Us</a></li>
                                             <li><a href="contact-us.html">Contact Page</a></li>
@@ -58,61 +58,15 @@
                                             <li><a href="comming-soon-2.html">Comming Soon 02</a></li>
                                             <li><a href="faq.html">FAQ</a></li>
                                         </ul>
-                                    </li>
-                                    <li><a href="/shop">Shop</a>
-                                        <ul class="mega-menu-style-2 mega-menu-width2 menu-negative-mrg1">
-                                            <li class="mega-menu-sub-width20"><a class="menu-title" href="#">Shop Layout</a>
-                                                <ul>
-                                                    <li><a href="shop-fullwide.html">Shop Fullwidth</a></li>
-                                                    <li><a href="shop-sidebar.html">Shop Sidebar</a></li>
-                                                    <li><a href="shop-metro.html">Shop Metro Layout</a></li>
-                                                    <li><a href="shop-3-col.html">Shop 03 Columns</a></li>
-                                                    <li><a href="shop-2-col.html">Shop 02 Columns</a></li>
-                                                    <li><a href="shop-collection-1.html">Shop Collection 01</a></li>
-                                                    <li><a href="shop-collection-2.html">Shop Collection 02</a></li>
-                                                </ul>
-                                            </li>
-                                            <li class="mega-menu-sub-width22"><a class="menu-title" href="#">Product Layout</a>
-                                                <ul>
-                                                    <li><a href="product-details.html">Single 01</a></li>
-                                                    <li><a href="product-details-2.html">Single 02</a></li>
-                                                    <li><a href="product-details-group.html">Grouped</a></li>
-                                                    <li><a href="product-details-sticky.html">Sticky Info</a></li>
-                                                    <li><a href="product-details-configurable.html">Configurable</a></li>
-                                                    <li><a href="product-details-thumbnail.html">Thumbnail</a></li>
-                                                    <li><a href="product-details-video.html">Video</a></li>
-                                                    <li><a href="product-details-affiliate.html">Affiliate</a></li>
-                                                    <li><a href="product-details-sidebar.html">Sidebar</a></li>
-                                                </ul>
-                                            </li>
-                                            <li class="mega-menu-sub-width20"><a class="menu-title" href="#">Shop Pages</a>
-                                                <ul>
-                                                    <li><a href="my-account.html">My Account</a></li>
-                                                    <li><a href="checkout.html">Check Out</a></li>
-                                                    <li><a href="cart.html">Shopping Cart</a></li>
-                                                    <li><a href="wishlist.html">Wishlist</a></li>
-                                                    <li><a href="order-tracking.html">Order Tracking</a></li>
-                                                    <li><a href="compare.html">Compare</a></li>
-                                                    <li><a href="login-register.html">login / register</a></li>
-                                                </ul>
-                                            </li>
-                                            <li class="mega-menu-sub-width37">
-                                                <div class="banner-menu-content-wrap default-overlay">
-                                                    <a href="product-details.html"><img src="user/assets/images/menu/banner-header.jpg" alt="banner"></a>
-                                                    <div class="banner-menu-content">
-                                                        <h2>Bikini <br>Collections</h2>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="shop-collection-1.html">Collections <i class="fa fa-angle-down"></i> </a>
+                                    </li> -->
+                                    <li><a href="/shop">Shop</a></li>
+                                    <!-- <li><a href="shop-collection-1.html">Collections <i class="fa fa-angle-down"></i> </a>
                                         <ul class="sub-menu-width">
                                             <li><a href="shop-collection-1.html">Shop Collection 01</a></li>
                                             <li><a href="shop-collection-2.html">Shop Collection 02</a></li>
                                             <li><a href="shop-metro.html">Shop Metro Layout</a></li>
                                         </ul>
-                                    </li>
+                                    </li> -->
                                 </ul>
                             </nav>
                         </div>
@@ -127,27 +81,18 @@
                     <div class="col-xl-2 col-lg-2 align-content-end">
                         <div class="header-right-wrap header-right-flex  ">
                             <div class="same-style header-wishlist">
-                                <a href="wishlist.html"><i class="fa fa-heart-o"></i></a>
+                                <a href="/wishlist"><i class="fa fa-heart-o"></i></a>
                             </div>
-                            <% if(!cartItems || cartItems.products.length == 0) { %>
-                                <div class="same-style ">
-                                    <a href="/cart" class="cart">
-                                        <i class="dlicon shopping_bag-20"></i>
-                                        <span class="count-style">
-                                            
-                                        </span>
-                                    </a>
-                                </div>
-                            <% }else{ %>
-                                <div class="same-style cart-wrap">
-                                    <a href="/cart" class="cart ">
-                                        <i class="dlicon shopping_bag-20"></i>
-                                        <span class="count-style">
-                                            <%= cartItems.products.length %>
-                                        </span>
-                                    </a>
-                                </div>
-                            <% } %>
+                            <div class="same-style cart-wrap" id="shoppingCartid">
+                                <a href="/cart" class="cart ">
+                                    <i class="dlicon shopping_bag-20"></i>
+                                    <% if(cartItems){ %>
+                                    <span class="count-style">
+                                         <%= cartItems.products.length %>
+                                    </span>
+                                    <% } %>
+                                </a>
+                            </div>
                             <div class="same-style header-search">
                                 <a class="search-active" href="#">
                                     <i class="dlicon ui-1_zoom"></i>
@@ -471,15 +416,16 @@
         <div class="product-area pt-130 pb-130">
             <div class="container-fluid">
                 <div class="section-title-1 mb-70 text-center">
-                    <h2>NEW ARRIVAL</h2>
+                    <h2>NEW ARRIVALS</h2>
                 </div>
             </div>
             <div class="product-slider-active product-slider-padding dot-style-1">
+                <% products.forEach(product=>{ %>
                 <div class="product-wrap product-wrap-opacity">
                     <div class="product-img default-overlay mb-40">
-                        <a href="product-details.html">
-                            <img class="default-img" src="user/assets/images/product/product-1.jpg" alt="">
-                            <img class="hover-img" src="user/assets/images/product/product-1-2.jpg" alt="">
+                        <a href="/productDetail/<%= product._id %>">
+                            <img class="default-img" src="/uploads/<%= product.images[0] %>" alt="">
+                            <img class="hover-img" src="/uploads/<%= product.images[1] %>" alt="">
                         </a>
                         <div class="product-action product-action-position-1">
                             <a data-bs-toggle="modal" data-bs-target="#exampleModal" href="#"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
@@ -495,66 +441,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="product-wrap product-wrap-opacity">
-                    <div class="product-img default-overlay mb-40">
-                        <a href="product-details.html">
-                            <img class="default-img" src="user/assets/images/product/product-2.jpg" alt="">
-                            <img class="hover-img" src="user/assets/images/product/product-2-2.jpg" alt="">
-                        </a>
-                        <div class="product-action product-action-position-1">
-                            <a data-bs-toggle="modal" data-bs-target="#exampleModal" href="#"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
-                            <a title="Add to Wishlist" href="#"><i class="fa fa-heart"></i><span>Add to Wishlist</span></a>
-                            <a class="icon-blod" title="Add to Compare" href="#"><i class="dlicon arrows-4_compare"></i><span>Add to Compare</span></a>
-                            <a title="Add to Cart" href="#"><i class="fa fa-shopping-cart"></i><span>Add to Cart</span></a>
-                        </div>
-                    </div>
-                    <div class="product-content">
-                        <h3 class="title-blod"><a href="product-details.html">Check Bermuda Shorts</a></h3>
-                        <div class="product-price">
-                            <span class="new-price">$25.00</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="product-wrap product-wrap-opacity">
-                    <div class="product-img default-overlay mb-40">
-                        <a href="product-details.html">
-                            <img class="default-img" src="user/assets/images/product/product-3.jpg" alt="">
-                            <img class="hover-img" src="user/assets/images/product/product-3-2.jpg" alt="">
-                        </a>
-                        <div class="product-action product-action-position-1">
-                            <a data-bs-toggle="modal" data-bs-target="#exampleModal" href="#"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
-                            <a title="Add to Wishlist" href="#"><i class="fa fa-heart"></i><span>Add to Wishlist</span></a>
-                            <a class="icon-blod" title="Add to Compare" href="#"><i class="dlicon arrows-4_compare"></i><span>Add to Compare</span></a>
-                            <a title="Add to Cart" href="#"><i class="fa fa-shopping-cart"></i><span>Add to Cart</span></a>
-                        </div>
-                    </div>
-                    <div class="product-content">
-                        <h3 class="title-blod"><a href="product-details.html">Check Bermuda Shorts</a></h3>
-                        <div class="product-price">
-                            <span class="new-price">$25.00</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="product-wrap product-wrap-opacity">
-                    <div class="product-img default-overlay mb-40">
-                        <a href="product-details.html">
-                            <img class="default-img" src="user/assets/images/product/product-4.jpg" alt="">
-                            <img class="hover-img" src="user/assets/images/product/product-4-2.jpg" alt="">
-                        </a>
-                        <div class="product-action product-action-position-1">
-                            <a data-bs-toggle="modal" data-bs-target="#exampleModal" href="#"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
-                            <a title="Add to Wishlist" href="#"><i class="fa fa-heart"></i><span>Add to Wishlist</span></a>
-                            <a class="icon-blod" title="Add to Compare" href="#"><i class="dlicon arrows-4_compare"></i><span>Add to Compare</span></a>
-                            <a title="Add to Cart" href="#"><i class="fa fa-shopping-cart"></i><span>Add to Cart</span></a>
-                        </div>
-                    </div>
-                    <div class="product-content">
-                        <h3 class="title-blod"><a href="product-details.html">Check Bermuda Shorts</a></h3>
-                        <div class="product-price">
-                            <span class="new-price">$25.00</span>
-                        </div>
-                    </div>
-                </div>
+                <% }) %>
             </div>
         </div>
         <div class="product-area section-padding-2 padding-120-row-col pb-125">

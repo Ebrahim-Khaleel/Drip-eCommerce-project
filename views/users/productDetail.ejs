@@ -127,27 +127,18 @@
                     <div class="col-xl-2 col-lg-2 align-content-end">
                         <div class="header-right-wrap header-right-flex  ">
                             <div class="same-style header-wishlist">
-                                <a href="wishlist.html"><i class="fa fa-heart-o"></i></a>
+                                <a href="/wishlist"><i class="fa fa-heart-o"></i></a>
                             </div>
-                            <% if(!cartItems || cartItems.products.length == 0) { %>
-                                <div class="same-style ">
-                                    <a href="/cart" class="cart">
-                                        <i class="dlicon shopping_bag-20"></i>
-                                        <span class="count-style">
-                                            
-                                        </span>
-                                    </a>
-                                </div>
-                            <% }else{ %>
-                                <div class="same-style cart-wrap">
-                                    <a href="/cart" class="cart ">
-                                        <i class="dlicon shopping_bag-20"></i>
-                                        <span class="count-style">
-                                            <%= cartItems.products.length %>
-                                        </span>
-                                    </a>
-                                </div>
-                            <% } %>
+                            <div class="same-style cart-wrap" id="shoppingCartid">
+                                <a href="/cart" class="cart ">
+                                    <i class="dlicon shopping_bag-20"></i>
+                                    <% if(cartItems){ %>
+                                    <span class="count-style">
+                                         <%= cartItems.products.length %>
+                                    </span>
+                                    <% } %>
+                                </a>
+                            </div>
                             <div class="same-style header-search">
                                 <a class="search-active" href="#">
                                     <i class="dlicon ui-1_zoom"></i>
@@ -539,14 +530,21 @@
                                             <li>Hood fur: 64% acrylic,23% modacrylic,13% polyester</li>
                                         </ul>
                                     </div> -->
+                                    <% if(product.quantity == 0){ %>
+                                        <h2 class="text-danger">Product Out of Stock</h2>
+                                    <% } %>
                                     <div class="product-details-action-wrap">
                                         <div class="product-details-quality">
-                                            <div class="cart-plus-minus">
-                                                <input class="cart-plus-minus-box" type="text" id="quantity" name="qtybutton" value="1" min="1" max="<%= product.quantity %>" required>
+                                            <div onclick="checkStock(this,'<%=product.quantity%>')" class="cart-plus-minus">
+                                                <input readonly class="cart-plus-minus-box" type="number"  id="quantity" name="qtybutton" value="1" min="1"  required>
                                             </div>
                                         </div>
                                         <div class="product-details-cart">
-                                            <a  title="Add to cart" onclick="addToCart('<%= product._id %>')">Add to cart</a>
+                                            <% if(product.quantity > 0){ %>
+                                                <a  title="Add to cart" onclick="addToCart('<%= product._id %>')">Add to cart</a>
+                                            <% }else{ %>
+                                                <button disabled>Add to cart</button>
+                                            <% } %>
                                         </div>
                                         <div class="product-details-wishlist">
                                             <a title="Add to wishlist" href="#"><i class="fa fa-heart"></i></a>
@@ -1219,11 +1217,21 @@
 
     <!-- All JS is here
 ============================================ -->
-
+    <!-- jQuery CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <!-- SweetAlert CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <script>
+
+        function checkStock(e,stock){
+
+            const inp = e.querySelector('input')
+
+            if(stock<Number(inp.value)) inp.value=stock;
+            if(Number(inp.value)<=0) inp.value=1
+        }
+
         function addToCart(productId){
 
             const quantity = document.getElementById('quantity').value
@@ -1248,7 +1256,7 @@
                             toast: true,
                             position: "top-end",
                             showConfirmButton: false,
-                            timer: 3000,
+                            timer: 1600,
                             timerProgressBar: true,
 
                         didOpen: (toast) => {
@@ -1273,7 +1281,7 @@
                             toast: true,
                             position: "top-end",
                             showConfirmButton: false,
-                            timer: 3000,
+                            timer: 1600,
                             timerProgressBar: true,
 
                             didOpen: (toast) => {
@@ -1288,6 +1296,9 @@
                             title: "Item added to cart"
                             
                         });
+
+                        $('#shoppingCartid').load(`/productDetail/${productId} #shoppingCartid`)
+
                     }
                 }
 

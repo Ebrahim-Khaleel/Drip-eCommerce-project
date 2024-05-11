@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const category = require('../models/categoryModel')
 const products = require('../models/productModel');
 const address = require('../models/addressModel');
 const cart = require('../models/cartModel');
@@ -17,7 +18,15 @@ const showHome = async (req, res) => {
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
 
-        res.render('users/home',{cartItems})
+        const allproducts = await products
+        .find()
+        .sort({createdAt : -1})
+        .limit(6)
+        .populate('category')
+
+        console.log(allproducts)
+
+        res.render('users/home',{products : allproducts,cartItems})
     } catch (error) {
         console.log(error.message);
     }
@@ -28,11 +37,91 @@ const showShop = async (req, res) => {
         // loading cart quantity
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+        const categories = await category.find({isBlocked:false})
 
         const showproducts = await products.find().populate('category')
-        res.render('users/shop', { showproducts,cartItems})
+        res.render('users/shop', { showproducts,cartItems,categories})
     } catch (error) {
         console.log(error);
+    }
+}
+
+const lowToHigh = async (req,res) => {
+    try{
+        // loading cart quantity
+        const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+        const categories = await category.find({isBlocked:false})
+
+        const lowtohigh = await products.find({}).sort({price : 1}).populate('category')
+
+        res.render('users/shop',{showproducts : lowtohigh,cartItems,categories})
+        
+    }catch(error){
+        console.log(error.message);
+    }
+}
+const HighToLow = async (req,res) => {
+    try{
+        // loading cart quantity
+        const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+        const categories = await category.find({isBlocked:false})
+
+        const hightolow = await products.find({}).sort({price : -1}).populate('category')
+
+        res.render('users/shop',{showproducts : hightolow,cartItems,categories})
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
+const popularity = async (req,res) => {
+    try{
+        // loading cart quantity
+        const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+        const categories = await category.find({isBlocked:false})
+
+        const showproducts = await products.find().populate('category')
+        res.render('users/shop',{showproducts,cartItems,categories})
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
+const latest = async (req,res) => {
+    try{
+        // loading cart quantity
+        const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+        const categories = await category.find({isBlocked:false})
+
+        const showproducts = await products.find().sort({createdAt : -1}).populate('category')
+        res.render('users/shop',{showproducts,cartItems,categories})
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const categoryFiltering = async(req,res) =>{
+    try{
+        // loading cart quantity
+        const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+        const categories = await category.find({isBlocked:false})
+
+        const categoryName = req.params.name
+        const foundCategoryId = await category.findOne({name : categoryName})
+        if(!foundCategoryId){
+            res.status(404).send('Category not found')
+        }
+        
+        const filteredProducts = await products.find({category:foundCategoryId._id}).populate('category')
+
+        res.render('users/shop', { showproducts : filteredProducts,cartItems,categories})
+    }catch(error){
+        console.log(error.message);
     }
 }
 
@@ -386,6 +475,17 @@ const changePassword = async(req,res) => {
     }
 }
 
+const loadWishlist = async(req,res) =>{
+    try{
+        // loading cart quantity
+        const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+        res.render('users/wishlist',{cartItems})
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
 const userLogout = async (req, res) => {
     try {
         req.session.destroy()
@@ -399,6 +499,11 @@ const userLogout = async (req, res) => {
 module.exports = {
     showHome,
     showShop,
+    lowToHigh,
+    popularity,
+    HighToLow,
+    latest,
+    categoryFiltering,
     showSignUp,
     insertUser,
     showOtp,
@@ -411,6 +516,7 @@ module.exports = {
     loadMyAccount,
     editProfile,
     changePassword,
+    loadWishlist,
     userLogout,
     successGoogleLogin,
     failureLogin,

@@ -1,6 +1,8 @@
 const User = require('../models/userModel')
-const bcrypt = require('bcrypt')
 const admin = require('../models/adminModel')
+const order = require('../models/orderModel')
+const offer = require('../models/offerModel')
+
 
 
 const loadLogin = async (req, res) => {
@@ -112,6 +114,123 @@ const userBlocking = async(req,res) =>{
     }
 }
 
+const loadOrders = async(req,res) => {
+    try{
+        const orders = await order.find().populate('products.productId').populate('userId')
+        res.render('admin/orders',{orders})
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const loadOrdersDetails = async(req,res) => {
+    try{
+        const orderId = req.params.id
+        const orderD = await order.findById(orderId).populate('products.productId').populate('userId')
+        res.render('admin/ordersDetails',{orderD})
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const updateorderstatus = async(req, res)=> {
+    try{
+        const {status} = req.body
+        const {orderId} = req.body
+        const {productId} = req.body
+
+        console.log(status);
+
+        const updatedStatus = await order.findOneAndUpdate({_id : orderId, 'products.productId' : productId},
+        { $set : {"products.$.orderStatus" : status}})
+
+        res.json({success : true})
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const loadOffers = async(req,res) => {
+    try{
+        const offers = await offer.find()
+
+        res.render('admin/offers',{offers})
+    }catch(error){
+        console.log(error.message)
+    }
+}
+
+const addOffer = async(req,res) =>{
+    try{
+        const {name, percentage} = req.body
+
+        const existingOffer = await offer.findOne({name : { $regex: new RegExp('^' + name + '$', 'i') } })
+
+        if(existingOffer){
+            return res.json({error : 'Offer with same name already exists'})
+        }
+
+        const newOffer = await offer.create({
+            name : name,
+            percentage : percentage
+        })
+
+        if(newOffer){
+            console.log('new offer added')
+            res.redirect('/admin/offers')
+        }
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const editOffer = async(req,res) =>{
+    try{
+        const {offerId} = req.body
+        const findedOffer = await offer.findOne({_id:offerId})
+        res.json({ name : findedOffer.name, percentage : findedOffer.percentage })
+         
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const saveEditOffer = async(req,res) =>{
+    try{
+        const {offerId,name,percentage} = req.body
+
+        const existingOffer = await offer.findOne({name : { $regex: new RegExp('^' + name + '$', 'i') } })
+
+        if(existingOffer){
+            return res.json({error : 'Offer with same name already exists'})
+        }
+
+        await offer.findOneAndUpdate({_id:offerId}, {name : name, percentage : percentage})
+
+        res.json({success : true})
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const offerDelete = async(req, res) =>{
+    try{
+        const {offerId} = req.body
+        const done = await offer.findOneAndDelete({_id:offerId})
+
+        if(done){
+            res.json({success:true})
+        }
+    }catch(error){
+        console.log();
+    }
+}
+
+
+
 module.exports = {
     loadLogin,
     verifyAdmin,
@@ -121,4 +240,12 @@ module.exports = {
     showSignUp,
     insertAdmin,
     userBlocking,
+    loadOrders,
+    loadOrdersDetails,
+    updateorderstatus,
+    loadOffers,
+    addOffer,
+    editOffer,
+    saveEditOffer,
+    offerDelete,
 }

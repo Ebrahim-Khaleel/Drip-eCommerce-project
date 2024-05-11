@@ -3,6 +3,7 @@ const adminRoute = express()
 const adminController = require('../controllers/adminController')
 const productController = require('../controllers/productController')
 const categoryController = require('../controllers/categoryController')
+const couponController = require('../controllers/couponController')
 const multer = require('multer')
 const path = require('path')
 const fs = require('fs')
@@ -57,5 +58,24 @@ adminRoute.post('/addProducts', upload.array('image'), productController.addProd
 adminRoute.get('/editProducts',isLogin, productController.loadEditProduct)
 adminRoute.post('/editProducts', upload.array('image[]'), productController.editProduct)
 adminRoute.patch('/unlistProduct',productController.unlistingProduct)
+
+// Order routes
+adminRoute.get('/orders',adminController.loadOrders)
+adminRoute.get('/ordersDetails/:id',adminController.loadOrdersDetails)
+adminRoute.put('/updateOrderStatus',adminController.updateorderstatus)
+
+// Offer routes
+adminRoute.get('/offers',adminController.loadOffers)
+adminRoute.post('/offers',adminController.addOffer)
+adminRoute.post('/editOffer',adminController.editOffer)
+adminRoute.patch('/saveEditOffer',adminController.saveEditOffer)
+adminRoute.patch('/offerDelete',adminController.offerDelete)
+
+// Coupon routes
+adminRoute.get('/coupons',couponController.loadCoupons)
+adminRoute.post('/addCoupons',couponController.addCoupon)
+adminRoute.post('/editCoupons',couponController.editCoupon)
+adminRoute.patch('/saveEditCoupons',couponController.saveEditCoupon)
+adminRoute.patch('/couponDelete',couponController.couponDelete)
 
 module.exports = adminRoute

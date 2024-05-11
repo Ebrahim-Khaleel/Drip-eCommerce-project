@@ -338,27 +338,18 @@
                     <div class="col-xl-2 col-lg-2">
                         <div class="header-right-wrap header-right-flex">
                             <div class="same-style header-wishlist">
-                                <a href="wishlist.html"><i class="fa fa-heart-o"></i></a>
+                                <a href="/wishlist"><i class="fa fa-heart-o"></i></a>
                             </div>
-                            <% if(!cartItems || cartItems.products.length == 0) { %>
-                                <div class="same-style ">
-                                    <a href="/cart" class="cart" >
-                                        <i class="dlicon shopping_bag-20"></i>
-                                        <span class="count-style">
-                                            
-                                        </span>
-                                    </a>
-                                </div>
-                            <% }else{ %>
-                                <div class="same-style cart-wrap">
-                                    <a href="/cart" class="cart ">
-                                        <i class="dlicon shopping_bag-20"></i>
-                                        <span class="count-style">
-                                            <%= cartItems.products.length %>
-                                        </span>
-                                    </a>
-                                </div>
-                            <% } %>
+                            <div class="same-style cart-wrap" id="shoppingCartid">
+                                <a href="/cart" class="cart ">
+                                    <i class="dlicon shopping_bag-20"></i>
+                                    <% if(cartItems){ %>
+                                    <span class="count-style">
+                                         <%= cartItems.products.length %>
+                                    </span>
+                                    <% } %>
+                                </a>
+                            </div>
                             <div class="same-style header-search">
                                 <a class="search-active" href="#">
                                     <i class="dlicon ui-1_zoom"></i>
@@ -666,9 +657,9 @@
             </div>
         </div>
         <!-- cart start -->
-        <div class="cart-main-area pt-90 pb-100" id="box">
+        <div class="cart-main-area pt-90 pb-100" >
             <div class="container">
-                <div class="row">
+                <div class="row" id="reloadbox">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                         <form action="#">
                             <div class="row">
@@ -700,9 +691,9 @@
                                                     <td class="product-name"><a href="#"><h5><%= product.productId.name %></h5></a></td>
                                                     <td class="product-price"><span id="price" class="amount"><%= product.productId.price %></span></td>
                                                     <td class="cart-quality">
-                                                        <div class="product-details-quality quality-width-cart">
-                                                            <div onclick="cartUpdate(this, '<%= product.productId._id %>','<%= cartItems._id %>')" class="cart-plus-minus">
-                                                                <input class="cart-plus-minus-box" type="number" name="quantity" value="<%= product.quantity %>" min="1" max="<%= product.productId.quantity %>" step="1" data-decimals="0" required>
+                                                        <div class="product-details-quality">
+                                                            <div onclick="cartUpdate(this, '<%= product.productId._id %>','<%= cartItems._id %>','<%= product.productId.quantity %>')" class="cart-plus-minus">
+                                                                <input  class="cart-plus-minus-box" type="number" id="quantity" value="<%= product.quantity %>" min="1" max="<%= product.productId.quantity %>" step="1" data-decimals="0" required>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -720,7 +711,7 @@
                                             <button class="coupon-btn" type="submit">Apply coupon</button>
                                         </div>
                                         <div class="cart-clear">
-                                            <a href="#">Clear Cart</a>
+                                            <button onclick="clearCart()">Clear Cart</button>
                                         </div>
                                     </div>
                                 </div>
@@ -732,7 +723,6 @@
                                                
                                             <ul>
                                                 <li>Subtotal <span>Rs. <%= Total %>.00</span></li> 
-                                                <li>Vat <span>00.00</span></li>
                                                 <li>Offer <span>00.00</span></li>
                                                 <li>Total <span>Rs. <%= Total %>.00</span></li>
                                             </ul>
@@ -846,36 +836,38 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <!-- SweetAlert CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <!-- Axios CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
 
         // cartUpdate function
-        function cartUpdate(e, prodId, cartId){
+        function cartUpdate(e, prodId, cartId, stock){
             const inp = e.querySelector('input')
-            const updatedQuantity = parseInt(inp.value);
-            const maxQuantity = parseInt(inp.getAttribute('max'));
+            let updatedQuantity = parseInt(inp.value);
+            console.log(stock);
          
             // Ensure quantity is within stock limits
-            if (updatedQuantity > maxQuantity) {
-                inp.value = maxQuantity;
-            } else if (updatedQuantity < 1) {
-                inp.value = 1;
+            if (updatedQuantity > stock) {
+                updatedQuantity = stock;
             }
-
-            if(updatedQuantity >= 1 && updatedQuantity <= maxQuantity){
-                fetch('/cartUpdate',{
-                    method : 'PUT',
-                    headers : { 'Content-Type':'application/json' },
-                    body : JSON.stringify({updtdQuantity :  updatedQuantity, prodId, cartId})
-                }).then(res=> res.json())
-                .then(data => {
-                    if(data.success){
-                        window.location.href = '/cart'
-                        // $('#box').load('/cart #box')
-                    }
-                }).catch(err=>{
-                    console.log(err);
-                })
+            if (updatedQuantity <= 0) {
+                updatedQuantity = 1;
             }
+            
+            fetch('/cartUpdate',{
+                method : 'PATCH',
+                headers : { 'Content-Type':'application/json' },
+                body : JSON.stringify({updtdQuantity :  updatedQuantity, prodId, cartId})
+            }).then(res=> res.json())
+            .then(data => {
+                if(data.success){
+                    // window.location.href = '/cart'
+                    $('#reloadbox').load('/cart #reloadbox')
+                }
+            }).catch(err=>{
+                console.log(err);
+            })
+            
             
         }
 
@@ -900,12 +892,19 @@
                     }).then(()=>{
                         fetch(`/removeItem?id=${prodId}`,{ method : 'POST' })
                         .then(data => {
-                            window.location.reload()
+                            $('#reloadbox').load('/cart #reloadbox')
                         })
                     })    
                 }
 
             })
+        }
+
+        async function clearCart(){
+            const response = await axios.patch('/clearCart')
+            if(response.data.success){
+                $('#reloadbox').load('/cart #reloadbox')
+            }
         }
 
     </script>

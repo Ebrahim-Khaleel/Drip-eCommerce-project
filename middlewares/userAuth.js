@@ -1,4 +1,6 @@
-const isLogin = async (req, res, next) => {
+const user = require('../models/userModel')
+
+const isLogin = (req, res, next) => {
     try {
         if (req.session.user_id) {
             next()
@@ -10,7 +12,7 @@ const isLogin = async (req, res, next) => {
     }
 }
 
-const isLogout = async (req, res, next) => {
+const isLogout = (req, res, next) => {
     try {
         if (req.session.user_id) {
             res.redirect('/myAccount')
@@ -22,7 +24,7 @@ const isLogout = async (req, res, next) => {
     }
 }
 
-const userAuthorize = async (req, res, next) => {
+const userAuthorize = (req, res, next) => {
     try {
         if (req.session.user_id) {
             res.render('users/error-404')
@@ -34,8 +36,22 @@ const userAuthorize = async (req, res, next) => {
     }
 }
 
+const isBlockAuth = async(req, res, next) =>{ 
+    try{
+        const userDetail = await user.findOne({_id:req.session.user_id})
+        if(userDetail.isBlocked){
+            res.redirect('/logout')
+        } else {
+            next()
+        }
+    }catch(error){
+        console.log(error.message)
+    }
+}
+
 module.exports = {
     isLogin,
     isLogout,
     userAuthorize,
+    isBlockAuth
 }

@@ -62,9 +62,40 @@ const removeAddress = async(req,res) => {
         const removed = await address.findByIdAndDelete({_id : addressId})
 
         if(removed){
+            console.log('Address removed');
             res.json({success:true})
         }
         
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const checkoutAddAddress = async(req,res) => {
+    try{
+        const {name, mobile, pincode, state, streetAddress, locality, city} = req.body
+        const { user_id } = req.session
+
+        console.log(name, mobile, pincode, state, streetAddress, locality, city);
+
+        // create a new address object
+        const newAddress = new address({
+            userId: user_id,
+            name: name,
+            mobile: mobile,
+            pincode: pincode,
+            state: state,
+            streetAddress: streetAddress,
+            locality: locality,
+            city: city,
+        })
+
+        const inserted = await newAddress.save()
+
+        if(inserted){
+            res.json({success:true})
+        }
+
     }catch(error){
         console.log(error.message);
     }
@@ -75,4 +106,5 @@ module.exports = {
     loadEditAddress,
     saveEditAddress,
     removeAddress,
+    checkoutAddAddress
 }

@@ -12,7 +12,7 @@ const passport = require('passport');
 require('dotenv').config();
 
 // Database connecting
-const db = require('./config/config');
+const db = require('./config/dbConnect');
  
 db()
 .then(()=>{
@@ -43,9 +43,9 @@ app.use('/', userRoute);
 app.use('/admin', adminRoute);
 
 // error handing middleware
-// app.use((err, res, next) => {
-//     res.status(404).render('users/error-404');
-// });
+app.use((err, res, next) => {
+    res.status(404).render('users/error-404');
+});
 
 // setting port
 const PORT = process.env.PORT

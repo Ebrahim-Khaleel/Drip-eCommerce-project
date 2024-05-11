@@ -128,16 +128,16 @@
                     <div class="col-xl-2 col-lg-2 align-content-end">
                         <div class="header-right-wrap header-right-flex  ">
                             <div class="same-style header-wishlist">
-                                <a href="wishlist.html"><i class="fa fa-heart-o"></i></a>
+                                <a href=""><i class="fa fa-heart-o"></i></a>
                             </div>
                             <div class="same-style ">
-                                <a href="/cart" class="cart">
+                                <a href="" class="cart">
                                     <i class="dlicon shopping_bag-20"></i>
                                     
                                 </a>
                             </div>
                             <div class="same-style header-search">
-                                <a class="search-active" href="#">
+                                <a class="search-active" href="">
                                     <i class="dlicon ui-1_zoom"></i>
                                 </a>
                             </div>
@@ -565,7 +565,10 @@
             }
 
             // password validation
-            if(password === '' || password.length < 7){
+            if(password === ''){
+                document.getElementById('errorpass').innerHTML = 'Enter your password'
+                return false
+            } else if(password.length < 7){
                 document.getElementById('errorpass').innerHTML = 'Password must be atleast 7 characters'
                 return false
             }

@@ -36,6 +36,19 @@ const productSchema = new mongoose.Schema({
     isBlocked : {
         type : Boolean,
         default : false
+    },
+
+    createdAt : {
+        type : Date
+    },
+
+    offer : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'offer'
+    },
+
+    offerPrice : {
+        type : Number
     }
 })
 

@@ -11,27 +11,27 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="user/assets/images/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/user/assets/images/favicon.png">
 
     <!-- All CSS is here
 	============================================ -->
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="user/assets/css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="/user/assets/css/vendor/bootstrap.min.css">
     <!-- Icon Font CSS -->
-    <link rel="stylesheet" href="user/assets/css/vendor/font-awesome.css">
-    <link rel="stylesheet" href="user/assets/css/vendor/dlicon.css">
+    <link rel="stylesheet" href="/user/assets/css/vendor/font-awesome.css">
+    <link rel="stylesheet" href="/user/assets/css/vendor/dlicon.css">
     <!-- Others CSS -->
-    <link rel="stylesheet" href="user/assets/css/plugins/owl-carousel.css">
-    <link rel="stylesheet" href="user/assets/css/plugins/slick.css">
-    <link rel="stylesheet" href="user/assets/css/plugins/magnific-popup.css">
-    <link rel="stylesheet" href="user/assets/css/plugins/jarallax.css">
-    <link rel="stylesheet" href="user/assets/css/plugins/easyzoom.css">
-    <link rel="stylesheet" href="user/assets/css/plugins/animate.css">
-    <link rel="stylesheet" href="user/assets/css/plugins/fullpage.css">
-    <link rel="stylesheet" href="user/assets/css/plugins/jquery-ui.css">
-    <link rel="stylesheet" href="user/assets/css/plugins/select2.min.css">
-    <link rel="stylesheet" href="user/assets/css/style.css">
+    <link rel="stylesheet" href="/user/assets/css/plugins/owl-carousel.css">
+    <link rel="stylesheet" href="/user/assets/css/plugins/slick.css">
+    <link rel="stylesheet" href="/user/assets/css/plugins/magnific-popup.css">
+    <link rel="stylesheet" href="/user/assets/css/plugins/jarallax.css">
+    <link rel="stylesheet" href="/user/assets/css/plugins/easyzoom.css">
+    <link rel="stylesheet" href="/user/assets/css/plugins/animate.css">
+    <link rel="stylesheet" href="/user/assets/css/plugins/fullpage.css">
+    <link rel="stylesheet" href="/user/assets/css/plugins/jquery-ui.css">
+    <link rel="stylesheet" href="/user/assets/css/plugins/select2.min.css">
+    <link rel="stylesheet" href="/user/assets/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"rel="stylesheet"/>
 
 </head>
@@ -98,7 +98,7 @@
                                             </li>
                                             <li class="mega-menu-sub-width37">
                                                 <div class="banner-menu-content-wrap default-overlay">
-                                                    <a href="product-details.html"><img src="user/assets/images/menu/banner-header.jpg" alt="banner"></a>
+                                                    <a href="product-details.html"><img src="/user/assets/images/menu/banner-header.jpg" alt="banner"></a>
                                                     <div class="banner-menu-content">
                                                         <h2>Bikini <br>Collections</h2>
                                                     </div>
@@ -120,34 +120,25 @@
                     <div class="col-xl-4 col-lg-2">
                         <div class="logo logo-width ms-4 ps-3">
                             <a href="/">
-                                <img src="user/assets/images/logo/logo-no-background.png" alt="logo">
+                                <img src="/user/assets/images/logo/logo-no-background.png" alt="logo">
                             </a>
                         </div>
                     </div>
                     <div class="col-xl-2 col-lg-2 align-content-end">
                         <div class="header-right-wrap header-right-flex  ">
                             <div class="same-style header-wishlist">
-                                <a href="wishlist.html"><i class="fa fa-heart-o"></i></a>
+                                <a href="/wishlist"><i class="fa fa-heart-o"></i></a>
                             </div>
-                            <% if(!cartItems || cartItems.products.length == 0) { %>
-                                <div class="same-style ">
-                                    <a href="/cart" class="cart">
-                                        <i class="dlicon shopping_bag-20"></i>
-                                        <span class="count-style">
-                                            
-                                        </span>
-                                    </a>
-                                </div>
-                            <% }else{ %>
-                                <div class="same-style cart-wrap">
-                                    <a href="/cart" class="cart ">
-                                        <i class="dlicon shopping_bag-20"></i>
-                                        <span class="count-style">
-                                            <%= cartItems.products.length %>
-                                        </span>
-                                    </a>
-                                </div>
-                            <% } %>
+                            <div class="same-style cart-wrap" id="shoppingCartid">
+                                <a href="/cart" class="cart ">
+                                    <i class="dlicon shopping_bag-20"></i>
+                                    <% if(cartItems){ %>
+                                    <span class="count-style">
+                                         <%= cartItems.products.length %>
+                                    </span>
+                                    <% } %>
+                                </a>
+                            </div>
                             <div class="same-style header-search">
                                 <a class="search-active" href="#">
                                     <i class="dlicon ui-1_zoom"></i>
@@ -155,7 +146,7 @@
                             </div>
                             <div class="same-style">
                                 <a class="" href="/login">
-                                    <i class="ri-user-line"></i>
+                                    <i class="ri-/user-line"></i>
                                 </a>
                             </div>
                         </div>
@@ -169,7 +160,7 @@
                     <div class="col-6">
                         <div class="mobile-logo logo-width">
                             <a href="index.html">
-                                <img alt="" src="user/assets/images/logo/logo.png">
+                                <img alt="" src="/user/assets/images/logo/logo.png">
                             </a>
                         </div>
                     </div>
@@ -213,7 +204,7 @@
                     <ul>
                         <li class="single-product-cart">
                             <div class="cart-img">
-                                <a href="#"><img src="user/assets/images/cart/cart-1.jpg" alt=""></a>
+                                <a href="#"><img src="/user/assets/images/cart/cart-1.jpg" alt=""></a>
                             </div>
                             <div class="cart-title">
                                 <h4><a href="#">Bejewelled velvet sandals</a></h4>
@@ -225,7 +216,7 @@
                         </li>
                         <li class="single-product-cart">
                             <div class="cart-img">
-                                <a href="#"><img src="user/assets/images/cart/cart-2.jpg" alt=""></a>
+                                <a href="#"><img src="/user/assets/images/cart/cart-2.jpg" alt=""></a>
                             </div>
                             <div class="cart-title">
                                 <h4><a href="#">Contrast faux fur jacket</a></h4>
@@ -416,7 +407,7 @@
                             </ul>
                         </nav>
                     </div>
-                    <img src="user/assets/images/icon-img/payments.png" alt="payment">
+                    <img src="/user/assets/images/icon-img/payments.png" alt="payment">
                     <p>Pellentesque mollis nec orci id tincidunt. Sed mollis risus eu nisi aliquet, sit amet fermentum justo dapibus.</p>
                     <div class="aside-contact-info">
                         <ul>
@@ -481,12 +472,12 @@
                         <div class="shop-short-by ml-50">
                             <span>Sort by <i class="fa fa-angle-down angle-down"></i> <i class="fa fa-angle-up angle-up"></i></span>
                             <ul>
-                                <li class="active"><a href="#">Default sorting</a></li>
-                                <li><a href="#">Sort by popularity</a></li>
-                                <li><a href="#">Sort by average rating</a></li>
-                                <li><a href="#">Sort by latest</a></li>
-                                <li><a href="#">Sort by price: low to high</a></li>
-                                <li><a href="#">Sort by price: high to low</a></li>
+                                <li class="active"><a href="/shop">Default sorting</a></li>
+                                <li><a href="/shop/popularity">Sort by popularity</a></li>
+                                <li><a href="/shop/averageRating">Sort by average rating</a></li>
+                                <li><a href="/shop/latest">Sort by latest</a></li>
+                                <li><a href="/shop/lowToHigh">Sort by price: low to high</a></li>
+                                <li><a href="/shop/highToLow">Sort by price: high to low</a></li>
                             </ul>
                         </div>
                     </div>
@@ -507,7 +498,7 @@
                             </div>
                         </div>
                         <!-- Product Filter -->
-                        <div class="col-md-3 col-sm-6 col-xs-12 mb-20">
+                        <!-- <div class="col-md-3 col-sm-6 col-xs-12 mb-20">
                             <div class="product-filter">
                                 <h5>Size</h5>
                                 <div class="product-size">
@@ -521,9 +512,9 @@
                                     </ul>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- Product Filter -->
-                        <div class="col-md-3 col-sm-6 col-xs-12 mb-20">
+                        <!-- <div class="col-md-3 col-sm-6 col-xs-12 mb-20">
                             <div class="product-filter">
                                 <h5>Color</h5>
                                 <div class="product-color">
@@ -537,18 +528,16 @@
                                     </ul>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- Product Filter -->
                         <div class="col-md-3 col-sm-6 col-xs-12 mb-20">
                             <div class="product-filter">
-                                <h5>Brands</h5>
+                                <h5>Categories</h5>
                                 <div class="product-brands">
                                     <ul>
-                                        <li><a href="#">Airi</a></li>
-                                        <li><a href="#">Draven</a></li>
-                                        <li><a href="#">Mango</a></li>
-                                        <li><a href="#"> Valentino</a></li>
-                                        <li><a href="#">Zara </a></li>
+                                        <% categories.forEach(category=>{ %>
+                                            <li><a href="/shop/category/<%= category.name %>"><%= category.name %></a></li>
+                                        <% }) %>                                    
                                     </ul>
                                 </div>
                             </div>
@@ -559,17 +548,18 @@
                     <div id="shop-1" class="tab-pane active">
                         <div class="row">
                             <% showproducts.forEach(product => { %>
+                                <% if(!product.category.isBlocked) { %>
                                 <% if(!product.isBlocked) { %>
                             <div class="custom-col-5">
                                 <div class="product-wrap mb-50">
                                     <div class="product-img default-overlay mb-25">
                                         <a href="/productDetail/<%= product._id %>">
-                                            <div>
-                                                <img width="315px" src="/uploads/<%= product.images[0] %>" alt="">
+                                            <div class="eachImageDiv">
+                                                <img width="315px" src="/uploads/<%= product.images[0] %>" alt=""><% if(product.quantity == 0){ %><span>sold out</span><% } %>
                                             </div> 
                                         </a>
                                         <div class="product-action product-action-position-1">
-                                            <a data-bs-toggle="modal" data-bs-target="#exampleModal" href="#"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
+                                            <a data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
                                             <a title="Add to Wishlist" href="#"><i class="fa fa-heart"></i><span>Add to Wishlist</span></a>
                                             <a class="icon-blod" title="Add to Compare" href="#"><i class="dlicon arrows-4_compare"></i><span>Add to Compare</span></a>
                                             <a title="Add to Cart" href="#"><i class="fa fa-shopping-cart"></i><span>Add to Cart</span></a>
@@ -583,12 +573,13 @@
                                             <span class="new-price">$28.00</span>
                                         </div> -->
                                         <div>
-                                            <span class="new-price">₹<%= product.price %></span>
+                                            <span class="new-price">$<%= product.price %>.00</span>
                                         </div>
                                     </div>
                                    
                                 </div>
                             </div>
+                            <% } %>
                             <% } %>
                             <% }) %>
                         </div>
@@ -613,11 +604,11 @@
                                         </div>
                                         <div class="custom-col-68-shop">
                                             <div class="shop-list-content ml-20">
-                                                <h3><a href="#">Checked Knit Jumpsuit</a></h3>
+                                                <h3><a href="#"><%= product.name %></a></h3>
                                                 <div class="pro-list-price">
-                                                    <span>$50.00</span>
+                                                    <span>$<%= product.price %>.00</span>
                                                 </div>
-                                                <p>Composition: 50% cotton,45% polyester, 5% polyamide. Filling: 100% polyester. Hood fur: 64% acrylic,23% modacrylic,13% polyester</p>
+                                                <p><%= product.description %></p>
                                                 <div class="product-list-action">
                                                     <a title="Add to Wishlist" href="#"><i class="fa fa-heart"></i></a>
                                                     <div class="pro-list-actioncart">
@@ -647,8 +638,8 @@
                     <div class="row">
                         <div class="footer-column footer-width-24">
                             <div class="footer-widget footer-about mb-30">
-                                <a href="index.html">
-                                    <img src="user/assets/images/logo/logo.png" alt="logo">
+                                <a href="/">
+                                    <img src="/user/assets/images/logo/logo-no-background.png" alt="logo">
                                 </a>
                                 <p>Lorem ipsum dolor sit amet, magna habemus ius ad, qui minimum voluptar</p>
                                 <div class="social-icon-style-2 social-icon-hm4">
@@ -673,7 +664,7 @@
                         </div>
                         <div class="footer-column footer-width-14">
                             <div class="footer-widget footer-info-list-2 mb-30">
-                                <h3 class="footer-title">Userful Link</h3>
+                                <h3 class="footer-title">/Userful Link</h3>
                                 <ul>
                                     <li><a href="#">Guides & Articles</a></li>
                                     <li><a href="#">Customer Reviews</a></li>
@@ -721,14 +712,12 @@
                         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"><span class="dlicon ui-1_simple-remove" aria-hidden="true"></span></button>
                     </div>
                     <div class="modal-body">
-                        <% showproducts.forEach(product => { %>
                         <div class="row g-0">
+                            <% showproducts.forEach(product => { %>
                             <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                                <% product.images.forEach(img => { %>
                                 <div class="quickview-slider-active owl-carousel">
-                                    <a class="img-popup" href=""><img src="/uploads/<%= img[0]  %>" alt=""><span>sold uot</span></a>
+                                    <a class="img-popup" href=""><img src="/uploads/<%= product.images[0]  %>" alt=""><% if(product.quantity == 0){ %><span>sold out</span><% } %></a>
                                 </div>
-                                <% }) %>
                                 <!-- Thumbnail Large Image End -->
                             </div>
                             <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
@@ -777,8 +766,8 @@
                                     </div>
                                 </div>
                             </div>
+                            <% }) %>
                         </div>
-                        <% }) %>
                     </div>
                 </div>
             </div>
@@ -790,37 +779,37 @@
 ============================================ -->
 
     <!-- Modernizer JS -->
-    <script src="user/assets/js/vendor/modernizr-3.11.7.min.js"></script>
+    <script src="/user/assets/js/vendor/modernizr-3.11.7.min.js"></script>
     <!-- jquery -->
-    <script src="user/assets/js/vendor/jquery-v3.6.0.min.js"></script>
+    <script src="/user/assets/js/vendor/jquery-v3.6.0.min.js"></script>
     <!-- Popper JS -->
-    <script src="user/assets/js/vendor/popper.js"></script>
+    <script src="/user/assets/js/vendor/popper.js"></script>
     <!-- Bootstrap JS -->
-    <script src="user/assets/js/vendor/bootstrap.min.js"></script>
-    <script src="user/assets/js/plugins/owl-carousel.js"></script>
-    <script src="user/assets/js/plugins/slick.js"></script>
-    <script src="user/assets/js/plugins/jarallax.min.js"></script>
-    <script src="user/assets/js/plugins/countdown.js"></script>
-    <script src="user/assets/js/plugins/magnific-popup.js"></script>
-    <script src="user/assets/js/plugins/instafeed.js"></script>
-    <script src="user/assets/js/plugins/tilt.js"></script>
-    <script src="user/assets/js/plugins/images-loaded.js"></script>
-    <script src="user/assets/js/plugins/isotope.js"></script>
-    <script src="user/assets/js/plugins/scrolloverflow-fullpage.js"></script>
-    <script src="user/assets/js/plugins/fullpage.js"></script>
-    <script src="user/assets/js/plugins/jquery-ui.js"></script>
-    <script src="user/assets/js/plugins/jquery-ui-touch-punch.js"></script>
-    <script src="user/assets/js/plugins/easyzoom.js"></script>
-    <script src="user/assets/js/plugins/resizesensor.js"></script>
-    <script src="user/assets/js/plugins/sticky-sidebar.js"></script>
-    <script src="user/assets/js/plugins/scrollup.js"></script>
-    <script src="user/assets/js/plugins/select2.min.js"></script>
-    <script src="user/assets/js/plugins/cookie.js"></script>
-    <script src="user/assets/js/plugins/bpopup.js"></script>
-    <script src="user/assets/js/plugins/wow.js"></script>
-    <script src="user/assets/js/plugins/ajax-mail.js"></script>
+    <script src="/user/assets/js/vendor/bootstrap.min.js"></script>
+    <script src="/user/assets/js/plugins/owl-carousel.js"></script>
+    <script src="/user/assets/js/plugins/slick.js"></script>
+    <script src="/user/assets/js/plugins/jarallax.min.js"></script>
+    <script src="/user/assets/js/plugins/countdown.js"></script>
+    <script src="/user/assets/js/plugins/magnific-popup.js"></script>
+    <script src="/user/assets/js/plugins/instafeed.js"></script>
+    <script src="/user/assets/js/plugins/tilt.js"></script>
+    <script src="/user/assets/js/plugins/images-loaded.js"></script>
+    <script src="/user/assets/js/plugins/isotope.js"></script>
+    <script src="/user/assets/js/plugins/scrolloverflow-fullpage.js"></script>
+    <script src="/user/assets/js/plugins/fullpage.js"></script>
+    <script src="/user/assets/js/plugins/jquery-ui.js"></script>
+    <script src="/user/assets/js/plugins/jquery-ui-touch-punch.js"></script>
+    <script src="/user/assets/js/plugins/easyzoom.js"></script>
+    <script src="/user/assets/js/plugins/resizesensor.js"></script>
+    <script src="/user/assets/js/plugins/sticky-sidebar.js"></script>
+    <script src="/user/assets/js/plugins/scrollup.js"></script>
+    <script src="/user/assets/js/plugins/select2.min.js"></script>
+    <script src="/user/assets/js/plugins/cookie.js"></script>
+    <script src="/user/assets/js/plugins/bpopup.js"></script>
+    <script src="/user/assets/js/plugins/wow.js"></script>
+    <script src="/user/assets/js/plugins/ajax-mail.js"></script>
     <!-- Main JS -->
-    <script src="user/assets/js/main.js"></script>
+    <script src="/user/assets/js/main.js"></script>
 
 </body>
 

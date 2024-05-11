@@ -348,27 +348,18 @@
                     <div class="col-xl-2 col-lg-2">
                         <div class="header-right-wrap header-right-flex">
                             <div class="same-style header-wishlist">
-                                <a href="wishlist.html"><i class="fa fa-heart-o"></i></a>
+                                <a href="/wishlist"><i class="fa fa-heart-o"></i></a>
                             </div>
-                            <% if(!cartItems || cartItems.products.length == 0) { %>
-                                <div class="same-style ">
-                                    <a href="/cart" class="cart">
-                                        <i class="dlicon shopping_bag-20"></i>
-                                        <span class="count-style">
-                                            
-                                        </span>
-                                    </a>
-                                </div>
-                            <% }else{ %>
-                                <div class="same-style cart-wrap">
-                                    <a href="/cart" class="cart ">
-                                        <i class="dlicon shopping_bag-20"></i>
-                                        <span class="count-style">
-                                            <%= cartItems.products.length %>
-                                        </span>
-                                    </a>
-                                </div>
-                            <% } %>
+                            <div class="same-style cart-wrap" id="shoppingCartid">
+                                <a href="/cart" class="cart ">
+                                    <i class="dlicon shopping_bag-20"></i>
+                                    <% if(cartItems){ %>
+                                    <span class="count-style">
+                                         <%= cartItems.products.length %>
+                                    </span>
+                                    <% } %>
+                                </a>
+                            </div>
                             <div class="same-style header-search">
                                 <a class="search-active" href="#">
                                     <i class="dlicon ui-1_zoom"></i>
@@ -760,9 +751,13 @@
                                     <div class="myaccount-table table-responsive text-center">
                                         <% orders.forEach((order)=>{ %>
                                             <div class="d-flex mb-4 bg-light border  justify-content-between p-3">
-                                                <div class="d-block ps-3">
-                                                    <h4 class="fw-semibold "><%= order.orderStatus %></h4>
-                                                    <p><%= order.products.length%> Items</p>
+                                                <div class="d-block ps-3" style="max-width: 100px;">
+                                                    <h5 class="fw-semibold "><%= order.products.length %> Items</h5>
+                                                    <div>
+                                                        <% order.products.forEach((prod)=>{ %>
+                                                            <img src="/uploads/<%= prod.productId.images[0] %>" style="width:60px; border-radius: 3px;" alt="">
+                                                        <% }) %>
+                                                    </div>
                                                 </div>
                                                 <div >
                                                     <p><%= order.orderDate.toLocaleDateString() %></p>
@@ -1224,13 +1219,15 @@
 
             if(name === '' || /\d/.test(name) || /[^\w\s]/.test(name)){
                 document.getElementById('nameError').innerHTML = 'Please enter a name';
+                return false
             } 
 
             if (mobile === '') {
                 document.getElementById("mobileError").innerHTML = 'Please enter your Mobile Number';
                 return false;
-            } else if(phone.length < 10){
+            } else if(mobile.length < 10){
                 document.getElementById("mobileError").innerHTML = 'Phone must be at least 10 numbers';
+                return false
             }
 
             if (pincode === '') {
@@ -1321,6 +1318,7 @@
                 return false;
             } else if(mobile.length < 10){
                 document.getElementById("editMobileError").innerHTML = 'Phone must be at least 10 numbers';
+                return false
             }
 
             if (pincode === '') {

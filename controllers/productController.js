@@ -32,7 +32,8 @@ const addProduct = async (req, res) => {
             quantity: quantity,
             images: req.files.map(file => file.filename),
             description: description,
-            category: category
+            category: category,
+            createdAt : Date.now()
         })
         const prodsaved = await newProduct.save()
 
@@ -60,7 +61,7 @@ const loadEditProduct = async (req,res) =>{
 
 const editProduct = async(req, res)=>{
     try{
-        const { name, description, price, quantity, id } = req.body;
+        const { name, description, price, quantity,category, id } = req.body;
         const newImages = req.files.map(file => file.filename);
 
         const existingData = await product.findOne({_id: id});
@@ -82,7 +83,7 @@ const editProduct = async(req, res)=>{
             }
         });
         
-        const updatedProduct = await product.findOneAndUpdate({_id:req.body.id},{$set:{name,description,price,quantity,images:imageArr}},{new:true})
+        const updatedProduct = await product.findOneAndUpdate({_id:req.body.id},{$set:{name,description,price,quantity,category,images:imageArr}},{new:true})
         console.log(updatedProduct);
 
         if(updatedProduct)

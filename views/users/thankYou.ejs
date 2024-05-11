@@ -128,12 +128,16 @@
                     <div class="col-xl-2 col-lg-2 align-content-end">
                         <div class="header-right-wrap header-right-flex  ">
                             <div class="same-style header-wishlist">
-                                <a href="wishlist.html"><i class="fa fa-heart-o"></i></a>
+                                <a href="/wishlist"><i class="fa fa-heart-o"></i></a>
                             </div>
-                            <div class="same-style cart-wrap">
-                                <a href="#" class="cart-active">
+                            <div class="same-style cart-wrap" id="shoppingCartid">
+                                <a href="/cart" class="cart ">
                                     <i class="dlicon shopping_bag-20"></i>
-                                    <span class="count-style">02</span>
+                                    <% if(cartItems){ %>
+                                    <span class="count-style">
+                                         <%= cartItems.products.length %>
+                                    </span>
+                                    <% } %>
                                 </a>
                             </div>
                             <div class="same-style header-search">

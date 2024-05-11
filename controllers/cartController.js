@@ -2,13 +2,13 @@ const product = require('../models/productModel')
 const cart = require('../models/cartModel')
 const user = require('../models/userModel')
 const address = require('../models/addressModel')
+const coupon = require('../models/couponModel')
 
 const loadCart = async(req,res)=>{
     try{
         // loading cart quantity
         const userId = req.session.user_id
-        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
-
+        let cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         res.render('users/cart',{cartItems})
     }catch(error){
         console.log(error.message);
@@ -95,15 +95,35 @@ const removeFromCart = async(req,res) =>{
     }
 }
 
+const clearCart = async(req, res) => {
+    try{
+        const userId = req.session.user_id
+        await cart.findOneAndDelete({userId:userId})
+        res.json({success:true})
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
 const loadCheckout = async(req,res) => {
     try{
         // loading cart quantity
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
-
         const addresses = await address.find({userId:userId})
+        const coupons = await coupon.find({})
+        
+        let couponPercentage = 0
+        let appliedCoupon;
 
-        res.render('users/checkout',{cartItems,addresses})
+        console.log("session : "+req.session.coupon);
+
+        if(req.session.coupon){
+            appliedCoupon = await coupon.findOne({_id:req.session.coupon})
+            couponPercentage = appliedCoupon.percentage
+        }
+
+        res.render('users/checkout',{cartItems,addresses,coupons,couponPercentage,appliedCoupon})
     }catch(error){
         console.log(error.message);
     }
@@ -114,5 +134,6 @@ module.exports = {
     addToCart,
     updateCart,
     removeFromCart,
+    clearCart,
     loadCheckout
 }
