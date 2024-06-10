@@ -420,7 +420,7 @@
                 </div>
             </div>
             <div class="product-slider-active product-slider-padding dot-style-1">
-                <% products.forEach(product=>{ %>
+                <% newArrivals.forEach(product=>{ %>
                 <div class="product-wrap product-wrap-opacity">
                     <div class="product-img default-overlay mb-40">
                         <a href="/productDetail/<%= product._id %>">
@@ -435,9 +435,9 @@
                         </div>
                     </div>
                     <div class="product-content">
-                        <h3 class="title-blod"><a href="product-details.html">Check Bermuda Shorts</a></h3>
+                        <h3 class="title-blod"><a href="product-details.html"><%= product.name %></a></h3>
                         <div class="product-price">
-                            <span class="new-price">$25.00</span>
+                            <span class="new-price">$<%= product.price %>.00</span>
                         </div>
                     </div>
                 </div>

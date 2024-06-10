@@ -653,6 +653,10 @@
                             <a href="/">Home </a>
                         </li>
                         <li><span> &gt; </span></li>
+                        <li>
+                            <a href="/cart">Cart </a>
+                        </li>
+                        <li><span> &gt; </span></li>
                         <li class="active">Checkout </li>
                     </ul>
                 </div>
@@ -668,15 +672,20 @@
                             <p>If you have a coupon code, please apply it below.</p>
                             <button class="btn btn-outline-light text-dark bg-light" data-bs-target="#exampleModal" data-bs-toggle="modal">Available Coupons</button>
                         </div>
-                        <% let couponStatus = appliedCoupon ? "Remove Coupon" : "Apply Coupon"; %>
+
+                        <!-- Coupon Buttons -->
+                            <% let couponStatus = appliedCoupon ? "Remove Coupon" : "Apply Coupon"; %>
                             <input type="text" placeholder="Coupon code" id="couponInput" <% if(appliedCoupon){ %> value="<%= appliedCoupon.couponCode %>" readonly <% } %> oninput="validateCoupon()" onchange="validateCoupon()">
+
                             <% if(!appliedCoupon){ %>
-                            <button disabled class="text-muted applyCouponBtn" onclick="applyCoupon(this)"  id="applyCouponId"><%= couponStatus %></button>
+                                <button disabled class="text-muted applyCouponBtn" onclick="applyCoupon(this)"  id="applyCouponId"><%= couponStatus %></button>
                             <% }else{ %>
-                                <button class=" applyCouponBtn" onclick="removeCoupon()"  id="applyCouponId" ><%= couponStatus %></button>
+                                <button class=" applyCouponBtn" onclick="removeCoupon(this)"  id="applyCouponId" ><%= couponStatus %></button>
                             <% } %>
-                                <button class=" applyCouponBtn" hidden onclick="removeCoupon()"  id="remove" >Remove Coupon</button>
-                            
+
+                            <button disabled hidden class="text-muted applyCouponBtn" onclick="applyCoupon(this)"  id="applyCouponId1"><%= couponStatus %></button>
+                            <button class=" applyCouponBtn" hidden onclick="removeCoupon(this)"  id="remove" >Remove Coupon</button>
+                        <!--  -->
                         
                         <p class="d-none" id="couponCodeErrorMes"></p>
                         <p class="d-none" id="couponCodeSuccessMes"></p>
@@ -776,13 +785,13 @@
                                                 <% ProductTotal = product.productId.price * product.quantity %>
                                                 <% Total += ProductTotal %>
                                                 <ul>        
-                                                    <li><%= product.productId.name %> x <%= product.quantity %> <span>$<%= ProductTotal %></span></li>
+                                                    <li><%= product.productId.name %> x <%= product.quantity %> <span>$<%= ProductTotal.toFixed(2) %></span></li>
                                                 </ul>
                                             </div>
                                         <% }) %>
                                         <div class="your-order-info order-subtotal border-top-1 ">
                                             <ul>
-                                                <li>Subtotal <span>$<%= Total %></span></li>
+                                                <li>Subtotal <span>$<%= Total.toFixed(2) %></span></li>
                                             </ul>
                                         </div>
 
@@ -795,7 +804,7 @@
                                         <div class="your-order-info order-subtotal couponDiscountArea">
                                             <ul>
                                                 <li>Coupon Discount
-                                                    <span class="text-danger" id="discountPrice">- $<%= discount %></span>
+                                                    <span class="text-danger" id="discountPrice">- $<%= discount.toFixed(2) %></span>
                                                 </li>
                                             </ul>
                                         </div>
@@ -803,7 +812,7 @@
 
                                         <div class="your-order-info order-total">
                                             <ul>
-                                                <li  class="fw-semibold">Total <span id="grandTotal">$<%= GrandTotal %></span></li>
+                                                <li  class="fw-semibold">Total <span id="grandTotal">$<%= GrandTotal.toFixed(2) %></span></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -813,12 +822,24 @@
                                         <h5 class="fw-semibold">PAYMENT METHOD</h5>
                                     </div>
                                     <div class="condition-wrap mb-4">
-                                        <p><input type="radio" id="" name="paymentMethod" class="paymntRadioBox" value="Cash on Delivery">Cash on Delivery</p>
-                                        <input type="number" class="d-none" id="orderAmount" value="<%= Total %>">
+                                        <div class="d-flex ">
+                                            <i class="ri-cash-line" ></i>
+                                            <h5>Cash on Delivery<input type="radio" id="" name="paymentMethod" class="paymntRadioBox" value="Cash on Delivery"></h5>
+                                        </div>
                                     </div>
                                     <div class="condition-wrap mb-4">
-                                        <p><input type="radio" id="" name="paymentMethod" class="paymntRadioBox" value="Online Payment">Paypal</p>
+                                        <!-- <i class="ri-paypal-fill"></i> -->
+                                        <h5><input type="radio" id="" name="paymentMethod" class="paymntRadioBox card-radio-input" value="Online Payment">Paypal</h5 >
                                     </div>
+                                    
+                                    <% if(GrandTotal < wallett.balance){ %>
+                                        <div class="condition-wrap mb-4">
+                                            <div class="d-flex">
+                                                <h5>Pay using wallet<input type="radio" id="" name="paymentMethod" class="paymntRadioBox" value="Wallet"></h5>
+                                            </div>
+                                        </div>
+                                    <% } %>
+
                                     <div>
                                         <p class="text-danger" id="errorPlacing"></p>
                                         <p class="text-danger" id="addrssErrorPlacing"></p>
@@ -836,8 +857,10 @@
         <!-- checkout end -->
 
         <!-- Hidden variables -->
+        <input hidden type="number" id="DiscountPrice" value="<%= discount %>">
         <input hidden type="number" id="subTotal" value="<%= Total %>">
-        <input hidden type="number" id="grandTotalVal" value="<%= GrandTotal %>">
+        <!-- <input  type="number" id="grandTotalVal" value=""> -->
+        <p hidden id="grandTotalVal"><%= GrandTotal %></p>
         <!--  -->
 
         <!-- Add Address Modal -->
@@ -1254,7 +1277,15 @@
 
             const paymentMethodOpt = document.querySelector('input[name="paymentMethod"]:checked')
             const addressSelection = document.querySelector('input[name="addressSelected"]:checked')
-            var orderAmount = document.getElementById('orderAmount').value
+            let orderAmount = document.getElementById('grandTotalVal').textContent
+            // if paypal
+            const subTotal =  document.getElementById('subTotal')
+            const discountPrice =  document.getElementById('DiscountPrice')
+
+            console.log(' discssss ');
+            console.log(subTotal.value);
+            console.log(discountPrice.value);
+            
 
             document.getElementById('errorPlacing').innerHTML = '';
             document.getElementById('addrssErrorPlacing').innerHTML = '';
@@ -1272,19 +1303,30 @@
 
             if(paymentMethod == "Online Payment"){
                 console.log('enter the function');
-                const response = await axios.post('/paypal',{paymentMethod,selectedAddress,orderAmount});
+                const response = await axios.post('/paypal',{paymentMethod,selectedAddress,orderAmount,discountPrice:discountPrice.value,subTotal:subTotal.value});
+                console.log('ajkajajajajjaja');
                 const redirectUrl = response.data.redirectUrl;
                 window.location.href = redirectUrl;
                 console.log('after everything')
             } else if(paymentMethod == "Cash on Delivery"){
 
-                // const response = await axios.post('/COD',{paymentMethod,selectedAddress,orderAmount})
+                if(orderAmount<100){
+                    document.getElementById('errorPlacing').innerHTML = 'COD only available for orders above $100';
+                } else {
+                    const response = await axios.post('/COD',{paymentMethod,selectedAddress,orderAmount,discountPrice:discountPrice.value,subTotal:subTotal.value})
 
-                // if(response.data.success){
-                //     window.location.href = '/successMessage'
-                // }
-                console.log("order amount at place order");
-                console.log(orderAmount);
+                    if(response.data.success){
+                        window.location.href = '/successMessage'
+                    }
+                    console.log("order amount at place order");
+                    console.log(orderAmount);
+                }
+            } else if(paymentMethod == "Wallet"){
+                const response = await axios.post('/COD',{paymentMethod,selectedAddress,orderAmount,discountPrice:discountPrice.value,subTotal:subTotal.value})
+
+                if(response.data.success){
+                    window.location.href = '/successMessage'
+                }
             }
 
         }
@@ -1319,16 +1361,22 @@
 
             const response = await axios.patch('/validateCoupon', { couponCode });
 
-                if (response.data.notFound) {
+                if(response.data.expired){
+                    couponErr.innerHTML = "Coupon Expired";
+                    couponErr.classList.remove('d-none');
+                    couponErr.classList.add('text-danger');
+                    applyBtn.setAttribute('disabled', 'disabled');
+                    applyBtn.classList.add('text-muted');
+                } else if(response.data.success) {
+                    couponErr.classList.add('d-none');
+                    applyBtn.removeAttribute('disabled');
+                    applyBtn.classList.remove('text-muted');
+                } else if(response.data.notFound){
                     couponErr.innerHTML = "Coupon code doesn't match";
                     couponErr.classList.remove('d-none');
                     couponErr.classList.add('text-danger')
                     applyBtn.setAttribute('disabled', 'disabled');
                     applyBtn.classList.add('text-muted');
-                } else {
-                    couponErr.classList.add('d-none');
-                    applyBtn.removeAttribute('disabled');
-                    applyBtn.classList.remove('text-muted');
                 }
         }
 
@@ -1336,7 +1384,7 @@
         async function applyCoupon(e){
             e.hidden=true
             const removeBtn = document.getElementById('remove')
-            let grandTotalVal = document.getElementById('grandTotalVal').value
+            let grandTotalVal = document.getElementById('grandTotalVal').textContent
             const couponCode = document.getElementById('couponInput')
             removeBtn.hidden=false
 
@@ -1350,11 +1398,6 @@
 
             const response = await axios.patch('/applyCoupon',{grandTotal:grandTotalVal,couponCode:couponCode.value})
 
-            // if(response.data.exist){
-            //     couponSucc.classList.remove('d-none')
-            //     couponSucc.innerHTML = "Coupon already added";
-            //     couponSucc.classList.add('text-success')
-            // }else{
             if(response.data.success){
 
                 const Toast = Swal.mixin({
@@ -1374,13 +1417,19 @@
 
                 // assigning the discounted price to total variable
                 const grandTotal = document.getElementById('grandTotal')
-                grandTotal.innerHTML = "$" + response.data.grandTotaltot
-
-                // assigning the discounted price to total hidden variable
-                grandTotalVal = response.data.grandTotaltot;
+                grandTotal.innerHTML = "$" + response.data.grandTotaltot.toFixed(2)
 
                 let span = document.getElementById('discountPrice')
-                span.textContent =  "- $" + response.data.discountPrice
+                span.textContent =  "- $" + response.data.discountPrice.toFixed(2)
+
+                // assigning the discounted price to total hidden variable
+                let grandTotalVal1 = document.getElementById('grandTotalVal')
+                grandTotalVal1.textContent = response.data.grandTotaltot.toFixed(2)
+
+                let discountPricee = document.getElementById('DiscountPrice')
+                discountPricee.value = response.data.discountPrice
+                //
+                console.log(" after calculating :: "+grandTotalVal1);
 
                 // changing the attributes
                 const btn =  document.getElementById('applyCouponId')
@@ -1390,12 +1439,12 @@
             
         }
 
-        async function removeCoupon(){
+        async function removeCoupon(e){
             // const couponCode = document.getElementById('couponInput').value
-            const applyBtn = document.getElementById('applyCouponId')
+            const applyBtn = document.getElementById('applyCouponId1')
             applyBtn.hidden=false
             const removeBtn = document.getElementById('remove')
-            removeBtn.hidden = true
+            e.hidden = true
 
             const response = await axios.patch('/removeCoupon')
 
@@ -1429,6 +1478,10 @@
                 const subtotal = document.getElementById('subTotal').value
 
                 grandTotal.innerHTML = "$" + subtotal
+
+                // assigning the deducted price to hidden total
+                let grandTotalVal1 = document.getElementById('grandTotalVal')
+                grandTotalVal1.textContent = subtotal
 
                 const applyCpnBtn = document.getElementById('applyCouponId')
                 applyBtn.setAttribute('disabled', 'disabled')

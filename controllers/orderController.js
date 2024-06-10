@@ -3,6 +3,7 @@ const cart = require('../models/cartModel')
 const coupon = require('../models/couponModel')
 const address = require('../models/addressModel')
 const product = require('../models/productModel')
+const wallet = require('../models/walletModel')
 const paypal = require('../config/paypal')
 
 const loadOrderDetails = async(req, res) => {
@@ -22,29 +23,31 @@ const loadOrderDetails = async(req, res) => {
 const CODorder = async(req, res) => {
     try{
         const userId = req.session.user_id
-        const {paymentMethod,selectedAddress,orderAmount} = req.body
-        console.log("cod ::: "+paymentMethod);
+        const {paymentMethod,selectedAddress,orderAmount,discountPrice,subTotal} = req.body
+        console.log(paymentMethod);
         const cartItems = await cart.findOne({userId:userId}).populate('products.productId')
         const products = cartItems.products
-
-        // products.forEach(prod=>{
-        //     prod.quantity
-        // })
-
-        console.log('herer');
-        console.log(selectedAddress);
 
         const addresses = await address.findOne({_id : selectedAddress})
         const {name, mobile, pincode, state, streetAddress, locality, city} = addresses
 
-        console.log(cartItems.products);
+        // if coupon is apllied for product
+        let discPrice = 0;
+        discPrice = discountPrice / products.length
 
 
-        // console.log(addresses);
+        const updatedProducts = products.map((product)=>{
+            const discAmount = product.productId.price - discPrice
+            return {
+                productId: product.productId._id,
+                quantity: product.quantity,
+                totalPrice: discAmount
+            }
+        })
 
         const orderPlaced = await order.create({
             userId : userId,
-            products : products,
+            products : updatedProducts,
             deliveryAddress : {
                 name : name,
                 mobile : mobile,
@@ -57,7 +60,7 @@ const CODorder = async(req, res) => {
             orderAmount : orderAmount,
             payment : paymentMethod,
             orderDate : Date.now(),
-            orderStatus : "Pending"
+            orderStatus : "Shipped"
         })
 
         if(orderPlaced){
@@ -71,12 +74,17 @@ const CODorder = async(req, res) => {
                 let updatedStock = orderedProduct.quantity - prod.quantity
 
                 await product.findOneAndUpdate({_id:prod.productId},{$set:{quantity : updatedStock}})
+                delete req.session.coupon
 
             })
             
         }
 
         await cart.findOneAndDelete({userId:userId})
+
+        if(paymentMethod == "Wallet"){
+            await wallet.findOneAndUpdate({userId : req.session.user_id},{$inc:{balance:-orderAmount},$push: {transaction: {amount:orderAmount,creditOrDebit:'debit'}}}, {new:true})
+        }
         
         res.json({success:true})
 
@@ -101,19 +109,51 @@ const orderCancellation = async(req, res) => {
         const {productId,orderId,price,cancelReason} = req.body
         const userId = req.session.user_id
 
-        const cancelled = await order.findOneAndUpdate({_id : orderId, 'products.productId' : productId},{
+        const cancelled = await order.findOneAndUpdate({userId : userId, _id : orderId, 'products.productId' : productId},{
             $set : { 'products.$.orderStatus' : 'Cancelled', 'products.$.cancelled' : true, 'products.$.cancelReason' : cancelReason }
-        })
+        },{new : true})
+        
+        if(cancelled){
 
-        cancelled.products.forEach(async(prod)=>{
-            const eproduct = await product.findOne({_id:prod.productId})
-            let updatedStock = eproduct.quantity + prod.quantity
+            const cancelledProduct = cancelled.products.find((prod)=>prod.productId.toString() === productId);
 
-            await product.findOneAndUpdate({_id:prod.productId},{$set:{quantity:updatedStock}})
-        })
+            if(cancelledProduct){
+
+                const eproduct = await product.findOne({_id:cancelledProduct.productId})
+                let updatedStock = eproduct.quantity + cancelledProduct.quantity;
+
+                await product.findOneAndUpdate({_id: cancelledProduct.productId},{$set:{quantity:updatedStock}})
+                const netAmount = cancelledProduct.totalPrice * cancelledProduct.quantity;
+
+                if(cancelled.payment == "Online Payment"){
+
+                    await wallet.findOneAndUpdate({userId:userId},
+                        {$inc:{balance : parseFloat(netAmount.toFixed(2))},
+                        $push: {transaction :{amount:parseFloat(netAmount.toFixed(2)), creditOrDebit:'credit'}}
+                        },
+                        {new : true, upsert:true})
+                }
+            }
+        
+            res.json({success:true})
+        }
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const returnRequest = async(req,res) =>{
+    try{
+        const {productId,orderId,price,returnReason} = req.body
+        const userId = req.session.user_id
+
+        await order.findOneAndUpdate({userId:userId,_id : orderId, 'products.productId' : productId},{
+            $set : { 'products.$.orderStatus' : 'Return Requested', 'products.$.returnReason' : returnReason }
+            },{new:true})
 
         res.json({success:true})
-
+    
     }catch(error){
         console.log(error.message);
     }
@@ -121,23 +161,30 @@ const orderCancellation = async(req, res) => {
 
 const returnOrder = async(req, res) => {
     try{
-        const {productId,orderId,price,returnReason} = req.body
-        const userId = req.session.user_id
+        const {productId,orderId,returnReason,userId} = req.body
 
-        const returned = await order.findOneAndUpdate({_id : orderId, 'products.productId' : productId},{
+        const returned = await order.findOneAndUpdate({userId:userId,_id : orderId, 'products.productId' : productId},{
             $set : { 'products.$.orderStatus' : 'Returned', 'products.$.returned' : true, 'products.$.returnReason' : returnReason }
-        })
-
-        returned.products.forEach(async(prod)=>{
-            const eproduct = await product.findOne({_id:prod.productId})
-            let updatedStock = eproduct.quantity + prod.quantity
-
-            await product.findOneAndUpdate({_id:prod.productId},{$set:{quantity:updatedStock}})
-        })
+        },{new:true})
 
         if(returned){
-            res.json({success:true})
+
+            const returnedProduct =returned.products.find((prod)=>prod.productId.toString()==productId)
+
+            if(returnedProduct){
+                const eproduct = await product.findOne({_id:productId})
+                let updatedStock = eproduct.quantity + returnedProduct.quantity;
+
+                await product.findOneAndUpdate({_id:productId},{$set:{quantity:updatedStock}})
+                await wallet.findOneAndUpdate({userId:userId},
+                    {$inc:{balance:parseFloat(returnedProduct.totalPrice.toFixed(2))},
+                    $push: {transaction :{amount:parseFloat(returnedProduct.totalPrice.toFixed(2)), creditOrDebit:'credit'}}},
+                    {new : true, upsert:true})
+            }
+            
         }
+        console.log('Returned');
+        res.json({success:true})
 
     }catch(error){
         console.log(error.message);
@@ -149,53 +196,74 @@ const paypalPayment = async(req,res) =>{
         console.log('entered the controller')
         //items for payment
 
-        const image = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60"
+        const userId = req.session.user_id
+        const {paymentMethod,selectedAddress,discountPrice,subTotal} = req.body
+        let {orderAmount} = req.body
 
-        const items = [{
-            "name": "Product1", //product name
-            "sku": '001', //unique identifier for product (you can use _id from database)
-            "price": '1', //price
-            "currency": "USD", //currency
-            "quantity": 1, //quantity
-            "url": image //image url if available (optional)
-        }, {
-            "name": "Product1",
-            "sku": '001',
-            "price": '1',
-            "currency": "USD",
-            "quantity": 1,
-            "url": image
-        }
+        orderAmount = parseFloat(orderAmount)
+        console.log( " amontt ;;;; "+orderAmount.toFixed(2));
 
-        ]
+        const cartItems = await cart.findOne({userId:userId}).populate('products.productId')
+        const products = cartItems.products
+
+        const items = products.map(product => {
+            return {
+                name: product.productId.name, // Product name
+                sku: product.productId._id, // Unique identifier for product
+                price: product.productId?.price, // Price per item 
+                currency: "USD", // Currency
+                quantity: product.quantity, // Quantity 
+            };
+        });
 
         const amount = {
-            "currency": "USD", //currency
-            "total": "2" //total amount
-        }
+            currency: "USD", // Currency
+            total:orderAmount.toFixed(2),
+            details :{
+                subtotal : subTotal,
+                discount:discountPrice
+            }
+        };
+
+        console.log('amount end');
 
         const paymentData = {
-
-            "intent": "sale",
-            "payer": {
-                "payment_method": "paypal"
+            intent: "sale",
+            application_context : {
+                shipping_preference :'NO_SHIPPING',
+                user_action:'CONTINUE',
             },
-            "redirect_urls": {
-                "return_url": "http://localhost:4001/successMessage", // if sucessfull return url
-                "cancel_url": "http://localhost:4001/paypalcancel" // if canceled return url
+            payer: {
+                payment_method: "paypal"
             },
-            "transactions": [{
-                "item_list": {
-                    "items": items // the items
+            redirect_urls: {
+                return_url: "http://localhost:4001/paypalsuccess", // If successful return URL
+                cancel_url: "http://localhost:4001/paypalcancel" // If canceled return URL
+            },
+            transactions: [{
+                item_list: {
+                    items: items // The items
                 },
-                "amount": amount, // the amount
-                "description": "Payment using PayPal"
+                amount: amount, // The amount
+                description: "Payment using PayPal"
             }]
-
-        }
-        console.log('before payment create')
+        };
+        console.log('peymant data ends');
 
         const paymentUrl = await createPayment(paymentData);
+
+        console.log("creat peyment");
+        // saving to the session
+        req.session.paymentData = {
+            userId : userId,
+            paymentMethod : paymentMethod,
+            selectedAddress : selectedAddress,
+            discountPrice : discountPrice,
+            subTotal: subTotal,
+            orderAmount: orderAmount,
+            products: products
+        }
+
         res.json({redirectUrl : paymentUrl})
 
         console.log('after payment create')
@@ -207,21 +275,28 @@ const paypalPayment = async(req,res) =>{
 
 const createPayment = (paymentData) => {
     return new Promise((resolve, reject) => {
-      paypal.payment.create(paymentData, function (err, payment) {
-        if (err) {
-          reject(err);
-        } else {
-            for (let i = 0; i < payment.links.length; i++) {
-                if (payment.links[i].rel === "approval_url") {
-                resolve(payment.links[i].href);
-                return; // Ensure to return after resolving
+        // Create payment with PayPal
+        paypal.payment.create(paymentData, function (err, payment) {
+            if (err) {
+                // Log and reject the Promise if there's an error
+                console.error("Error creating payment:", err.response.details);
+                reject(err);
+            } else {
+                // Log success message
+                console.log("Payment created successfully.");
+                // Find approval URL in payment links
+                const approvalUrl = payment.links.find(link => link.rel === "approval_url");
+                if (approvalUrl) {
+                    // Resolve Promise with approval URL
+                    resolve(approvalUrl.href);
+                } else {
+                    // Reject Promise if approval URL is not found
+                    reject(new Error("Approval URL not found in payment response."));
                 }
             }
-        }
-      });
+        });
     });
-  };
-  
+};  
 
 const handlePayment = async(req, res) => {
     const payerId = req.query.PayerID;
@@ -230,31 +305,101 @@ const handlePayment = async(req, res) => {
     const executePayment = {
       payer_id: payerId,
     };
+
+    console.log(' entering thefunctin  ::::    ');
   
-    paypal.payment.execute(paymentId, executePayment, (error, payment) => {
+    paypal.payment.execute(paymentId, executePayment, async(error, payment) => {
       if (error) {
         console.error('Error executing PayPal payment:', error);
-        res.redirect('/paypalcancel');
-      } else {
+
+        console.log(' cancellll ayipoyii ');
         
-        res.send('Payment Success'); 
+        res.redirect('/paypalcancel');
+
+      } else {
+        console.log(' succcsseesss ;;;;;;   ');
+
+        const { userId, paymentMethod, selectedAddress, discountPrice,orderAmount, subTotal, products} = req.session.paymentData; 
+        const orderAmount1 = parseFloat(orderAmount);
+        
+        const addresses = await address.findOne({_id : selectedAddress})
+        const {name, mobile, pincode, state, streetAddress, locality, city} = addresses
+
+            // if coupon is apllied for product
+            let discPrice = 0;
+            discPrice = discountPrice / products.length
+
+            const updatedProducts = products.map((product)=>{
+                const discAmount = product.productId.price - discPrice
+                return {
+                    productId: product.productId._id,
+                    quantity: product.quantity,
+                    totalPrice: discAmount
+                }
+            })
+            
+
+            const orderPlaced = await order.create({
+                userId : userId,
+                products : updatedProducts,
+                deliveryAddress : {
+                    name : name,
+                    mobile : mobile,
+                    pincode : pincode,
+                    state : state,
+                    streetAddress : streetAddress,
+                    locality : locality,
+                    city : city
+                },
+                orderAmount : orderAmount1.toFixed(2),
+                payment : paymentMethod,
+                orderDate : Date.now(),
+                orderStatus : "Shipped"
+            })
+
+            if(orderPlaced){
+                console.log(' :: placed successfully :: ');
+                orderPlaced.products.forEach(async(prod)=>{
+                    console.log(prod.productId);
+                    
+                    const orderedProduct = await product.findOne({_id:prod.productId})
+    
+                    let updatedStock = orderedProduct.quantity - prod.quantity
+    
+                    await product.findOneAndUpdate({_id:prod.productId},{$set:{quantity : updatedStock}})
+    
+                })
+
+                await cart.findOneAndDelete({userId:userId})
+
+            }
+            delete req.session.paymentData;
+            delete req.session.coupon
+
+        res.redirect('/successMessage');
+
       }
     });
-  }
+}
 
-  const handlePaymenterror = async(req,res)=>{
+const handlePaymenterror = async(req,res)=>{
     try{
+
+        console.log('   cancceell aaakiiii   ');
+
         res.redirect('/checkout')
     }catch(error){
         console.log(error.message);
     }
-  }
+}
+
 
 module.exports = {
     loadOrderDetails,
     CODorder,
     thankYou,
     orderCancellation,
+    returnRequest,
     returnOrder,
     paypalPayment,
     handlePayment,

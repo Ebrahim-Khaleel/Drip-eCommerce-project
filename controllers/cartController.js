@@ -3,12 +3,14 @@ const cart = require('../models/cartModel')
 const user = require('../models/userModel')
 const address = require('../models/addressModel')
 const coupon = require('../models/couponModel')
+const wallet = require('../models/walletModel')
 
 const loadCart = async(req,res)=>{
     try{
         // loading cart quantity
         const userId = req.session.user_id
         let cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+        
         res.render('users/cart',{cartItems})
     }catch(error){
         console.log(error.message);
@@ -17,7 +19,7 @@ const loadCart = async(req,res)=>{
 
 const addToCart = async(req,res)=>{
     try{
-        const productId = req.query.id
+        const productId = req.body.productId
         const userId = req.session.user_id
         const quantity = req.body.quantity || 1
 
@@ -28,6 +30,7 @@ const addToCart = async(req,res)=>{
 
             const exist = await cart.findOne({ userId : userId, products: { $elemMatch : { productId : productId } } })
             if(!exist){
+                
 
                 await cart.findOneAndUpdate(
                     { userId : userId},
@@ -112,6 +115,7 @@ const loadCheckout = async(req,res) => {
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         const addresses = await address.find({userId:userId})
         const coupons = await coupon.find({})
+        const wallett = await wallet.findOne({userId:userId})
         
         let couponPercentage = 0
         let appliedCoupon;
@@ -123,7 +127,7 @@ const loadCheckout = async(req,res) => {
             couponPercentage = appliedCoupon.percentage
         }
 
-        res.render('users/checkout',{cartItems,addresses,coupons,couponPercentage,appliedCoupon})
+        res.render('users/checkout',{cartItems,addresses,coupons,couponPercentage,appliedCoupon,wallett})
     }catch(error){
         console.log(error.message);
     }

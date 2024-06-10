@@ -5,6 +5,8 @@ const category = require('../models/categoryModel')
 const products = require('../models/productModel');
 const address = require('../models/addressModel');
 const cart = require('../models/cartModel');
+const wishlist = require('../models/wishlistModel');
+const wallet = require('../models/walletModel');
 const order = require('../models/orderModel');
 const passport = require('passport');
 const googleStrategy = require('passport-google-oauth20').Strategy
@@ -21,12 +23,12 @@ const showHome = async (req, res) => {
         const allproducts = await products
         .find()
         .sort({createdAt : -1})
-        .limit(6)
+        .limit(4)
         .populate('category')
 
         console.log(allproducts)
 
-        res.render('users/home',{products : allproducts,cartItems})
+        res.render('users/home',{newArrivals : allproducts,cartItems})
     } catch (error) {
         console.log(error.message);
     }
@@ -39,7 +41,7 @@ const showShop = async (req, res) => {
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         const categories = await category.find({isBlocked:false})
 
-        const showproducts = await products.find().populate('category')
+        const showproducts = await products.find().populate('category').populate('offer')
         res.render('users/shop', { showproducts,cartItems,categories})
     } catch (error) {
         console.log(error);
@@ -189,6 +191,7 @@ const insertUser = async (req, res) => {
         const verified = await verifyEmail(user.email, req)
 
         req.session.userData = user
+        req.session.email = user.email
 
         console.log('req session userData' + req.session.userData);
 
@@ -277,34 +280,43 @@ const showOtp = async (req, res) => {
 const verifyOtp = async (req, res) => {
     try {
         // user input Otp
-        const otpDigits = req.body.Otp
-        const userOtp = otpDigits.join('')
+        const userOtp = req.body.Otp
 
         console.log('User inputted OTP : ' + userOtp);
 
         if (otpExpiration && Date.now() > otpExpiration) {
             delete req.session.otp; // Clear OTP from session
-            res.render('users/otp', { emessage: 'OTP expired. Please request a new one.' });
+            res.json({expired:true})
         }
 
         if (userOtp == req.session.otp) {
 
-            const { name, email, password, phone } = req.session.userData
+            if(req.session.userData){
 
-            const data = await User.create({
-                name: name,
-                email: email,
-                phone: phone,
-                password: password
-            })
+                const { name, email, password, phone } = req.session.userData
 
-            if (data) {
-                req.session.user_id = data._id;
-                res.redirect('/')
+                const data = await User.create({
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    password: password
+                })
+
+                if (data) {
+                    req.session.user_id = data._id;
+
+                    await wallet.create({
+                        userId : req.session.user_id
+                    })
+
+                    res.json({success:true})
+                }
+            } else {
+                res.json({successForg:true})
             }
 
         } else {
-            res.render('users/otp', { wmessage: 'wrong otp' })
+            res.json({wrong:true})
         }
 
     } catch (error) {
@@ -317,7 +329,7 @@ const resendOtp = async (req, res) => {
     try {
         const newOtp = generateOtp();
 
-        const email = req.session.userData.email
+        const email = req.session.email
         req.session.otp = newOtp
         otpExpiration = Date.now() + 60000;
 
@@ -429,9 +441,10 @@ const loadMyAccount = async (req, res) => {
         const userData = await User.findById({ _id: req.session.user_id })
         const addresses = await address.find({userId:userId})
         let orders = await order.find({userId:userId}).populate('products.productId')
+        const wallett = await wallet.findOne({userId : userId})
         
         if(userData){
-            res.render('users/myAccount',{userData,addresses,cartItems,orders})
+            res.render('users/myAccount',{userData,addresses,cartItems,orders,wallett})
         } else {
             res.redirect('/login')
         }
@@ -480,7 +493,81 @@ const loadWishlist = async(req,res) =>{
         // loading cart quantity
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
-        res.render('users/wishlist',{cartItems})
+
+        const wishlists = await wishlist.findOne({userId:userId}).populate('products.productId')
+        res.render('users/wishlist',{wishlists,cartItems})
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const addToWishlist = async(req, res) =>{
+    try{
+        const userId = req.session.user_id
+        const {productId} = req.body
+        console.log(productId);
+
+        if(!userId){
+            res.json({noUser:true})
+        }
+
+        const exist = await wishlist.findOne({userId:userId, products:{ $elemMatch :{productId:productId} }})
+
+        if(!exist){
+
+            await wishlist.findOneAndUpdate(
+                {userId : userId},
+                { $addToSet : {
+                    products : {
+                        productId : productId
+                    }
+                }},
+                {new : true, upsert : true}
+            )
+
+            res.json({success:true})
+            console.log("product added to wishlist");
+        
+        }else{
+            res.json({exist:true})
+            console.log("product already in wishlist");
+        }
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const removeFromWishlist = async(req, res) =>{
+    try{
+        const userId = req.session.user_id
+        const {productId} = req.body
+
+        await wishlist.findOneAndUpdate(
+            {userId : userId},
+            {$pull :
+                { products:{
+                    productId : productId
+                }
+            }}
+        )
+
+        res.json({success:true})
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const addMoneyToWallet = async(req, res) =>{
+    try{
+        const {amount} = req.body
+        const adding = await wallet.findOneAndUpdate({userId : req.session.user_id},{$inc:{balance:amount},$push: {transaction: {amount:amount,creditOrDebit:'credit'}}}, {new:true})
+
+        if(adding){
+            res.json({success:true})
+            console.log('Money added to Wallet successfully');
+        }
     }catch(error){
         console.log(error.message);
     }
@@ -495,6 +582,59 @@ const userLogout = async (req, res) => {
         console.log(error.message);
     }
 }
+
+const loadForgotPage = async(req,res) => {
+    try{
+        res.render('users/forgotPass')
+    }   catch(error){
+        console.log(error.message)
+    }
+}
+
+const forgotPassword = async(req, res) => {
+    try{
+        const email = req.body.email
+        const exist = await User.findOne({email : email})
+
+        if(!exist){
+            res.render('users/forgotPass',{message : "Email doesn't exist"})
+        } else {
+            const verified = await verifyEmail(email, req)
+
+            req.session.email = exist.email
+            res.redirect('/otp')
+        }
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const loadNewPass = async(req, res) =>{
+    try{
+        res.render('users/forgotConfirm')
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const forgetPassConfirm = async(req ,res) => {
+    try{
+        const email = req.session.email
+        const password = req.body.password
+
+        const encryptPass = await securePassword(password)
+        const changed = await User.findOneAndUpdate({email:email},{$set:{password : encryptPass}})
+
+        if(changed){
+            res.redirect('/login')
+        }
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
 
 module.exports = {
     showHome,
@@ -517,7 +657,14 @@ module.exports = {
     editProfile,
     changePassword,
     loadWishlist,
+    addToWishlist,
+    removeFromWishlist,
+    addMoneyToWallet,
     userLogout,
     successGoogleLogin,
     failureLogin,
+    loadForgotPage,
+    forgotPassword,
+    loadNewPass,
+    forgetPassConfirm
 }

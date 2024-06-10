@@ -5,9 +5,15 @@ const dayjs = require('dayjs')
 
 const loadCoupons = async(req,res) =>{
     try{
-        const coupons = await coupon.find()
+        const limit  = 6;
+        const page = parseInt(req.query.page) || 1
+        const skip = (page - 1) * limit;
+        const totalCoupCount = await coupon.countDocuments()
+        const totalPages = Math.ceil( totalCoupCount / limit);
 
-        res.render('admin/coupons',{coupons})
+        const coupons = await coupon.find().skip(skip).limit(limit);
+
+        res.render('admin/coupons',{coupons, currentPage : page, totalPages})
     }catch(error){
         console.log(error.message);
     }
@@ -35,20 +41,21 @@ function generateRandomString() {
 
 const addCoupon = async(req,res) =>{
     try{
-        const {couponname,couponDescription,percentage} = req.body
+        const {couponname,couponDescription,percentage,endDate,minAmount} = req.body
 
         const couponCode = generateRandomString()
         console.log(couponCode);
 
-        const expirationDate = dayjs().add(7, 'day')
+        // const expirationDate = dayjs().add(7, 'day')
 
         const addedCoupon = await coupon.create({
             couponName : couponname,
             couponCode : couponCode,
             couponDescription : couponDescription,
             percentage : percentage,
+            minAmount : minAmount,
             startDate : Date.now(),
-            endDate : expirationDate.toDate()
+            endDate : endDate
         })
 
         console.log(addedCoupon);
@@ -65,7 +72,8 @@ const editCoupon = async(req,res) =>{
     try{
         const {couponId} = req.body
         const findingCoupon = await coupon.findOne({_id : couponId})
-        res.json({couponName : findingCoupon.couponName, couponCode : findingCoupon.couponCode, couponDescription : findingCoupon.couponDescription, percentage : findingCoupon.percentage})
+        console.log(findingCoupon.endDate);
+        res.json({couponName : findingCoupon.couponName, couponCode : findingCoupon.couponCode, couponDescription : findingCoupon.couponDescription, percentage : findingCoupon.percentage, minAmount : findingCoupon.minAmount, endDate : findingCoupon.endDate})
     }catch(error){
         console.log(error.message);
     }
@@ -73,9 +81,11 @@ const editCoupon = async(req,res) =>{
 
 const saveEditCoupon = async(req, res) =>{
     try{
-        const {couponId,couponCode,couponName,couponPercentage,couponDescription} = req.body
+        const {couponId,couponCode,couponName,couponPercentage,couponDescription,couponMinAmount,couponExpiryDate} = req.body
 
-        const saved = await coupon.findOneAndUpdate({_id:couponId},{$set:{couponName : couponName, couponCode : couponCode, percentage : couponPercentage, couponDescription : couponDescription}})
+        const saved = await coupon.findOneAndUpdate({_id:couponId},
+            {$set:{couponName : couponName, couponCode : couponCode, percentage : couponPercentage, couponDescription : couponDescription, minAmount : couponMinAmount, endDate : couponExpiryDate}
+        })
 
         res.json({success : true})
     }catch(error){
@@ -101,11 +111,17 @@ const couponDelete = async(req, res) =>{
 const validateCoupon = async(req, res) =>{
     try{
         const {couponCode} = req.body
-        const foundCoupon = await coupon.findOne({couponCode:couponCode})
+        const foundCoupon = await coupon.findOne({couponCode : couponCode})
         // console.log(foundCoupon);
 
         if(foundCoupon){
-            res.json({success:true})
+            const valid = foundCoupon.endDate > new Date();
+            if(valid){
+                res.json({success:true})
+            }else{
+                res.json({expired:true})
+            }
+
         } else {
             res.json({notFound:true})
         }
@@ -116,7 +132,9 @@ const validateCoupon = async(req, res) =>{
 
 const applyCoupon = async(req, res) =>{
     try{
-        const {grandTotal,couponCode} = req.body
+        const {couponCode} = req.body
+        let {grandTotal} = req.body
+        grandTotal = parseInt(grandTotal)
 
         if(req.session.coupon){
             res.json({exist:true})
@@ -124,8 +142,11 @@ const applyCoupon = async(req, res) =>{
         } else {
             const foundCoupon = await coupon.findOne({couponCode:couponCode})
             const discountPrice = (grandTotal * foundCoupon.percentage / 100)
-            const grandTotaltot = grandTotal - discountPrice
-
+            let grandTotaltot = grandTotal - discountPrice
+            grandTotaltot.toFixed(2)
+            
+            console.log(grandTotaltot.toFixed(2));
+            
             req.session.coupon=foundCoupon._id
 
             res.json({success:true,discountPrice,grandTotaltot})

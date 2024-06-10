@@ -1,10 +1,16 @@
-const { name } = require('ejs');
 const category = require('../models/categoryModel')
+
 
 const loadCategory = async (req, res) => {
     try {
-        const categories = await category.find()
-        res.render('admin/category', { categories })
+        const limit = 4;
+        const page = parseInt(req.query.page) || 1
+        const skip = (page - 1) * limit;
+        const totalCateCount = await category.countDocuments();
+        const totalPages = Math.ceil(totalCateCount / limit);
+
+        const categoriesData = await category.find().skip(skip).limit(limit)
+        res.render('admin/category', { categories : categoriesData, totalPages, currentPage : page})
     } catch (error) {
         console.log(error.message);
     }
@@ -18,20 +24,22 @@ const addCategory = async (req, res) => {
         const existingName = await category.findOne({name: { $regex: new RegExp(`^${lowerCaseName}$`, 'i') } })
 
         if(existingName){
-            return res.status(400).json({added : false,message:'Category already exists'})
-        }
+            
+            res.json({alreadyAdded : true})
 
-        const newCate = new category({
-            name: name,
-            description: description,
-            isBlocked: false
-        })
+        } else {
 
-        const savedCategory = await newCate.save()
+            const newCate = new category({
+                name: name,
+                description: description,
+                isBlocked: false
+            })
 
-        if(savedCategory){
-            // res.json({added:true, message : 'Category Added Successfully'})
-            res.redirect('/admin/category')
+            const savedCategory = await newCate.save()
+
+            if(savedCategory){
+                res.json({added:true})
+            }
         }
 
     } catch (error) {

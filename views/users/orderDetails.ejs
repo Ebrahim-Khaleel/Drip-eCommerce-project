@@ -433,14 +433,18 @@
             <div class="container-fluid">
                 <div class="breadcrumb-content text-center">
                     <div class="breadcrumb-title">
-                        <h2>My Account</h2>
+                        <h2>Order Details</h2>
                     </div>
                     <ul>
                         <li>
                             <a href="/">Home</a>
                         </li>
                         <li><span> &gt; </span></li>
-                        <li class="active"> My Account </li>
+                        <li>
+                            <a href="/myAccount">My Account</a>
+                        </li>
+                        <li><span> &gt; </span></li>
+                        <li class="active">Order Details </li>
                     </ul>
                 </div>
             </div>
@@ -457,12 +461,14 @@
                             <div>
                                 <h5 class="ms-4 mb-2"><%= prod.productId.name %></h5>
                                 <div class="pb-5">
-                                    <h5 class="ps-4 mb-5 pb-5 ">Rs. <%= prod.productId.price %>.00</h5>
+                                    <h5 class="ps-4 mb-5 pb-5 ">$<%= prod.totalPrice.toFixed(2) %></h5>
                                 </div>
                                 <div class="ms-4 mt-3">
                                     <p class="m-0">Id : <%= prod.productId._id %></p>
                                     <p class="m-0 ">Quantity : <%= prod.quantity %></p>
-                                    <p class="m-0">Total : <%= prod.productId.price * prod.quantity%></p>
+                                    <% let totPrice = 0;
+                                    totPrice = prod.totalPrice * prod.quantity %>
+                                    <p class="m-0">Total : $<%= totPrice.toFixed(2) %></p>
                                 </div>
                             </div>
                             <div style="margin-left: 140px;">
@@ -614,7 +620,7 @@
 
         }
 
-        async function returnOrder(productId, orderId, price){
+        async function returnOrder(productId, orderId, price,totalPrice){
 
             const {value: returnReason} = await Swal.fire({
                 title: "Return reason",
@@ -630,11 +636,11 @@
             })
 
             if(returnReason){
-                const response = await axios.post('/returnOrder',{productId,orderId,price,returnReason})
+                const response = await axios.post('/returnRequest',{productId,orderId,price,returnReason,totalPrice})
                 if(response.data.success){
                     await Swal.fire({
                         title:"Success",
-                        text: "Order is returned",
+                        text: "Return requested",
                         icon: "success",
                         showConfirmButton: false,
                         timer: 1500

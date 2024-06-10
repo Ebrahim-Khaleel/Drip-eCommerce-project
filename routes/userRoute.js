@@ -54,7 +54,9 @@ userRoute.post('/loadEditAddress',addressController.loadEditAddress)
 userRoute.patch('/saveEditAddress',addressController.saveEditAddress)
 userRoute.patch('/removeAddress',addressController.removeAddress)
 // Wishlist
-userRoute.get('/wishlist',userController.loadWishlist)
+userRoute.get('/wishlist',userAuth.isLogin, userController.loadWishlist)
+userRoute.patch('/addToWishlist',userController.addToWishlist)
+userRoute.patch('/removeFromWishlist',userController.removeFromWishlist)
 //checkout
 userRoute.get('/checkout',cartController.loadCheckout)
 userRoute.patch('/checkoutAddAddress',addressController.checkoutAddAddress)
@@ -65,11 +67,13 @@ userRoute.patch('/removeCoupon',couponController.removeCoupon)
 userRoute.post('/COD',orderController.CODorder)
 userRoute.get('/successMessage',orderController.thankYou)
 userRoute.post('/cancelOrder',orderController.orderCancellation)
-userRoute.post('/returnOrder',orderController.returnOrder)
+userRoute.post('/returnRequest',orderController.returnRequest)
+userRoute.patch('/returnOrder',orderController.returnOrder)
 userRoute.post('/paypal',orderController.paypalPayment)
 userRoute.get('/paypalsuccess',orderController.handlePayment)
 userRoute.get('/paypalcancel',orderController.handlePaymenterror)
-
+// wallet
+userRoute.patch('/addAmount',userController.addMoneyToWallet)
 
 // logout
 userRoute.get('/logout',userAuth.isLogin, userController.userLogout)
@@ -101,5 +105,11 @@ userRoute.get('/auth/google/callback',
 
 userRoute.get('/', userController.successGoogleLogin);
 userRoute.get('/failure', userController.failureLogin);
+
+// forgot password
+userRoute.get('/forgotPassword', userController.loadForgotPage)
+userRoute.post('/forgotPassword',userController.forgotPassword)
+userRoute.get('/forgotConfirm',userController.loadNewPass)
+userRoute.post('/forgotConfirm',userController.forgetPassConfirm)
 
 module.exports = userRoute

@@ -436,7 +436,7 @@
                     </div>
                     <ul>
                         <li>
-                            <a href="index.html">Home</a>
+                            <a href="/">Home</a>
                         </li>
                         <li><span> &gt; </span></li>
                         <li class="active">Wishlist</li>
@@ -446,10 +446,11 @@
         </div>
         <div class="wishlist-main-area pt-100 pb-100">
             <div class="container">
-                <div class="row">
+                <div class="row" id="reloadbox">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                         <form action="#">
                             <div class="row">
+                                <% if(wishlists && wishlists.products.length >= 1){ %>
                                 <div class="col-lg-12">
                                     <div class="table-content table-responsive wishlist-table-content">
                                         <table>
@@ -460,68 +461,58 @@
                                                     <th>Product</th>
                                                     <th>Stock Status</th>
                                                     <th> Price</th>
-                                                    <th class="wishlist-cart-none"><span>Add to cart</span></th>
+                                                    <th class="wishlist-cart-none"><span></span></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                <% wishlists.products.forEach((product)=>{ %>
                                                 <tr>
                                                     <td class="wishlist-remove">
-                                                        <a href="#"><i class="dlicon ui-1_simple-remove"></i></a>
+                                                        <a onclick="removeItem('<%= product.productId._id %>')"><i class="dlicon ui-1_simple-remove"></i></a>
                                                     </td>
                                                     <td class="wishlist-img">
-                                                        <a href="#"><img src="user/assets/images/cart/cart-1.jpg" alt=""></a>
+                                                        <a href="#"><img width="80px" src="/uploads/<%= product.productId.images[0] %>" alt=""></a>
                                                     </td>
                                                     <td class="wishlist-name">
-                                                        <a href="#">Embroidered logo shirt</a>
+                                                        <a href="#"><%= product.productId.name %></a>
                                                     </td>
                                                     <td class="wishlist-stock">
-                                                        <span>In Stock</span>
+                                                        <% if(product.productId.quantity == 0 ){ %>
+                                                            <span class="text-danger">Out of Stock</span>
+                                                        <% }else{ %>
+                                                            <span class="text-success">In Stock</span>
+                                                        <% } %>
                                                     </td>
-                                                    <td class="wishlist-price"><span class="amount">$26.00</span></td>
+                                                    <td class="wishlist-price"><span class="amount">$<%= product.productId.price %>.00</span></td>
                                                     <td class="wishlist-cart">
-                                                        <a href="#">Add to cart</a>
+                                                        <% if(product.productId.quantity == 0 ){ %>
+                                                        <% }else{ %>
+                                                            <a onclick="addToCart('<%= product.productId?._id %>')">Add to cart</a>
+                                                        <% } %>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td class="wishlist-remove">
-                                                        <a href="#"><i class="dlicon ui-1_simple-remove"></i></a>
-                                                    </td>
-                                                    <td class="wishlist-img">
-                                                        <a href="#"><img src="user/assets/images/cart/cart-2.jpg" alt=""></a>
-                                                    </td>
-                                                    <td class="wishlist-name">
-                                                        <a href="#">Floral lace dress</a>
-                                                    </td>
-                                                    <td class="wishlist-stock">
-                                                        <span>In Stock</span>
-                                                    </td>
-                                                    <td class="wishlist-price"><span class="amount">$26.00</span></td>
-                                                    <td class="wishlist-cart">
-                                                        <a href="#">Add to cart</a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="wishlist-remove">
-                                                        <a href="#"><i class="dlicon ui-1_simple-remove"></i></a>
-                                                    </td>
-                                                    <td class="wishlist-img">
-                                                        <a href="#"><img src="user/assets/images/cart/cart-1.jpg" alt=""></a>
-                                                    </td>
-                                                    <td class="wishlist-name">
-                                                        <a href="#">Embroidered logo shirt</a>
-                                                    </td>
-                                                    <td class="wishlist-stock">
-                                                        <span>In Stock</span>
-                                                    </td>
-                                                    <td class="wishlist-price"><span class="amount">$26.00</span></td>
-                                                    <td class="wishlist-cart">
-                                                        <a href="#">Add to cart</a>
-                                                    </td>
-                                                </tr>
+                                                <% }) %>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
+                            <% } else { %>
+                                <div>
+                                    <div class="pt-5">
+                                        <h4 class="text-center text-warning text-warning">Your Wishlist is Empty</h4 >
+                                    </div>
+                                    <div class="btn-style-1 text-center py-5">
+                                        <a class="btn-border-black2" href="/shop">
+                                            <div class="btn-viewmore-normal btn-ptb-3 btn-viewmore-bg-transparent btn-viewmore-common btn-font-3">
+                                                <span>Back to shop</span>
+                                            </div>
+                                            <div class="btn-viewmore-hover btn-ptb-3 btn-viewmore-common btn-hover-transition btn-font-3">
+                                                <span>Back to shop</span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <% } %>
                             </div>
                         </form>
                     </div>
@@ -604,6 +595,75 @@
 
     <!-- All JS is here
 ============================================ -->
+    <!-- jQuery CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- SweetAlert CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <!-- Axios CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        async function removeItem(productId){
+
+            const response = await axios.patch('/removeFromWishlist',{productId})
+            if(response.data.success){
+                $('#reloadbox').load('/wishlist #reloadbox')
+            }
+        }
+
+        async function addToCart(productId) {
+            console.log(productId)
+            const response = await axios.post('/addToCart',{productId})
+            if(response.data.exist){
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 1600,
+                    timerProgressBar: true,
+
+                didOpen: (toast) => {
+
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+
+                });
+
+                Toast.fire({
+
+                    icon: "warning",
+                    title: "Already Added"
+
+                });
+
+            }else if(response.data.success){
+                    
+                const Toast = Swal.mixin({
+
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 1600,
+                    timerProgressBar: true,
+
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+
+                Toast.fire({
+
+                    icon: "success",
+                    title: "Item added to cart"
+                    
+                });
+
+                $('#shoppingCartid').load('/wishlist #shoppingCartid')
+            }
+        }
+    </script>
 
     <!-- Modernizer JS -->
     <script src="user/assets/js/vendor/modernizr-3.11.7.min.js"></script>

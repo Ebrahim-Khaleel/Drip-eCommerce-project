@@ -37,8 +37,10 @@ adminRoute.get('/login', isLogout , adminController.loadLogin)
 adminRoute.post('/login', adminController.verifyAdmin)
 adminRoute.get('/signup', isLogin,adminController.showSignUp)
 adminRoute.post('/signup', adminController.insertAdmin)
-adminRoute.get('/home', isLogin, adminController.loadHome)
 adminRoute.get('/logout',isLogin,adminController.adminLogout)
+
+// Home Routes
+adminRoute.get('/home', isLogin, adminController.loadHome)
 
 // Users routes
 adminRoute.get('/users', isLogin,adminController.loadUsers)
@@ -63,12 +65,15 @@ adminRoute.patch('/unlistProduct',productController.unlistingProduct)
 adminRoute.get('/orders',adminController.loadOrders)
 adminRoute.get('/ordersDetails/:id',adminController.loadOrdersDetails)
 adminRoute.put('/updateOrderStatus',adminController.updateorderstatus)
+adminRoute.get('/returnRequest',adminController.loadReturnRequets)
 
 // Offer routes
 adminRoute.get('/offers',adminController.loadOffers)
-adminRoute.post('/offers',adminController.addOffer)
-adminRoute.post('/editOffer',adminController.editOffer)
-adminRoute.patch('/saveEditOffer',adminController.saveEditOffer)
+// adminRoute.post('/offers',adminController.addOffer)
+adminRoute.get('/addOffer',adminController.loadAddOffer)
+adminRoute.post('/addOffer',adminController.addOffer)
+// adminRoute.post('/editOffer',adminController.editOffer)
+// adminRoute.patch('/saveEditOffer',adminController.saveEditOffer)
 adminRoute.patch('/offerDelete',adminController.offerDelete)
 
 // Coupon routes
@@ -77,5 +82,16 @@ adminRoute.post('/addCoupons',couponController.addCoupon)
 adminRoute.post('/editCoupons',couponController.editCoupon)
 adminRoute.patch('/saveEditCoupons',couponController.saveEditCoupon)
 adminRoute.patch('/couponDelete',couponController.couponDelete)
+
+// Sales Report
+adminRoute.get('/salesReport',adminController.loadSalesPage)
+adminRoute.get('/salesReport/:period',adminController.loadReport)
+adminRoute.patch('/salesReport/custom',adminController.loadCustomReport)
+
+// Sales Chart
+adminRoute.put('/home/monthChart',adminController.monthChart)
+adminRoute.put('/home/chartYear',adminController.chartYear)
+
+adminRoute.get('/invoice',adminController.loadInvoice)
 
 module.exports = adminRoute

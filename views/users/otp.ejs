@@ -660,27 +660,27 @@
             <div class="container">
                 <div class="row" style="display: flex; justify-content: center;">
                     <div class="col-lg-6 col-md-6">
-                        <form action="/otp" class="otp-form" method="post" name="otp-form">
+                        
                             <div class="title text-center">
                                 <p class="info" style="font-size: medium;">An OTP has been sent to ****@gmail.com</p>
                                 <p class="msg text-center " style="font-size: larger; margin-bottom: 20px;">Please enter OTP to verify</p>
                             </div>
                             <div class="card" style="border: 0;">
                                 <div class="otp-input-fields d-flex justify-content-center mb-3">
-                                    <input type="number" max="9" name="Otp" required class="otp__digit otp__field__1">
-                                    <input type="number" max="9" name="Otp" required class="otp__digit otp__field__2">
-                                    <input type="number" max="9" name="Otp" required class="otp__digit otp__field__3">
-                                    <input type="number" max="9" name="Otp" required class="otp__digit otp__field__4">
+                                    <input type="number" max="9" id="otp1" required class="otp__digit otp__field__1">
+                                    <input type="number" max="9" id="otp2" required class="otp__digit otp__field__2">
+                                    <input type="number" max="9" id="otp3" required class="otp__digit otp__field__3">
+                                    <input type="number" max="9" id="otp4" required class="otp__digit otp__field__4">
                                 </div>
                                 <div id="timer" class="text-center mt-2"></div>
                                 <div class="otpbtns d-flex">
-                                    <button type="submit" class="btn bg-primary text-white mt-4">Submit</button>
+                                    <button type="submit" onclick="verifyOtp()" class="btn bg-primary text-white mt-4">Submit</button>
                                     <a id="resendBtn" class="btn bg-primary text-white mt-4 " style="display:none;" href="/resendOtp">Resend</a>
                                 </div>
                             </div>
                             <div>
-                                <h4 class="text-center text-danger"><%= locals.wmessage %></h4>
-                                <h4 style="text-align: center; color: rgb(166, 6, 6);"><%= locals.emessage %></h4>
+                                <h4 id="wrongT" class=" text-center text-danger"></h4>
+                                <h4 id="expiredT" style="text-align: center; color: rgb(166, 6, 6);"></h4>
                             </div>
                         </form>
                     </div>
@@ -803,11 +803,9 @@
         }
     }
 </style>
-    
 
-<!-- Your HTML code here -->
-
-<!-- Your HTML code here -->
+<!-- Axios CDN -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
     var otp_inputs = document.querySelectorAll(".otp__digit");
@@ -912,8 +910,28 @@
         console.log('Timer stopped');
     });
 });
+</script>
+<script>
+    async function verifyOtp(){
+        const otp1 = document.getElementById('otp1').value
+        const otp2 = document.getElementById('otp2').value
+        const otp3 = document.getElementById('otp3').value
+        const otp4 = document.getElementById('otp4').value
 
+        const Otp = otp1 + otp2 + otp3 + otp4;
+        console.log(Otp);
 
+        const response = await axios.post('/otp',{Otp})
+
+        if(response.data.wrong){
+            document.getElementById('wrongT').innerHTML = 'Incorrect OTP'
+        }
+        if(response.data.successForg){
+            window.location.href = '/forgotConfirm'
+        }else if(response.data.success){
+            window.location.href = '/'
+        }
+    }
 </script>
 
 

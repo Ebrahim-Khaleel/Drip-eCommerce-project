@@ -2,6 +2,8 @@ const User = require('../models/userModel')
 const admin = require('../models/adminModel')
 const order = require('../models/orderModel')
 const offer = require('../models/offerModel')
+const product = require('../models/productModel')
+const category = require('../models/categoryModel')
 
 
 
@@ -69,11 +71,104 @@ const insertAdmin = async(req,res) => {
 
 const loadHome = async (req, res) => {
     try {
-        res.render('admin/home')
+        const report = await order.find({products:{$elemMatch: {orderStatus : "Delivered"}} }).sort({orderDate:-1})
+        res.render('admin/home',{report})
     } catch (error) {
         console.log(error.message);
     }
 }
+
+const loadSalesPage = async(req, res) => {
+    try{
+        const currentDate = new Date();
+        let startDate, endDate, reports;
+
+        startDate = new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth(),
+            currentDate.getDate() - currentDate.getDay()
+        )
+
+        endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate()+7)
+
+        reports = await order.find({orderDate : {$gte : startDate, $lte: endDate}, products: {$elemMatch: {orderStatus : "Delivered"}} }).sort({orderDate:-1})
+
+        res.render('admin/salesReport',{report : reports})
+        
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+// Sales Report
+const loadReport = async(req,res) => {
+    try{
+        const period = req.params.period
+
+        const currentDate = new Date();
+        let startDate, endDate, reports;
+
+        switch(period){
+            case "weekly" : 
+
+                startDate = new Date(
+                    currentDate.getFullYear(),
+                    currentDate.getMonth(),
+                    currentDate.getDate() - currentDate.getDay()
+                )
+
+                endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate()+7)
+
+                reports = await order.find({orderDate : {$gte : startDate, $lte: endDate}, products: {$elemMatch: {orderStatus : "Delivered"}} }).sort({orderDate:-1})
+
+                res.render('admin/salesReport',{report : reports})
+                break;
+
+            case "monthly" :
+
+                startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
+                endDate = new Date(currentDate.getFullYear(),currentDate.getMonth() + 1, 0);
+                
+                reports = await order.find({orderDate : {$gte : startDate, $lte : endDate}, products : {$elemMatch: {orderStatus : "Delivered"}} }).sort({orderDate:-1})
+
+                res.render('admin/salesReport',{report : reports})
+                break;
+
+            case "yearly" :
+
+                startDate = new Date(currentDate.getFullYear(), 0 , 1);
+                endDate = new Date(currentDate.getFullYear(), 11, 31);
+
+                reports = await order.find({orderDate : {$gte : startDate, $lte : endDate}, products : {$elemMatch: {orderStatus : "Delivered"}} }).sort({orderDate:-1})
+
+                res.render('admin/salesReport',{report : reports})
+                break;
+        }
+        
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
+const loadCustomReport = async(req, res) =>{
+    try{
+        const {customStartDate} = req.body
+        const {customEndDate} = req.body
+
+        const startDate = new Date(customStartDate)
+        const endDate = new Date(customEndDate)
+
+        const reports = await order.find({orderDate: {$gte : startDate, $lte : endDate}, products : {$elemMatch: {orderStatus : "Delivered"}} }).sort({orderDate : -1})
+
+        res.json({report : reports});
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
 
 const adminLogout = async (req, res) => {
     try {
@@ -87,8 +182,15 @@ const adminLogout = async (req, res) => {
 
 const loadUsers = async (req, res) => {
     try {
-        const usersData = await User.find()
-        res.render('admin/users', { usersData })
+        const limit = 6;
+        const page = parseInt(req.query.page) || 1
+        const skip = (page - 1) * limit;
+        const userCount = await User.countDocuments();
+        const totalPages = Math.ceil(userCount / limit);
+
+        const usersData = await User.find().skip(skip).limit(limit)
+
+        res.render('admin/users', { users : usersData, currentPage : page ,totalPages})
     } catch (error) {
         console.log(error.message);
     }
@@ -116,8 +218,16 @@ const userBlocking = async(req,res) =>{
 
 const loadOrders = async(req,res) => {
     try{
-        const orders = await order.find().populate('products.productId').populate('userId')
-        res.render('admin/orders',{orders})
+        const limit = 6;
+        const page = parseInt(req.query.page) || 1
+        const skip = (page - 1) * limit;
+        const orderCount = await order.countDocuments();
+        const totalPages = Math.ceil(orderCount / limit);
+
+        const orderDatas = await order.find().populate('products.productId').populate('userId').skip(skip).limit(limit).sort({orderDate : -1});
+
+        res.render('admin/orders',{orders : orderDatas, currentPage : page, totalPages})
+        
     }catch(error){
         console.log(error.message);
     }
@@ -151,6 +261,41 @@ const updateorderstatus = async(req, res)=> {
     }
 }
 
+
+const loadReturnRequets = async(req, res) =>{
+    try{
+        const returnProduct = await order.aggregate([
+
+            {$unwind : "$products"},
+            {$match: {"products.orderStatus" : "Return Requested"}},
+            {$group : {
+                _id : "$products.productId",
+                orderId : {$first: "$_id"},
+                productId : {$first: "$products.productId"},
+                quantity : {$first : "$products.quantity"},
+                returnReason : {$first : "$products.returnReason"},
+                userId : {$first: "$userId"},
+                totalPrice : {$first : "$products.totalPrice"},
+                orderDate  : {$first : "$orderDate"}
+            }},
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "productId",
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            },
+            { $unwind: "$productDetails" }
+            
+        ])
+        console.log(returnProduct);
+        res.render('admin/returnRequests',{products:returnProduct})
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
 const loadOffers = async(req,res) => {
     try{
         const offers = await offer.find()
@@ -161,25 +306,45 @@ const loadOffers = async(req,res) => {
     }
 }
 
+const loadAddOffer = async(req, res) =>{
+    try{
+        const categories = await category.find({})
+
+        res.render('admin/addOffer',{categories})
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
 const addOffer = async(req,res) =>{
     try{
-        const {name, percentage} = req.body
+        const {title, percentage, startDate, endDate, category} = req.body
 
-        const existingOffer = await offer.findOne({name : { $regex: new RegExp('^' + name + '$', 'i') } })
+        const existingOffer = await offer.findOne({name : { $regex: new RegExp('^' + title + '$', 'i') } })
 
         if(existingOffer){
-            return res.json({error : 'Offer with same name already exists'})
+            return res.json({alreadyExist:true})
         }
 
         const newOffer = await offer.create({
-            name : name,
-            percentage : percentage
+            name : title,
+            percentage : percentage,
+            category : category,
+            startDate : startDate,
+            endDate : endDate
         })
 
-        if(newOffer){
-            console.log('new offer added')
-            res.redirect('/admin/offers')
-        }
+        const products = await product.find({category})
+
+        products.forEach(async(prod)=>{
+            const offeredPrice = (prod.price * (percentage / 100));
+            const offerPrice = prod.price - offeredPrice
+            const applied = await product.updateOne({_id:prod._id},{$set: {offer : newOffer._id, offerPrice : parseFloat(offerPrice.toFixed(2))}})
+            console.log(applied);
+        })
+
+        console.log('new offer added')
+        res.json({success:true})
 
     }catch(error){
         console.log(error.message);
@@ -219,6 +384,15 @@ const saveEditOffer = async(req,res) =>{
 const offerDelete = async(req, res) =>{
     try{
         const {offerId} = req.body
+
+        const offerr = await offer.findOne({_id:offerId}).populate('category')
+        const category = offerr.category
+        const products = await product.find({category})
+
+        for(const prod of products){
+            await product.findOneAndUpdate({_id:prod._id},{$unset:{ offer:1,offerPrice:1}})
+        }
+
         const done = await offer.findOneAndDelete({_id:offerId})
 
         if(done){
@@ -229,12 +403,139 @@ const offerDelete = async(req, res) =>{
     }
 }
 
+const loadInvoice = async(req,res) =>{
+    try{
+        const orders = await order.find({products:{$elemMatch : {orderStatus : "Delivered"}}}).sort({orderDate:-1})
+        res.render('admin/invoice',{orders})
+    }catch(error){
+        console.log(error.message);
+    }
+}
 
+const chartYear = async (req, res , next) => {
+
+    try {
+  
+      const curntYear = new Date().getFullYear();
+  
+      const yearChart = await order.aggregate([
+          
+        {
+          
+          $match: {
+  
+            orderDate: {
+  
+              $gte: new Date(`${curntYear - 5}-01-01`),
+              $lte: new Date(`${curntYear}-12-31`),
+  
+            },
+  
+          },
+  
+        },
+  
+        {
+          $group: {
+  
+            _id: { $year: "$orderDate" },
+            totalAmount: { $sum: "$orderAmount" },
+  
+          },
+  
+        },
+  
+        {
+          $sort: { _id: 1 },
+        },
+  
+      ]);
+      console.log('yeaer:::');
+      console.log(yearChart);
+      res.send({ yearChart });
+  
+    }catch(error) {
+      next(error,req,res);
+    }
+  
+};
+  
+const monthChart = async (req, res , next) => {
+  
+    try {
+      
+      const monthName = [
+  
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+  
+      const curntYear = new Date().getFullYear();
+  
+      const monData = await order.aggregate([
+      
+        {
+          $match: {
+  
+            orderDate: {
+  
+              $gte: new Date(`${curntYear}-01-01`),
+              $lte: new Date(`${curntYear}-12-31`),
+              
+            },
+  
+          },
+        },
+  
+        {
+          $group: {
+            _id: { $month: "$orderDate" },
+            totalAmount: { $sum: "$orderAmount" },
+          },
+        },
+  
+        {
+          $sort: { _id: 1 },
+        },
+  
+      ]);
+  
+      const salesData = Array.from({ length: 12 }, (_, i) => {
+  
+        const monthData = monData.find((item) => item._id === i + 1);
+  
+        return monthData ? monthData.totalAmount : 0;
+  
+      });
+      console.log('monthside');
+      console.log(salesData);
+      res.json({ months: monthName, salesData });
+  
+    } catch (error) {
+  
+      next(error,req,res);
+  
+    }
+  
+};
 
 module.exports = {
     loadLogin,
     verifyAdmin,
     loadHome,
+    loadSalesPage,
+    loadReport,
+    loadCustomReport,
     loadUsers,
     adminLogout,
     showSignUp,
@@ -243,9 +544,14 @@ module.exports = {
     loadOrders,
     loadOrdersDetails,
     updateorderstatus,
+    loadReturnRequets,
     loadOffers,
     addOffer,
     editOffer,
     saveEditOffer,
+    loadAddOffer,
     offerDelete,
+    loadInvoice,
+    chartYear,
+    monthChart,
 }

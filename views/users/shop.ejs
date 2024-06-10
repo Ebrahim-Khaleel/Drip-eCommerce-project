@@ -146,7 +146,7 @@
                             </div>
                             <div class="same-style">
                                 <a class="" href="/login">
-                                    <i class="ri-/user-line"></i>
+                                    <i class="ri-user-line"></i>
                                 </a>
                             </div>
                         </div>
@@ -474,7 +474,7 @@
                             <ul>
                                 <li class="active"><a href="/shop">Default sorting</a></li>
                                 <li><a href="/shop/popularity">Sort by popularity</a></li>
-                                <li><a href="/shop/averageRating">Sort by average rating</a></li>
+                                <!-- <li><a href="/shop/averageRating">Sort by average rating</a></li> -->
                                 <li><a href="/shop/latest">Sort by latest</a></li>
                                 <li><a href="/shop/lowToHigh">Sort by price: low to high</a></li>
                                 <li><a href="/shop/highToLow">Sort by price: high to low</a></li>
@@ -485,7 +485,7 @@
                 <div class="product-filter-wrapper">
                     <div class="row">
                         <!-- Product Filter -->
-                        <div class="col-md-3 col-sm-6 col-xs-12 mb-20">
+                        <!-- <div class="col-md-3 col-sm-6 col-xs-12 mb-20">
                             <div class="product-filter">
                                 <h5>Price</h5>
                                 <div class="price-filter">
@@ -496,7 +496,7 @@
                                     </ul>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- Product Filter -->
                         <!-- <div class="col-md-3 col-sm-6 col-xs-12 mb-20">
                             <div class="product-filter">
@@ -555,7 +555,9 @@
                                     <div class="product-img default-overlay mb-25">
                                         <a href="/productDetail/<%= product._id %>">
                                             <div class="eachImageDiv">
-                                                <img width="315px" src="/uploads/<%= product.images[0] %>" alt=""><% if(product.quantity == 0){ %><span>sold out</span><% } %>
+                                                <img width="315px" src="/uploads/<%= product.images[0] %>" alt="">
+                                                <% if(product.quantity == 0){ %><span class="sold">sold out</span><% } %>
+                                                <% if(product.offer){ %><span class="off"><%= product.offer?.percentage %> %</span><% } %>
                                             </div> 
                                         </a>
                                         <div class="product-action product-action-position-1">
@@ -573,7 +575,11 @@
                                             <span class="new-price">$28.00</span>
                                         </div> -->
                                         <div>
-                                            <span class="new-price">$<%= product.price %>.00</span>
+                                            <% if(product.offer){ %>
+                                                <span>$<%= product.offerPrice.toFixed(2) %></span>
+                                            <% }else{ %>
+                                            <span>$<%= product.price.toFixed(2) %></span>
+                                            <% } %>
                                         </div>
                                     </div>
                                    
@@ -606,7 +612,11 @@
                                             <div class="shop-list-content ml-20">
                                                 <h3><a href="#"><%= product.name %></a></h3>
                                                 <div class="pro-list-price">
-                                                    <span>$<%= product.price %>.00</span>
+                                                    <% if(product.offer){ %>
+                                                        <span>$<%= product.offerPrice.toFixed(2) %></span>
+                                                    <% }else{ %>
+                                                    <span>$<%= product.price.toFixed(2) %></span>
+                                                    <% } %>
                                                 </div>
                                                 <p><%= product.description %></p>
                                                 <div class="product-list-action">

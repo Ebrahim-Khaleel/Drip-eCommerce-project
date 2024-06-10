@@ -555,18 +555,18 @@
         
                                 <div class="collapse navbar-collapse" id="topnav-menu-content">
                                     <ul class="navbar-nav">
-                                        <li class="nav-item">
+                                        <!-- <li class="nav-item">
                                             <a class="nav-link dropdown-toggle arrow-none" href="index.html" id="topnav-dashboard" role="button"
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <i class='bx bx-tachometer'></i>
                                                 <span data-key="t-dashboards">Dashboard</span>
                                             </a>
-                                        </li>
+                                        </li> -->
         
                                         <!-- User Management Pages -->
                                         <li class="nav-item dropdown">
                                             <a class="nav-link dropdown-toggle arrow-none" href="/admin/users" id="topnav-pages" role="button">
-                                                <i class='bx bx-grid-alt'></i>
+                                                <i class="mdi mdi-account-multiple-outline"></i>
                                                 <span data-key="t-apps">Users</span> <div ></div>
                                             </a>
                                         </li>
@@ -582,7 +582,7 @@
                                         <!-- Product Management Pages -->
                                         <li class="nav-item dropdown">
                                             <a class="nav-link dropdown-toggle arrow-none" href="/admin/products" id="topnav-pages" role="button">
-                                                <i class='bx bx-grid-alt'></i>
+                                                <i class="mdi mdi-shopping-outline "></i>
                                                 <span data-key="t-apps">Products</span> <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-pages">
@@ -596,27 +596,34 @@
                                         <!-- Orders Management Page -->
                                         <li class="nav-item dropdown">
                                             <a class="nav-link dropdown-toggle arrow-none" href="/admin/orders" id="topnav-components" role="button">
-                                                <i class='bx bx-layer' ></i>
+                                                <i class='bx bx-store' ></i>
                                                 <span data-key="t-components">Orders</span> <div ></div>
                                             </a>                       
                                         </li>
         
                                         <!-- Offer Management Page -->
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle arrow-none" href="/admin/offers" id="topnav-components" role="button">
-                                                <i class='bx bx-layer' ></i>
-                                                <span data-key="t-components">Offers</span>
-                                            </a>                       
-                                        </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle arrow-none" href="/admin/offers" id="topnav-components" role="button">
+                                            <i class='bx bx-tachometer' ></i>
+                                            <span data-key="t-components">Offers</span>
+                                        </a>                       
+                                    </li>
 
-                                        <!-- Coupon Management Page -->
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle arrow-none" href="/admin/coupons" id="topnav-components" role="button">
-                                                <i class='bx bx-layer' ></i>
-                                                <span data-key="t-components">Coupons</span>
-                                            </a>                       
-                                        </li>
-        
+                                    <!-- Coupon Management Page -->
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle arrow-none" href="/admin/coupons" id="topnav-components" role="button">
+                                            <i class='bx bx-layout' ></i>
+                                            <span data-key="t-components">Coupons</span>
+                                        </a>                       
+                                    </li>
+
+                                    <!-- Sales Report Page -->
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle arrow-none" href="/admin/salesReport" id="topnav-components" role="button">
+                                            <i class='bx bxs-bar-chart-alt-2' ></i>
+                                            <span data-key="t-components">Sales Report</span>
+                                        </a>                       
+                                    </li>
                                     </ul>
                                 </div>
                             </nav>
@@ -809,7 +816,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="page-title-box d-flex align-items-center justify-content-between">
-                                    <h3 class="mb-0">Orders</h3>
+                                    <h4 class="mb-0">Order : <%= orderD._id %></h4>
                                     <div class="page-title-right">
                                         <ol class="breadcrumb m-0">
                                             <li class="breadcrumb-item"><a href="/admin/orders">Orders</a></li>
@@ -847,7 +854,6 @@
                                                 <thead>
                                                     <tr>
                                                         <th>Sl No.</th>
-                                                        <th>Order Id</th>
                                                         <th>Customer</th>
                                                         <th>Product</th>
                                                         <th>Order Date</th>
@@ -860,7 +866,6 @@
                                                     <% orderD.products.forEach((prod,i)=> { %>
                                                         <tr>
                                                             <td><%= i+1 %></td>
-                                                            <td><%= orderD._id  %></td>
                                                             <td><%= orderD.userId.name %></td>
                                                             <td>
                                                                     <div>
@@ -869,10 +874,12 @@
                                                                     </div>
                                                                     <p><%= prod.productId.name %><span class="fw-semibold text-danger "> x </span><%= prod.quantity %> qty</p>
                                                                     <div>
-                                                                        <p>Product Price : <%= prod.productId.price %></p>
+                                                                        <p>Product Price : <%= prod.totalPrice.toFixed(2) %></p>
                                                                     </div>
                                                                     <div>
-                                                                        <p>Total Amount : <%= prod.productId.price * prod.quantity%></p>
+                                                                        <% let tot = 0;
+                                                                        tot = prod.totalPrice * prod.quantity %>
+                                                                        <p>Total Amount : <%= tot.toFixed(2) %></p>
                                                                     </div>
                                                             </td>            
                                                             <td><%= orderD.orderDate.toLocaleDateString() %></td>
@@ -901,23 +908,7 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <ul class="pagination pagination-rounded justify-content-end mb-2">
-                                            <li class="page-item disabled">
-                                                <a class="page-link" href="javascript: void(0);" aria-label="Previous">
-                                                    <i class="mdi mdi-chevron-left"></i>
-                                                </a>
-                                            </li>
-                                            <li class="page-item active"><a class="page-link" href="javascript: void(0);">1</a></li>
-                                            <li class="page-item"><a class="page-link" href="javascript: void(0);">2</a></li>
-                                            <li class="page-item"><a class="page-link" href="javascript: void(0);">3</a></li>
-                                            <li class="page-item"><a class="page-link" href="javascript: void(0);">4</a></li>
-                                            <li class="page-item"><a class="page-link" href="javascript: void(0);">5</a></li>
-                                            <li class="page-item">
-                                                <a class="page-link" href="javascript: void(0);" aria-label="Next">
-                                                    <i class="mdi mdi-chevron-right"></i>
-                                                </a>
-                                            </li>
-                                        </ul>
+                                       
                                     </div>
                                 </div>
                             </div>

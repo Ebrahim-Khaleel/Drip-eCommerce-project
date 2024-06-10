@@ -673,17 +673,19 @@
         </div>
         <div class="my-account-area pt-100 pb-95">
             <div class="container">
-                <div class="row flex-row-reverse">
-                    <div class="col-lg-12">
-                        <div class="myaccount-tab-menu nav" role="tablist">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="myaccount-tab-menu nav flex-column " role="tablist">
                             <a href="#dashboad" class="active" data-bs-toggle="tab">
                                 Profile Details</a>
                             <a href="#orders" data-bs-toggle="tab"> Orders</a>
-                            <!-- <a href="#download" data-bs-toggle="tab"> Download</a> -->
+                            <a href="#download" data-bs-toggle="tab"> Wallet</a>
                             <a href="#address-edit" data-bs-toggle="tab"> address</a>
                             <a href="#account-info" data-bs-toggle="tab"> Edit Profile</a>
                             <a href="/logout"> Logout</a>
                         </div>
+                    </div>
+                    <div class="col-lg-9">
                         <!-- My Account Tab Menu End -->
                         <!-- My Account Tab Content Start -->
                         <div class="tab-content ps-5 pe-5" id="myaccountContent">
@@ -761,7 +763,7 @@
                                                 </div>
                                                 <div >
                                                     <p><%= order.orderDate.toLocaleDateString() %></p>
-                                                    <p>Rs. <%= order.orderAmount %>.00</p>
+                                                    <p>$<%= order.orderAmount.toFixed(2) %></p>
                                                 </div>
                                                 <div class="pe-2">
                                                     <a type="button" class="btn btn-dark" href="/orderDetails/<%= order._id %>">View</a>
@@ -778,38 +780,44 @@
                             </div>
                             <!-- Single Tab Content End -->
                             <!-- Single Tab Content Start -->
-                            <!-- <div class="tab-pane fade" id="download" role="tabpanel">
+                            <div class="tab-pane fade" id="download" role="tabpanel">
                                 <div class="myaccount-content">
-                                    <div class="myaccount-table table-responsive text-center">
-                                        <table class="table table-bordered">
+                                    <div class="myaccount-table table-responsive" id="walletArea">
+                                        <h3 class="fw-light">Total Balance</h3>
+                                        <h1 class="fw-semibold ">$ <%= wallett.balance.toFixed(2) %></h1>
+                                        <table class="table" style="margin-top: 40px;">
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th>Product</th>
+                                                    <th>Transactions</th>
+                                                    <th>Amount</th>
                                                     <th>Date</th>
-                                                    <th>Expire</th>
-                                                    <th>Download</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>Haven - Free Real Estate PSD Template</td>
-                                                    <td>Aug 22, 2023</td>
-                                                    <td>Yes</td>
-                                                    <td><a href="#" class="check-btn sqr-btn "><i
-                                                                class="fa fa-cloud-download"></i> Download File</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>HasTech - Profolio Business Template</td>
-                                                    <td>Sep 12, 2023</td>
-                                                    <td>Never</td>
-                                                    <td><a href="#" class="check-btn sqr-btn "><i
-                                                                class="fa fa-cloud-download"></i> Download File</a></td>
-                                                </tr>
+                                                <div class="d-flex " style="margin-top: 40px;">
+                                                    <input type="number" class="form-control w-25" id="addAmountId" placeholder="Enter Amount">
+                                                    <button class="btn btn-dark" onclick="addMoney()">Add Amount</button>
+                                                </div>
+                                                <p class="text-danger" id="addAmountErr"></p>
+                                                <div>
+                                                    <% wallett.transaction.forEach((transct)=>{ %>
+                                                        <tr>
+                                                            <td><%= transct.creditOrDebit %></td>
+                                                            <td>$<%= transct.amount.toFixed(2) %></td>
+                                                            <td><%= transct.time.toLocaleDateString() %></td>
+                                                        </tr>
+                                                   <% }) %>
+                                                </div>
                                             </tbody>
                                         </table>
+                                        <div class="p-4">
+                                        <% if(wallett.transaction.length == 0 ){ %>
+                                        <h5 class="text-center text-danger ">No Transactions </h5>
+                                            <% } %>
+                                        </div>
                                     </div>
                                 </div>
-                            </div> -->
+                            </div>
                             <!-- Single Tab Content End -->
                             <!-- Single Tab Content Start -->
                             <div class="tab-pane fade" id="address-edit" role="tabpanel">
@@ -1387,6 +1395,41 @@
                     })
                 }
             })
+        }
+
+        async function addMoney(){
+            const amount = document.getElementById('addAmountId').value
+
+            document.getElementById('addAmountErr').innerHTML = ""
+
+            if(amount === ''){
+                document.getElementById('addAmountErr').innerHTML = "Enter amount"
+                return false
+            }
+
+            document.getElementById('addAmountErr').innerHTML = ""
+
+            const response = await axios.patch('/addAmount',{amount})
+
+            if(response.data.success){
+                const Toast = Swal.mixin({
+                    toast: true,
+                    background : "#000000",
+                    position: "bottom",
+                    showConfirmButton: false,
+                    width : "20vw",
+                    timer: 4000,
+                    timerProgressBar: true,
+                });
+
+                Toast.fire({
+                    icon: "success",
+                    title: "Amount added"
+                });
+
+                $('#walletArea').load('/myAccount #walletArea')
+            }
+
         }
 
     </script>

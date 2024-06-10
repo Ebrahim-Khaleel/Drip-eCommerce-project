@@ -1,12 +1,21 @@
 const product = require('../models/productModel')
 const category = require('../models/categoryModel')
+const order = require('../models/orderModel')
 
 
 const loadProducts = async (req, res) => {
     try {
-        const products = await product.find().populate('category')
+        // For Pagination
+        const limit = 6;
+        const page = parseInt(req.query.page) || 1
+        const skip = (page - 1) * limit;
+        const totalProsCount = await product.countDocuments();
+        const totalPages = Math.ceil(totalProsCount / limit);
+
+        const productData = await product.find().populate('category').skip(skip).limit(limit);
+
         const categories = await category.find()
-        res.render('admin/products', { products, categories })
+        res.render('admin/products', { products : productData, categories,totalPages, currentPage :page})
     } catch (error) {
         console.log(error.message);
     }
@@ -67,9 +76,13 @@ const editProduct = async(req, res)=>{
         const existingData = await product.findOne({_id: id});
         
         let imageArr = existingData.images.slice(); // Start with a copy of the existing images
+     
 
         // Assuming you've corrected the form to pass old image names correctly
         const oldImageNames = [req.body.oldImage1, req.body.oldImage2, req.body.oldImage3, req.body.oldImage4];
+
+        console.log(" old "+req.body.oldImage4);
+        console.log(" new "+newImages);
 
         newImages.forEach((newImage, index) => {
             const oldImageName = oldImageNames[index];
@@ -100,9 +113,19 @@ const unlistingProduct = async(req, res)=>{
         const { productId } = req.body;
         const productData = await product.findOne({ _id : productId})
 
+        const pending = await order.findOne({products:{$elemMatch:{productId:productId,orderStatus:"Pending"||"Shipped"}}},{deliveryAddress:0})
+
+        console.log(" pendddd  ;;;;;;;  "+pending);
+
         if(!productData.isBlocked){
-            await product.findByIdAndUpdate({ _id : productId}, {$set: {isBlocked : true}})
-            console.log('Product Unlisted');
+
+            if(pending){
+                res.json({pending:true}) 
+            }else{
+                await product.findByIdAndUpdate({ _id : productId}, {$set: {isBlocked : true}})
+                console.log('Product Unlisted');
+            }
+            
         } else {
             await product.findByIdAndUpdate({ _id : productId}, {$set: {isBlocked : false}})
             console.log('Product listed');

@@ -2,11 +2,10 @@ const express = require('express');
 const path = require('path');
 const userRoute = require('./routes/userRoute');
 const adminRoute = require('./routes/adminRoute');
-const session = require('express-session');
 const logger = require('morgan');
 const nocache = require('nocache');
 const cors = require('cors');
-const passport = require('passport');
+const flash = require('express-flash');
 
 // importing env
 require('dotenv').config();
@@ -26,16 +25,16 @@ db()
 const app = express();
 
 //view engine setup
+app.use("/",express.static(path.join(__dirname, 'public')))
 app.set('view engine', 'ejs')
 
 // app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(express.static(path.join(__dirname, 'public')))
 app.use(nocache())
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
+app.use(flash())
 
 
 // setting Routes
