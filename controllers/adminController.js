@@ -71,8 +71,123 @@ const insertAdmin = async(req,res) => {
 
 const loadHome = async (req, res) => {
     try {
-        const report = await order.find({products:{$elemMatch: {orderStatus : "Delivered"}} }).sort({orderDate:-1})
-        res.render('admin/home',{report})
+        const ordersCount = await order.countDocuments()
+        const usersCount = await User.countDocuments()
+        const productsCount = await product.countDocuments()
+
+        // BEST SELLING PRODUCTS
+        const bestSellingProducts = await order.aggregate([
+            { $match: { 'products.orderStatus': 'Delivered' } },
+            { $unwind: '$products' },
+            {
+                $group: {
+                    _id: '$products.productId',
+                    totalQuantity: { $sum: '$products.quantity' },
+                    soldCount : { $sum : 1}
+                }
+            },
+            { $sort: { totalQuantity: -1 } },
+            { $limit: 10 },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    totalQuantity: 1,
+                    soldCount: 1,
+                    productDetails: { $arrayElemAt: ['$productDetails', 0] }
+                }
+            }
+
+        ])
+
+        // console.log(bestSellingProducts);
+
+        // BEST SELLING CATEGORY
+        const bestSellingCategory = await order.aggregate([
+            { $match: { 'products.orderStatus': 'Delivered' } },
+            { $unwind: '$products' },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'products.productId',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            { $unwind: '$productDetails' },
+            {
+                $group: {
+                    _id: '$productDetails.category',
+                    totalQuantity: { $sum: '$products.quantity' },
+                }
+            },
+            { $sort: { totalQuantity: -1 } },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'categoryDetails'
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    totalQuantity: 1,
+                    categoryName: { $arrayElemAt: ['$categoryDetails.name', 0] }
+                }
+            }
+
+        ])
+
+        // console.log(bestSellingCategory);
+
+        // TOTAL EARNINGS
+        const curntYear = new Date().getFullYear();
+  
+        const yearEarnings = await order.aggregate([
+            
+            {
+            
+            $match: {
+    
+                orderDate: {
+    
+                $gte: new Date(`${curntYear - 5}-01-01`),
+                $lte: new Date(`${curntYear}-12-31`),
+    
+                },
+                'products.orderStatus' : 'Delivered'
+    
+            },
+    
+            },
+    
+            {
+            $group: {
+    
+                _id: { $year: "$orderDate" },
+                totalAmount: { $sum: "$orderAmount" },
+    
+            },
+    
+            },
+    
+            {
+            $sort: { _id: 1 },
+            },
+    
+        ]);
+        console.log(yearEarnings)
+
+        res.render('admin/home',{ordersCount, yearEarnings, usersCount, productsCount, bestSellingProducts, bestSellingCategory})
     } catch (error) {
         console.log(error.message);
     }
@@ -412,7 +527,7 @@ const loadInvoice = async(req,res) =>{
     }
 }
 
-const chartYear = async (req, res , next) => {
+const chartYear = async (req, res) => {
 
     try {
   
@@ -430,6 +545,7 @@ const chartYear = async (req, res , next) => {
               $lte: new Date(`${curntYear}-12-31`),
   
             },
+            'products.orderStatus' : 'Delivered'
   
           },
   
@@ -455,12 +571,12 @@ const chartYear = async (req, res , next) => {
       res.send({ yearChart });
   
     }catch(error) {
-      next(error,req,res);
+      console.log(error.message)
     }
   
 };
   
-const monthChart = async (req, res , next) => {
+const monthChart = async (req, res) => {
   
     try {
       
@@ -493,6 +609,7 @@ const monthChart = async (req, res , next) => {
               $lte: new Date(`${curntYear}-12-31`),
               
             },
+            'products.orderStatus' : 'Delivered'
   
           },
         },
@@ -523,7 +640,7 @@ const monthChart = async (req, res , next) => {
   
     } catch (error) {
   
-      next(error,req,res);
+      console.log(error.message);
   
     }
   

@@ -16339,7 +16339,7 @@ body.body-menu-overlay::before {
 }
 
 .bg-1 {
-  background-image: url(../images/bg/bg-1.png);
+  background-image: url(../images/bg/tu-tu-QZGQO3NvsLo-unsplash.jpg);
   background-position: 110% calc(110% + 69.7px);
   position: absolute;
   left: 0;
@@ -16347,6 +16347,7 @@ body.body-menu-overlay::before {
   height: 120%;
   width: 100%;
   background-repeat: no-repeat;
+  background-size: 100%;
   will-change: transform;
 }
 
@@ -27039,6 +27040,10 @@ body.body-menu-overlay::before {
   float: left;
 }
 
+.pro-pagination-style ul{
+  margin-bottom: 20px;
+}
+
 .pro-pagination-style ul li {
   display: inline-block;
   margin: 0 1px;
@@ -27099,6 +27104,7 @@ body.body-menu-overlay::before {
 @media only screen and (max-width: 767px) {
   .pro-pagination-style.mt-35 {
     margin-top: 0;
+    
   }
   .pro-pagination-style.mt-50 {
     margin-top: 20px;
@@ -27108,6 +27114,7 @@ body.body-menu-overlay::before {
   }
   .pro-pagination-style.ml-150 {
     margin-left: 0px;
+    margin-bottom: 10px;
   }
   .pro-pagination-style.ml-50 {
     margin-left: 100px;

@@ -3,6 +3,7 @@ const path = require('path');
 const userRoute = require('./routes/userRoute');
 const adminRoute = require('./routes/adminRoute');
 const logger = require('morgan');
+const session = require('express-session')
 const nocache = require('nocache');
 const cors = require('cors');
 const flash = require('express-flash');
@@ -34,6 +35,11 @@ app.use(express.urlencoded({ extended: true }))
 app.use(nocache())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
+app.use(session({
+    secret: process.env.SESSIONSECRET, // Replace with your own secret key
+    resave: false,
+    saveUninitialized: true,
+  }));
 app.use(flash())
 
 

@@ -36,13 +36,20 @@ const showHome = async (req, res) => {
 
 const showShop = async (req, res) => {
     try {
+        const limit = 8;
+        const page = parseInt(req.query.page) || 1
+        const skip = (page - 1) * limit;
+        const productsCount = await products.countDocuments();
+        const totalPages = Math.ceil(productsCount / limit);
+
+
         // loading cart quantity
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         const categories = await category.find({isBlocked:false})
 
-        const showproducts = await products.find().populate('category').populate('offer')
-        res.render('users/shop', { showproducts,cartItems,categories})
+        const showproducts = await products.find().populate('category').populate('offer').skip(skip).limit(limit)
+        res.render('users/shop', { showproducts,cartItems,categories, currentPage : page, totalPages, productsCount})
     } catch (error) {
         console.log(error);
     }
@@ -50,14 +57,20 @@ const showShop = async (req, res) => {
 
 const lowToHigh = async (req,res) => {
     try{
+        const limit = 8;
+        const page = parseInt(req.query.page) || 1
+        const skip = (page - 1) * limit;
+        const productsCount = await products.countDocuments();
+        const totalPages = Math.ceil(productsCount / limit);
+
         // loading cart quantity
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         const categories = await category.find({isBlocked:false})
 
-        const lowtohigh = await products.find({}).sort({price : 1}).populate('category')
+        const lowtohigh = await products.find({}).sort({price : 1}).populate('category').skip(skip).limit(limit)
 
-        res.render('users/shop',{showproducts : lowtohigh,cartItems,categories})
+        res.render('users/shop',{showproducts : lowtohigh,cartItems,categories, currentPage : page, totalPages,productsCount})
         
     }catch(error){
         console.log(error.message);
@@ -65,14 +78,20 @@ const lowToHigh = async (req,res) => {
 }
 const HighToLow = async (req,res) => {
     try{
+        const limit = 8;
+        const page = parseInt(req.query.page) || 1
+        const skip = (page - 1) * limit;
+        const productsCount = await products.countDocuments();
+        const totalPages = Math.ceil(productsCount / limit);
+
         // loading cart quantity
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         const categories = await category.find({isBlocked:false})
 
-        const hightolow = await products.find({}).sort({price : -1}).populate('category')
+        const hightolow = await products.find({}).sort({price : -1}).populate('category').skip(skip).limit(limit)
 
-        res.render('users/shop',{showproducts : hightolow,cartItems,categories})
+        res.render('users/shop',{showproducts : hightolow,cartItems,categories, currentPage : page, totalPages,productsCount})
 
     }catch(error){
         console.log(error.message);
@@ -94,13 +113,19 @@ const popularity = async (req,res) => {
 }
 const latest = async (req,res) => {
     try{
+        const limit = 8;
+        const page = parseInt(req.query.page) || 1
+        const skip = (page - 1) * limit;
+        const productsCount = await products.countDocuments();
+        const totalPages = Math.ceil(productsCount / limit);
+
         // loading cart quantity
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         const categories = await category.find({isBlocked:false})
 
-        const showproducts = await products.find().sort({createdAt : -1}).populate('category')
-        res.render('users/shop',{showproducts,cartItems,categories})
+        const showproducts = await products.find().sort({createdAt : -1}).populate('category').skip(skip).limit(limit)
+        res.render('users/shop',{showproducts,cartItems,categories, currentPage : page, totalPages,productsCount})
     }catch(error){
         console.log(error.message);
     }
@@ -420,7 +445,7 @@ const verifyLogin = async (req, res) => {
                 }
                 
             } else {
-                res.render('users/login', { Pmessage: "Incorrect Passowrd" })
+                res.render('users/login', { Pmessage: "Incorrect Password" })
             }
             
         } else {
@@ -439,12 +464,15 @@ const loadMyAccount = async (req, res) => {
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
 
         const userData = await User.findById({ _id: req.session.user_id })
-        const addresses = await address.find({userId:userId})
-        let orders = await order.find({userId:userId}).populate('products.productId')
-        const wallett = await wallet.findOne({userId : userId})
+        const addresses = await address.find({userId:userId}).sort({_id:-1}).limit(3)
+        let orders = await order.find({userId:userId}).populate('products.productId').sort({_id:-1})
+        const wallett = await wallet.findOne({userId:userId}, {transaction:1, _id : 0});
+        wallett.transaction.sort((a, b) => new Date(b.time) - new Date(a.time))
+
+        const walletb = await wallet.findOne({userId:userId})
         
         if(userData){
-            res.render('users/myAccount',{userData,addresses,cartItems,orders,wallett})
+            res.render('users/myAccount',{userData,addresses,cartItems,orders,wallett, walletb})
         } else {
             res.redirect('/login')
         }

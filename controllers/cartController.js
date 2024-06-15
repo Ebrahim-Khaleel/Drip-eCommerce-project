@@ -113,7 +113,7 @@ const loadCheckout = async(req,res) => {
         // loading cart quantity
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
-        const addresses = await address.find({userId:userId})
+        const addresses = await address.find({userId:userId}).sort({_id:-1}).limit(3)
         const coupons = await coupon.find({})
         const wallett = await wallet.findOne({userId:userId})
         

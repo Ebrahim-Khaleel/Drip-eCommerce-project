@@ -11,12 +11,6 @@ require('dotenv').config
 const passport = require('passport')
 require('../passport')
 
-// session setting
-userRoute.use(session({
-    secret: process.env.SESSIONSECRET,
-    resave: true,
-    saveUninitialized: true
-}))
 
 // home page
 userRoute.get('/', userController.showHome)
@@ -72,6 +66,10 @@ userRoute.patch('/returnOrder',orderController.returnOrder)
 userRoute.post('/paypal',orderController.paypalPayment)
 userRoute.get('/paypalsuccess',orderController.handlePayment)
 userRoute.get('/paypalcancel',orderController.handlePaymenterror)
+userRoute.post('/failedPayment',orderController.failedPayment)
+// invoice
+userRoute.get('/getinvoice',orderController.loadInvoice)
+
 // wallet
 userRoute.patch('/addAmount',userController.addMoneyToWallet)
 
