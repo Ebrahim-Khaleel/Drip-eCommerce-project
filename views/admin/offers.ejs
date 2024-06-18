@@ -804,8 +804,7 @@
                                                         <%= offer.percentage %> %
                                                     </td>
                                                     <td>
-                                                        <button class="btn btn-outline-dark me-1" data-bs-target="#editModal" data-bs-toggle="modal" onclick="openEditModal('<%= offer._id %>')">
-                                                            Edit</button>
+                                                        <a class="btn btn-outline-dark me-1" href="/admin/editOffer/<%= offer._id %>">Edit</a>
                                                         <button class="btn btn-outline-danger ms-1" onclick="deleteOffer('<%= offer._id %>')">Delete</button>
                                                     </td>
                                                 </tr>

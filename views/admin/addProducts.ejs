@@ -692,7 +692,7 @@
                                                 <form action="/admin/addProducts"id='productForm' method="post" enctype="multipart/form-data" onsubmit="return validateForm(event)">
                                                     <div class="mb-3">
                                                         <label class="form-label" for="productname">Product Name:</label>
-                                                        <input type="text" class="form-control" placeholder="Enter name" id="nameId" name="name">
+                                                        <input type="text" class="form-control" style="width: 50%;" placeholder="Enter name" id="nameId" name="name">
                                                         <p id="nameError" class="text-danger"></p>
                                                     </div>
                                                     <div class="mb-3">
@@ -782,6 +782,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+
                                                         <p id="imageError" class="text-danger"></p>
                                                     </div>
                                                     <div class="row mt-3">
@@ -1027,6 +1028,9 @@
                     return false;
                 } else if(/\d/.test(name)) {
                     document.getElementById('nameError').innerHTML = 'Product name cannot be a number';
+                    return false;
+                } else if(name === ''){
+                    document.getElementById('nameError').innerHTML = 'Enter a Product name.';
                     return false;
                 }
 

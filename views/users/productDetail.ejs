@@ -505,13 +505,13 @@
                                         </div>
                                         <div class="product-details-cart">
                                             <% if(product.quantity > 0){ %>
-                                                <a  title="Add to cart" onclick="addToCart('<%= product._id %>')">Add to cart</a>
+                                                <a  title="Add to cart" onclick="addToCart('<%= product._id %>')"><i class="fa fa-shopping-cart"></i> Add to cart</a>
                                             <% }else{ %>
                                                 <button disabled>Add to cart</button>
                                             <% } %>
                                         </div>
                                         <div class="product-details-wishlist">
-                                            <a title="Add to wishlist" onclick="addToWishlist('<%= product._id %>')"><i class="fa fa-heart"></i></a>
+                                            <a title="Add to wishlist" onclick="addToWishlist('<%= product._id %>')"><i class="fa fa-heart-o"></i></a>
                                         </div>
                                     </div>
                                     <div class="product-details-info">

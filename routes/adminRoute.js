@@ -69,11 +69,10 @@ adminRoute.get('/returnRequest',adminController.loadReturnRequets)
 
 // Offer routes
 adminRoute.get('/offers',adminController.loadOffers)
-// adminRoute.post('/offers',adminController.addOffer)
 adminRoute.get('/addOffer',adminController.loadAddOffer)
 adminRoute.post('/addOffer',adminController.addOffer)
-// adminRoute.post('/editOffer',adminController.editOffer)
-// adminRoute.patch('/saveEditOffer',adminController.saveEditOffer)
+adminRoute.get('/editOffer/:id',adminController.loadEditOffer)
+adminRoute.post('/editOffer',adminController.editOffer)
 adminRoute.patch('/offerDelete',adminController.offerDelete)
 
 // Coupon routes

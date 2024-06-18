@@ -424,8 +424,9 @@ const loadOffers = async(req,res) => {
 const loadAddOffer = async(req, res) =>{
     try{
         const categories = await category.find({})
+        const products = await product.find({})
 
-        res.render('admin/addOffer',{categories})
+        res.render('admin/addOffer',{categories,products})
     }catch(error){
         console.log(error.message);
     }
@@ -433,7 +434,7 @@ const loadAddOffer = async(req, res) =>{
 
 const addOffer = async(req,res) =>{
     try{
-        const {title, percentage, startDate, endDate, category} = req.body
+        const {title, percentage, startDate, endDate, category, productt} = req.body.offerDetails
 
         const existingOffer = await offer.findOne({name : { $regex: new RegExp('^' + title + '$', 'i') } })
 
@@ -441,22 +442,41 @@ const addOffer = async(req,res) =>{
             return res.json({alreadyExist:true})
         }
 
-        const newOffer = await offer.create({
+        const newOfferData = {
             name : title,
             percentage : percentage,
-            category : category,
             startDate : startDate,
             endDate : endDate
-        })
+        }
 
-        const products = await product.find({category})
+        if(category){
+            newOfferData.category = category;
+        }
 
-        products.forEach(async(prod)=>{
+        if(productt){
+            newOfferData.product = productt;
+        }
+
+        const newOffer = await offer.create(newOfferData)
+
+        if(category){
+            const products = await product.find({category})
+
+            products.forEach(async(prod)=>{
+                const offeredPrice = (prod.price * (percentage / 100));
+                const offerPrice = prod.price - offeredPrice
+                const applied = await product.updateOne({_id:prod._id}, {$set: {offer : newOffer._id, offerPrice : parseFloat(offerPrice.toFixed(2)) } })
+                console.log(applied);
+            })
+
+        } else if(product){
+            const prod = await product.findOne({_id:productt});
+
             const offeredPrice = (prod.price * (percentage / 100));
-            const offerPrice = prod.price - offeredPrice
-            const applied = await product.updateOne({_id:prod._id},{$set: {offer : newOffer._id, offerPrice : parseFloat(offerPrice.toFixed(2))}})
+            const offerPrice = prod.price - offeredPrice;
+            const applied = await product.updateOne({_id:prod._id}, {$set: {offer : newOffer._id, offerPrice : parseFloat(offerPrice.toFixed(2)) } })
             console.log(applied);
-        })
+        }
 
         console.log('new offer added')
         res.json({success:true})
@@ -466,35 +486,93 @@ const addOffer = async(req,res) =>{
     }
 }
 
-const editOffer = async(req,res) =>{
+const loadEditOffer = async(req, res) =>{
     try{
-        const {offerId} = req.body
-        const findedOffer = await offer.findOne({_id:offerId})
-        res.json({ name : findedOffer.name, percentage : findedOffer.percentage })
-         
-    }catch(error){
-        console.log(error.message);
-    }
-}
+        const offerId = req.params.id
+        const offerDetails = await offer.findOne({_id:offerId}).populate('category product')
 
-const saveEditOffer = async(req,res) =>{
-    try{
-        const {offerId,name,percentage} = req.body
+        let categories = []
+        let products = []
 
-        const existingOffer = await offer.findOne({name : { $regex: new RegExp('^' + name + '$', 'i') } })
-
-        if(existingOffer){
-            return res.json({error : 'Offer with same name already exists'})
+        if(offerDetails.category){
+            categories = await category.find({});
+        } else if (offerDetails.product){
+            products = await product.find({});
         }
 
-        await offer.findOneAndUpdate({_id:offerId}, {name : name, percentage : percentage})
+        res.render('admin/editOffer',{offerDetails, categories, products})
+    }catch(error){
+        console.log(error.message);
+    }
+}
 
-        res.json({success : true})
+const editOffer = async(req,res) =>{
+    try{
+        const {offerId, title, percentage, startDate, endDate, category, productt} = req.body.offerDetails
+        console.log(req.body.offerDetails)
+        const existingOffer = await offer.findOne({_id:offerId})
+        console.log(existingOffer)
+        let previousProducts = [];
+        if(existingOffer.category){
+            previousProducts = await product.find({category : existingOffer.category})
+            console.log(previousProducts);
+        } else if (existingOffer.product){
+            previousProducts = await product.find({_id:existingOffer.product})
+        }
+
+        existingOffer.name = title;
+        existingOffer.percentage = percentage;
+        existingOffer.startDate = startDate;
+        existingOffer.endDate = endDate;
+
+        let updatedProducts = [];
+        if(category){
+            existingOffer.category = category;
+            existingOffer.product = null;
+
+            updatedProducts = await product.find({category})
+
+            for(const prod of updatedProducts){
+                const offerPrice = prod.price - (prod.price * (percentage / 100));
+                await product.updateOne({ _id: prod._id }, {
+                    offer: existingOffer._id,
+                    offerPrice: parseFloat(offerPrice.toFixed(2))
+                });
+            }
+
+        } else if(productt){
+            existingOffer.product = productt
+            existingOffer.category = null;
+
+            const prod = await product.findOne({_id:productt})
+            if (prod) {
+                updatedProducts = [prod];
+                const offerPrice = prod.price - (prod.price * (percentage / 100));
+                await product.updateOne({ _id: prod._id }, {
+                    offer: existingOffer._id,
+                    offerPrice: parseFloat(offerPrice.toFixed(2))
+                });
+            }
+        }
+
+        const updatedProductIds = updatedProducts.map(prod => prod._id.toString());
+        for (const prevProd of previousProducts) {
+            if (!updatedProductIds.includes(prevProd._id.toString())) {
+                await product.updateOne({ _id: prevProd._id }, {
+                    $unset: { offer: "", offerPrice: "" }
+                });
+            }
+        }
+
+        await existingOffer.save();
+        
+        res.json({success:true}) 
 
     }catch(error){
         console.log(error.message);
     }
 }
+
 
 const offerDelete = async(req, res) =>{
     try{
@@ -664,8 +742,8 @@ module.exports = {
     loadReturnRequets,
     loadOffers,
     addOffer,
+    loadEditOffer,
     editOffer,
-    saveEditOffer,
     loadAddOffer,
     offerDelete,
     loadInvoice,

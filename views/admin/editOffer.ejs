@@ -11,20 +11,20 @@
         <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
         <meta content="Themesbrand" name="author" />
         <!-- App favicon -->
-        <link rel="shortcut icon" href="assets/images/favicon.ico">
+        <link rel="shortcut icon" href="/admin/assets/images/favicon.ico">
 
         <!-- choices css -->
-        <link href="assets/libs/choices.js/public/assets/styles/choices.min.css" rel="stylesheet" type="text/css" />
+        <link href="/admin/assets/libs/choices.js/public/assets/styles/choices.min.css" rel="stylesheet" type="text/css" />
 
         <!-- dropzone css -->
-        <link href="assets/libs/dropzone/min/dropzone.min.css" rel="stylesheet" type="text/css" />
+        <link href="/admin/assets/libs/dropzone/min/dropzone.min.css" rel="stylesheet" type="text/css" />
 
         <!-- Bootstrap Css -->
-        <link href="assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
+        <link href="/admin/assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
         <!-- Icons Css -->
-        <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="/admin/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <!-- App Css-->
-        <link href="assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+        <link href="/admin/assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
 
     </head>
 
@@ -692,24 +692,30 @@
                                             <div class="p-4 border-top">
                                                     <div class="mb-3">
                                                         <label class="form-label" for="productname">Offer Title :</label>
-                                                        <input type="text" class="form-control" placeholder="Enter name" id="titleId">
+                                                        <input type="text" class="form-control" placeholder="Enter name" value="<%= offerDetails.name %>" id="titleId">
                                                         <p id="titleError" class="text-danger"></p>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-lg-4">
                                                             <div class="mb-3">
                                                                 <label class="form-label" for="price">Percentage:</label>
-                                                                <input type="number" min="0" max="99" class="form-control" placeholder="Enter percentage" id="percentageId">
+                                                                <input type="number" min="0" max="99" class="form-control" value="<%= offerDetails.percentage %>" placeholder="Enter percentage" id="percentageId">
                                                                 <p id="percentageError" class="text-danger"></p>
                                                             </div>
                                                         </div>
+
+                                                        <% 
+                                                            const startDateFormatted = new Date(offerDetails.startDate).toISOString().split('T')[0];
+                                                            const endDateFormatted = new Date(offerDetails.endDate).toISOString().split('T')[0];
+                                                        %>
+
                                                         <div class="col-md-3">
                                                             <div class="mb-3">
                                                                 <div>
                                                                     <label class="form-label">Start Date:</label>
                                                                 </div>
                                                                 <div>
-                                                                    <input type="date" class="form-control" id="startDateId">
+                                                                    <input type="date" class="form-control" value="<%= startDateFormatted %>" id="startDateId">
                                                                     <p id="startDateError" class="text-danger"></p>
                                                                 </div>
                                                             </div>                                                              
@@ -720,29 +726,37 @@
                                                                     <label class="form-label">End Date:</label>
                                                                 </div>
                                                                 <div>
-                                                                    <input type="date" class="form-control" id="endDateId">
+                                                                    <input type="date" class="form-control" value="<%= endDateFormatted %>" id="endDateId">
                                                                     <p id="endDateError" class="text-danger"></p>
                                                                 </div>
                                                             </div>                                                              
                                                         </div>
                                                     </div>
+
+                                                    <% if(offerDetails.category){ %>
                                                     <div class="row">
                                                         <div class="col-lg-4">
                                                             <div class="mb-3">
                                                                 <label for="category" class="form-label">Category:</label>
-                                                                <input type="radio" name="choose" id="categoryRadio" onclick="toggleAccordion('categoryAccordion')">
+                                                                <input type="radio" name="choose" id="categoryRadio" checked>
                                                             </div>
+                                                            <p id="catOrPro" class="text-danger"></p>
                                                         </div>
+                                                    </div>
+                                                    <% }else{ %>
+                                                    <div class="row">
                                                         <div class="col-lg-4">
                                                             <div class="mb-3">
                                                                 <label for="product" class="form-label">Product:</label>
-                                                                <input type="radio" name="choose" id="productRadio" onclick="toggleAccordion('productAccordion')">
+                                                                <input type="radio" name="choose" id="productRadio" checked>
                                                             </div>
                                                         </div>
                                                         <p id="catOrPro" class="text-danger"></p>
                                                     </div>
-                                                    
-                                                    <div id="categoryAccordion" class="accordion" style="display: none;">
+                                                    <% } %>
+
+                                                    <% if(offerDetails.category){ %>
+                                                    <div id="categoryAccordion" class="accordion" >
                                                         <div class="accordion-item">
                                                             <h2 class="accordion-header" id="headingOne">
                                                                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -753,6 +767,7 @@
                                                                 <div class="accordion-body">
                                                                     <!-- Category content here -->
                                                                     <select class="form-select" id="categorySelect">
+                                                                        <option value="<%= offerDetails.category._id %>" selected><%= offerDetails.category.name %></option>
                                                                         <% categories.forEach(category=>{ %>
                                                                             <% if(!category.isBlocked){ %>
                                                                             <option value="<%= category._id %>"><%= category.name  %></option>
@@ -763,8 +778,8 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    
-                                                    <div id="productAccordion" class="accordion" style="display: none;">
+                                                    <% }else{ %>
+                                                    <div id="productAccordion" class="accordion" >
                                                         <div class="accordion-item">
                                                             <h2 class="accordion-header" id="headingTwo">
                                                                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
@@ -774,6 +789,7 @@
                                                             <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingTwo" data-bs-parent="#productAccordion">
                                                                 <div class="accordion-body">
                                                                     <select class="form-select" id="productSelect">
+                                                                        <option value="<%= offerDetails.product._id %>" selected><%= offerDetails.product.name %></option>
                                                                         <% products.forEach(product=>{ %>
                                                                             <% if(!product.isBlocked){ %>
                                                                             <option value="<%= product._id %>"><%= product.name  %></option>
@@ -784,11 +800,13 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <% } %>
 
                                                     <div class="row mt-3">
                                                         <p id="emptyError" class="text-danger"></p>
                                                         <div class="col text-end me-3">
-                                                            <button onclick="addOffer()" class="btn btn-success"><i class="mdi mdi-plus"></i> Add Offer</button>
+                                                            <input id="offerId" type="text" hidden value="<%= offerDetails._id %>">
+                                                            <button onclick="editOffer()" class="btn btn-success"><i class="mdi mdi-plus"></i> Edit Offer</button>
                                                         </div> <!-- end col -->
                                                     </div> 
                                             </div>
@@ -980,14 +998,13 @@
         
         <script>
 
-            async function addOffer() {
+            async function editOffer() {
 
+                const offerId = document.getElementById('offerId').value
                 const title = document.getElementById('titleId').value
                 const percentage = document.getElementById('percentageId').value
                 const startDate = document.getElementById('startDateId').value
                 const endDate = document.getElementById('endDateId').value
-                const category = document.getElementById('categorySelect').value
-                const product = document.getElementById('productSelect').value
 
                 document.getElementById('titleError').innerHTML='';
                 document.getElementById('percentageError').innerHTML='';
@@ -1030,16 +1047,22 @@
                     return false;
                 }
 
-                let offerDetails = { title, percentage, startDate, endDate}
+                let offerDetails = { offerId ,title, percentage, startDate, endDate}
 
-                if (document.getElementById('categoryRadio').checked) {
+                const categoryRadio = document.getElementById('categoryRadio');
+                const productRadio = document.getElementById('productRadio');
+
+                if (categoryRadio && categoryRadio.checked) {
+                    const category = document.getElementById('categorySelect').value;
                     offerDetails.category = category;
-                } else if (document.getElementById('productRadio').checked) {
+                } else if (productRadio && productRadio.checked) {
+                    const product = document.getElementById('productSelect').value;
                     offerDetails.productt = product;
                 } else {
                     document.getElementById('catOrPro').innerHTML = 'Please select either a category or a product.';
                     return false;
                 }
+
 
                 document.getElementById('titleError').innerHTML='';
                 document.getElementById('percentageError').innerHTML='';
@@ -1048,7 +1071,7 @@
                 document.getElementById('catOrPro').innerHTML='';
                 document.getElementById('emptyError').innerHTML = '';
 
-                const response = await axios.post('/admin/addOffer',{offerDetails})
+                const response = await axios.post('/admin/editOffer',{offerDetails})
 
                 if(response.data.alreadyExist){
                     document.getElementById('titleError').innerHTML = 'Already exists';
@@ -1056,15 +1079,6 @@
                     window.location.href = '/admin/offers'
                 }
 
-            }
-
-            function toggleAccordion(accordionId) {
-                // Hide both accordions initially
-                document.getElementById('categoryAccordion').style.display = 'none';
-                document.getElementById('productAccordion').style.display = 'none';
-
-                // Show the selected accordion
-                document.getElementById(accordionId).style.display = 'block';
             }
 
         </script>
