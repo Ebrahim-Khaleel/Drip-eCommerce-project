@@ -4,7 +4,7 @@ const order = require('../models/orderModel')
 const offer = require('../models/offerModel')
 const product = require('../models/productModel')
 const category = require('../models/categoryModel')
-const ExcelJS = require('exceljs');
+
 
 
 const loadLogin = async (req, res) => {
@@ -284,78 +284,6 @@ const loadCustomReport = async(req, res) =>{
         console.log(error.message);
     }
 }
-
-const generateExcelReport = async (req, res) => {
-    try {
-        const period = req.params.period;
-
-        const currentDate = new Date();
-        let startDate, endDate, reports;
-
-        switch (period) {
-            case "weekly":
-                startDate = new Date(
-                    currentDate.getFullYear(),
-                    currentDate.getMonth(),
-                    currentDate.getDate() - currentDate.getDay()
-                );
-
-                endDate = new Date(startDate);
-                endDate.setDate(endDate.getDate() + 7);
-
-                reports = await order.find({ orderDate: { $gte: startDate, $lte: endDate }, products: { $elemMatch: { orderStatus: "Delivered" } } }).sort({ orderDate: -1 });
-
-                break;
-
-            case "monthly":
-                startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-                endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-
-                reports = await order.find({ orderDate: { $gte: startDate, $lte: endDate }, products: { $elemMatch: { orderStatus: "Delivered" } } }).sort({ orderDate: -1 });
-
-                break;
-
-            case "yearly":
-                startDate = new Date(currentDate.getFullYear(), 0, 1);
-                endDate = new Date(currentDate.getFullYear(), 11, 31);
-
-                reports = await order.find({ orderDate: { $gte: startDate, $lte: endDate }, products: { $elemMatch: { orderStatus: "Delivered" } } }).sort({ orderDate: -1 });
-
-                break;
-        }
-
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Sales Report');
-
-        worksheet.columns = [
-            { header: 'No', key: 'no', width: 10 },
-            { header: 'Order Id', key: 'orderId', width: 32 },
-            { header: 'Billing Name', key: 'billingName', width: 32 },
-            { header: 'Date', key: 'date', width: 15 },
-            { header: 'Order Amount', key: 'orderAmount', width: 15 }
-        ];
-
-        reports.forEach((element, index) => {
-            worksheet.addRow({
-                no: index + 1,
-                orderId: element._id,
-                billingName: element?.deliveryAddress?.name || 'N/A',
-                date: element.orderDate.toLocaleDateString(),
-                orderAmount: element.orderAmount.toFixed(2)
-            });
-        });
-
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', `attachment; filename=sales_report_${period}.xlsx`);
-
-        await workbook.xlsx.write(res);
-        res.end();
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).send('Internal Server Error');
-    }
-};
-
 
 
 const adminLogout = async (req, res) => {
@@ -817,7 +745,6 @@ module.exports = {
     loadSalesPage,
     loadReport,
     loadCustomReport,
-    generateExcelReport,
     loadUsers,
     adminLogout,
     showSignUp,

@@ -86,7 +86,6 @@ adminRoute.patch('/couponDelete', adminAuth.isLogin, couponController.couponDele
 adminRoute.get('/salesReport', adminAuth.isLogin, adminController.loadSalesPage)
 adminRoute.get('/salesReport/:period', adminAuth.isLogin, adminController.loadReport)
 adminRoute.patch('/salesReport/custom', adminAuth.isLoginn, adminController.loadCustomReport)
-adminRoute.get('/salesReport/:period/downloadExcel', adminAuth.isLogin, adminController.generateExcelReport)
 
 // Sales Chart
 adminRoute.put('/home/monthChart', adminAuth.isLogin, adminController.monthChart)

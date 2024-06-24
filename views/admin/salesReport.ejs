@@ -723,7 +723,7 @@
                                         <!--  -->
                                         
                                     </div>
-                                    <div class="card-body pt-xl-1">
+                                    <div class="card-body pt-xl-1" id="dataDiv">
                                         <div class="table-responsive">
                                             <table class="table table-striped table-centered align-middle table-nowrap mb-0">
                                                 <thead >
@@ -764,9 +764,9 @@
                                             <a type="button" href="javascript:window.print()" class="btn btn-primary waves-effect waves-light w-sm">
                                                 <i class="mdi mdi-download d-block"></i> PDF
                                             </a>
-                                            <a href="/admin/salesReport/<%= period %>/downloadExcel" type="button" class="btn btn-primary waves-effect waves-light w-sm" style="margin-left: 7px;">
+                                            <button type="button" onclick="exportExcel()" class="btn btn-primary waves-effect waves-light w-sm" style="margin-left: 7px;">
                                                 <i class="mdi mdi-download d-block"></i> Excel
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -945,6 +945,9 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <!-- Chart js -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- xlsx CDN -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
 
         <script>
             async function customDate(){
@@ -994,6 +997,14 @@
                 }
 
             } 
+
+            function exportExcel(){
+                const table = document.getElementById('dataDiv');
+                const ws = XLSX.utils.table_to_sheet(table);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                XLSX.writeFile(wb, 'report.xlsx');
+            }
 
         </script>
 
