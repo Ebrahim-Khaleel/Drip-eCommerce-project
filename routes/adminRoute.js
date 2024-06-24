@@ -8,7 +8,7 @@ const multer = require('multer')
 const path = require('path')
 const fs = require('fs')
 const session = require('express-session')
-const { isLogin, isLogout } = require('../middlewares/adminAuth')
+const adminAuth = require('../middlewares/adminAuth')
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -33,64 +33,65 @@ adminRoute.use(session({
 }))
 
 // Admin routes
-adminRoute.get('/login', isLogout , adminController.loadLogin)
-adminRoute.post('/login', adminController.verifyAdmin)
-adminRoute.get('/signup', isLogin,adminController.showSignUp)
-adminRoute.post('/signup', adminController.insertAdmin)
-adminRoute.get('/logout',isLogin,adminController.adminLogout)
+adminRoute.get('/login', adminAuth.isLogout , adminController.loadLogin)
+adminRoute.post('/login', adminAuth.isLogout, adminController.verifyAdmin)
+adminRoute.get('/signup', adminAuth.isLogout, adminController.showSignUp)
+adminRoute.post('/signup', adminAuth.isLogout, adminController.insertAdmin)
+adminRoute.get('/logout', adminAuth.isLogin, adminController.adminLogout)
 
 // Home Routes
-adminRoute.get('/home', isLogin, adminController.loadHome)
+adminRoute.get('/home', adminAuth.isLogin, adminController.loadHome)
 
 // Users routes
-adminRoute.get('/users', isLogin,adminController.loadUsers)
-adminRoute.patch('/userBlock',adminController.userBlocking)
+adminRoute.get('/users', adminAuth.isLogin,adminController.loadUsers)
+adminRoute.patch('/userBlock', adminAuth.isLogin, adminController.userBlocking)
 
 // Category routes
-adminRoute.get('/category',isLogin, categoryController.loadCategory)
-adminRoute.post('/category', categoryController.addCategory)
-adminRoute.post('/editCategory', categoryController.editCategory)
-adminRoute.patch('/editCategoryDone', categoryController.editCategoryDone)
-adminRoute.patch('/categoryBlock',categoryController.categoryBlocking)
+adminRoute.get('/category', adminAuth.isLogin, categoryController.loadCategory)
+adminRoute.post('/category', adminAuth.isLoginn, categoryController.addCategory)
+adminRoute.post('/editCategory', adminAuth.isLogin, categoryController.editCategory)
+adminRoute.patch('/editCategoryDone', adminAuth.isLoginn, categoryController.editCategoryDone)
+adminRoute.patch('/categoryBlock', adminAuth.isLogin, categoryController.categoryBlocking)
 
 // Product routes
-adminRoute.get('/products', isLogin,productController.loadProducts)
-adminRoute.get('/addProducts',isLogin, productController.loadAddProduct)
-adminRoute.post('/addProducts', upload.array('image'), productController.addProduct)
-adminRoute.get('/editProducts',isLogin, productController.loadEditProduct)
-adminRoute.post('/editProducts', upload.array('image[]'), productController.editProduct)
-adminRoute.patch('/unlistProduct',productController.unlistingProduct)
+adminRoute.get('/products', adminAuth.isLogin, productController.loadProducts)
+adminRoute.get('/addProducts',adminAuth.isLogin, productController.loadAddProduct)
+adminRoute.post('/addProducts', adminAuth.isLogin, upload.array('image'), productController.addProduct)
+adminRoute.get('/editProducts', adminAuth.isLogin, productController.loadEditProduct)
+adminRoute.post('/editProducts', adminAuth.isLogin, upload.array('image[]'), productController.editProduct)
+adminRoute.patch('/unlistProduct',adminAuth.isLogin, productController.unlistingProduct)
 
 // Order routes
-adminRoute.get('/orders',adminController.loadOrders)
-adminRoute.get('/ordersDetails/:id',adminController.loadOrdersDetails)
-adminRoute.put('/updateOrderStatus',adminController.updateorderstatus)
-adminRoute.get('/returnRequest',adminController.loadReturnRequets)
+adminRoute.get('/orders', adminAuth.isLogin, adminController.loadOrders)
+adminRoute.get('/ordersDetails/:id', adminAuth.isLogin, adminController.loadOrdersDetails)
+adminRoute.put('/updateOrderStatus', adminAuth.isLoginn, adminController.updateorderstatus)
+adminRoute.get('/returnRequest', adminAuth.isLogin, adminController.loadReturnRequets)
 
 // Offer routes
-adminRoute.get('/offers',adminController.loadOffers)
-adminRoute.get('/addOffer',adminController.loadAddOffer)
-adminRoute.post('/addOffer',adminController.addOffer)
-adminRoute.get('/editOffer/:id',adminController.loadEditOffer)
-adminRoute.post('/editOffer',adminController.editOffer)
-adminRoute.patch('/offerDelete',adminController.offerDelete)
+adminRoute.get('/offers', adminAuth.isLogin, adminController.loadOffers)
+adminRoute.get('/addOffer', adminAuth.isLogin, adminController.loadAddOffer)
+adminRoute.post('/addOffer', adminAuth.isLoginn, adminController.addOffer)
+adminRoute.get('/editOffer/:id', adminAuth.isLogin, adminController.loadEditOffer)
+adminRoute.post('/editOffer', adminAuth.isLoginn, adminController.editOffer)
+adminRoute.patch('/offerDelete', adminAuth.isLogin, adminController.offerDelete)
 
 // Coupon routes
-adminRoute.get('/coupons',couponController.loadCoupons)
-adminRoute.post('/addCoupons',couponController.addCoupon)
-adminRoute.post('/editCoupons',couponController.editCoupon)
-adminRoute.patch('/saveEditCoupons',couponController.saveEditCoupon)
-adminRoute.patch('/couponDelete',couponController.couponDelete)
+adminRoute.get('/coupons', adminAuth.isLogin, couponController.loadCoupons)
+adminRoute.post('/addCoupons', adminAuth.isLogin, couponController.addCoupon)
+adminRoute.post('/editCoupons', adminAuth.isLogin, couponController.editCoupon)
+adminRoute.patch('/saveEditCoupons', adminAuth.isLoginn, couponController.saveEditCoupon)
+adminRoute.patch('/couponDelete', adminAuth.isLogin, couponController.couponDelete)
 
 // Sales Report
-adminRoute.get('/salesReport',adminController.loadSalesPage)
-adminRoute.get('/salesReport/:period',adminController.loadReport)
-adminRoute.patch('/salesReport/custom',adminController.loadCustomReport)
+adminRoute.get('/salesReport', adminAuth.isLogin, adminController.loadSalesPage)
+adminRoute.get('/salesReport/:period', adminAuth.isLogin, adminController.loadReport)
+adminRoute.patch('/salesReport/custom', adminAuth.isLoginn, adminController.loadCustomReport)
+adminRoute.get('/salesReport/:period/downloadExcel', adminAuth.isLogin, adminController.generateExcelReport)
 
 // Sales Chart
-adminRoute.put('/home/monthChart',adminController.monthChart)
-adminRoute.put('/home/chartYear',adminController.chartYear)
+adminRoute.put('/home/monthChart', adminAuth.isLogin, adminController.monthChart)
+adminRoute.put('/home/chartYear', adminAuth.isLogin, adminController.chartYear)
 
-adminRoute.get('/invoice',adminController.loadInvoice)
+adminRoute.get('/invoice', adminAuth.isLogin, adminController.loadInvoice)
 
 module.exports = adminRoute

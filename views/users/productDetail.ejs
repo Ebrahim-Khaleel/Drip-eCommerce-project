@@ -533,7 +533,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="product-details-col-28">
+                            <!-- <div class="product-details-col-28">
                                 <div class="pro-details-sidebar-active slider-nav-style-3 owl-carousel">
                                     <div class="single-pro-details-sidebar">
                                         <a href="#"><img src="/user/assets/images/product-details/pro-details-sidebar-1.jpg" alt=""></a>
@@ -570,7 +570,7 @@
                                         </form>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -583,9 +583,9 @@
                         <div class="description-review-wrapper">
                             <div class="description-review-topbar nav">
                                 <a class="active" data-bs-toggle="tab" href="#des-details1">Description</a>
-                                <a data-bs-toggle="tab" href="#des-details2">Additional information</a>
+                                <!-- <a data-bs-toggle="tab" href="#des-details2">Additional information</a>
                                 <a data-bs-toggle="tab" href="#des-details3">Reviews (1)</a>
-                                <a data-bs-toggle="tab" href="#des-details4"> Brands</a>
+                                <a data-bs-toggle="tab" href="#des-details4"> Brands</a> -->
                                 <a data-bs-toggle="tab" href="#des-details5">Shipping & Delivery</a>
                             </div>
                             <div class="tab-content description-review-bottom">
@@ -605,7 +605,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div id="des-details2" class="tab-pane">
+                                <!-- <div id="des-details2" class="tab-pane">
                                     <div class="additional-info">
                                         <ul>
                                             <li><span>Size</span>L, S, XL, XXL</li>
@@ -699,8 +699,8 @@
                                                 </div>
                                             </form>
                                         </div>
-                                    </div>
-                                </div>
+                                    </div> 
+                                </div> -->
                                 <div id="des-details4" class="tab-pane ">
                                     <div class="pro-dec-brand-wrap">
                                         <div class="row">
@@ -723,9 +723,7 @@
                                 </div>
                                 <div id="des-details5" class="tab-pane">
                                     <div class="about-shiping-content">
-                                        <p>Nunc lacus elit, faucibus ac laoreet sed, dapibus ac mi. Maecenas eu ante a elit tempus fermentum. Aliquam commodo tincidunt semper. Phasellus accumsan, justo ac mollis pharetra, ex dui pharetra nisl, a scelerisque ipsum nulla ac sem. Cras eu risus urna. Duis lorem sapien, congue eget nisl sit amet, rutrum faucibus elit.</p>
-                                        <p>Donec accumsan auctor iaculis. Sed suscipit arcu ligula, at egestas magna molestie a. Proin ac ex maximus, ultrices justo eget, sodales orci. Aliquam egestas libero ac turpis pharetra, in vehicula lacus scelerisque. Vestibulum ut sem laoreet, feugiat tellus at, hendrerit arcu.</p>
-                                        <p>Nunc lacus elit, faucibus ac laoreet sed, dapibus ac mi. Maecenas eu ante a elit tempus fermentum. Aliquam commodo tincidunt semper. Phasellus accumsan, justo ac mollis pharetra, ex dui pharetra nisl, a scelerisque ipsum nulla ac sem. Cras eu risus urna. Duis lorem sapien, congue eget nisl sit amet, rutrum faucibus elit.</p>
+                                        <h5>delivery within 7 days</h5>
                                     </div>
                                 </div>
                             </div>
@@ -776,7 +774,7 @@
                 </div>
             </div>
         </div>
-        <div class="related-product-area section-padding-1 pb-95">
+        <!-- <div class="related-product-area section-padding-1 pb-95">
             <div class="container-fluid">
                 <div class="section-title-6 mb-50">
                     <h2>You may also like</h2>
@@ -1033,7 +1031,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <footer class="footer-area section-padding-1 border-top-3">
             <div class="container-fluid">
                 <div class="footer-top pt-100 pb-60">
@@ -1116,10 +1114,7 @@
                     <div class="modal-body">
                         <div class="row g-0">
                             <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                                <div class="quickview-slider-active owl-carousel">
-                                    <a class="img-popup" href="/user/assets/images/product/quickview-1.jpg"><img src="/user/assets/images/product/quickview-1.jpg" alt=""><span>sold uot</span></a>
-                                    <a class="img-popup" href="/user/assets/images/product/quickview-2.jpg"><img src="/user/assets/images/product/quickview-2.jpg" alt=""><span>sold uot</span></a>
-                                </div>
+
                                 <!-- Thumbnail Large Image End -->
                             </div>
                             <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
@@ -1195,25 +1190,17 @@
             if(Number(inp.value)<=0) inp.value=1
         }
 
-        function addToCart(productId){
+        async function addToCart(productId){
+            try{
+                const quantity = document.getElementById('quantity').value
 
-            const quantity = document.getElementById('quantity').value
-
-            fetch(`/addToCart`, {
-                method : 'post',
-                headers : {
-                    'Content-Type' : 'application/json'
-                },
-                body : JSON.stringify({productId,quantity})
-            })
-            .then(res=> res.json())
-            .then(data=> {
+                const response = await axios.post('/addToCart',{productId,quantity})
                 
-                if(data.noUser){
+                if(response.data.loginRequired){
                     window.location.href = '/login'
                 } else {
 
-                    if(data.exist){
+                    if(response.data.exist){
                     
                         const Toast = Swal.mixin({
                             toast: true,
@@ -1237,7 +1224,7 @@
 
                         });
 
-                    }else if(data.success){
+                    }else if(response.data.success){
                         
                         const Toast = Swal.mixin({
 
@@ -1265,57 +1252,57 @@
                     }
                 }
 
-            })
-
-            .catch(error=>{
-                console.log('Error', error);
-            })
+            }catch(error){
+                console.log(error.message);
+            }
         }
 
         async function addToWishlist(productId){
+            try{
+                const response = await axios.patch('/addToWishlist',{productId})
 
-            const response = await axios.patch('/addToWishlist',{productId})
+                if(response.data.loginRequired){
+                    window.location.href = '/login'
+                } else{
+                    if(response.data.success){
+                        const Toast = Swal.mixin({
 
-            if(response.data.noUser){
-                window.location.href = '/login'
-            } else{
-                if(response.data.success){
-                    const Toast = Swal.mixin({
-
-                        toast: true,
-                        position: "top-end",
-                        showConfirmButton: false,
-                        timer: 2000,
-                        timerProgressBar: true,
-                    });
-
-                        Toast.fire({
-
-                        icon: "success",
-                        title: "Added to Wishlist"
-
-                        });
-
-                        $('#shoppingCartid').load(`/productDetail/${productId} #shoppingCartid`)
-
-                } else if(response.data.exist){
-                    const Toast = Swal.mixin({
                             toast: true,
                             position: "top-end",
                             showConfirmButton: false,
-                            timer: 1600,
-                            timerProgressBar: true
+                            timer: 2000,
+                            timerProgressBar: true,
                         });
 
-                        Toast.fire({
+                            Toast.fire({
 
-                            icon: "warning",
-                            title: "Already Added"
+                            icon: "success",
+                            title: "Added to Wishlist"
 
-                        });
+                            });
+
+                            $('#shoppingCartid').load(`/productDetail/${productId} #shoppingCartid`)
+
+                    } else if(response.data.exist){
+                        const Toast = Swal.mixin({
+                                toast: true,
+                                position: "top-end",
+                                showConfirmButton: false,
+                                timer: 1600,
+                                timerProgressBar: true
+                            });
+
+                            Toast.fire({
+
+                                icon: "warning",
+                                title: "Already Added"
+
+                            });
+                    }
                 }
+            }catch(error){
+                console.log(error.message)
             }
-
 
         }
     </script>

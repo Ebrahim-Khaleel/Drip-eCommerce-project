@@ -3,9 +3,25 @@ const isLogin = async(req, res, next)=>{
         if(req.session.admin_id){
             next()
         }else{
-            res.redirect('/admin/login')
+            if(req.headers['content-type'] === 'application/json'){
+                res.status(401).json({ loginRequired: true });
+            }else{
+                res.redirect('/admin/login')
+            }
         }
     }catch(error){
+        console.log(error.message);
+    }
+}
+
+const isLoginn = (req, res, next) => {
+    try {
+        if (req.session.admin_id) {
+            next()
+        } else {
+            res.json({ loginRequired: true });
+        }
+    } catch (error) {
         console.log(error.message);
     }
 }
@@ -24,5 +40,6 @@ const isLogout = async(req, res, next) => {
 
 module.exports = {
     isLogin,
+    isLoginn,
     isLogout
 }

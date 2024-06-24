@@ -4,8 +4,27 @@ const isLogin = (req, res, next) => {
     try {
         if (req.session.user_id) {
             next()
+            
         } else {
-            res.redirect('/login')
+
+            if (req.headers['content-type'] === 'application/json') {
+                res.status(401).json({ loginRequired: true });
+            } else {
+                res.redirect('/login');
+            }
+
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const isLoginn = (req, res, next) => {
+    try {
+        if (req.session.user_id) {
+            next()
+        } else {
+            res.json({ loginRequired: true });
         }
     } catch (error) {
         console.log(error.message);
@@ -51,6 +70,7 @@ const isBlockAuth = async(req, res, next) =>{
 
 module.exports = {
     isLogin,
+    isLoginn,
     isLogout,
     userAuthorize,
     isBlockAuth

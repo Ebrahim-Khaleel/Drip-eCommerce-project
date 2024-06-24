@@ -875,26 +875,44 @@
             document.getElementById('editPhoneErr').innerHTML = ''
             document.getElementById('editNameErr').innerHTML = ''
 
-            const response = await axios.patch('/editProfile',{name : name.value, phone : phone.value})
-            console.log('aaa');
-            if(response.data.success){
-                const close=document.getElementById('close')
-                close.click()
-                Swal.fire({
-                    position: "center",
-                    icon: "success",
-                    title: "Profile Edited!",
-                    showConfirmButton: false,
-                    timer: 1800
-                }).then(()=>{
+            const result = await Swal.fire({
+                title: "Are you sure?",
+                text: "change credentials?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Confirm"
+            })
 
-                    $('#dashboad').load('/myAccount #dashboad')
-                })
+            if(result.isConfirmed){
+                try{
+                    const response = await axios.patch('/editProfile',{name : name.value, phone : phone.value})
+
+                    if (response.data.loginRequired) {
+                        window.location.href = '/login';
+                    } else if (response.data.success) {
+                        const close=document.getElementById('close')
+                        close.click()
+
+                        Swal.fire({
+                            position: "center",
+                            icon: "success",
+                            title: "Profile Edited!",
+                            showConfirmButton: false,
+                            timer: 1800
+                        }).then(()=>{
+                            $('#dashboad').load('/myAccount #dashboad')
+                        })
+                    }
+                }catch(error){
+                    console.log(error.message);
+                }
             }
             
         }
 
-        function validateChangePass(){
+        async function validateChangePass(){
             const currentPass = document.getElementById('current-pwd').value
             const newPass = document.getElementById('new-pwd').value
             const confirmPass = document.getElementById('confirm-pwd').value
@@ -936,7 +954,17 @@
             document.getElementById('confirm-pwdErr').innerHTML = '';
             document.getElementById('changeEmptyErr').innerHTML = '';
 
-            return true
+            const result = await Swal.fire({
+                title: "Are you sure?",
+                text: "Want to reset password",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Confirm"
+            })
+
+            if(result.isConfirmed) return true
         }
 
         function validateForm(){
@@ -1090,30 +1118,45 @@
                 return false;
             }
 
-            
-            const response = await axios.patch('/saveEditAddress', { addressId, name: name, mobile: mobile, pincode: pincode,
-                state: state, streetAddress: streetAddress, locality: locality,city: city});
+            const result = await Swal.fire({
+                title: "Are you sure?",
+                text: "Make changes in this address",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Confirm"
+            })
 
-                if (response.data.success) {
-                    const closeEdit = document.getElementById('closeEdit')
-                    closeEdit.click()
-                    Swal.fire({
-                        position: "center",
-                        icon: "success",
-                        title: "Address Edited!",
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then((result)=>{
-                        $('#reloadaddress').load('/myAccount #reloadaddress');
-                    })
+            if(result.isConfirmed){
+                try{
+                    const response = await axios.patch('/saveEditAddress', { addressId, name: name, mobile: mobile, pincode: pincode,
+                        state: state, streetAddress: streetAddress, locality: locality,city: city});
+
+                    if (response.data.loginRequired) {
+                        window.location.href = '/login';
+                    } else if (response.data.success) {
+                        const closeEdit = document.getElementById('closeEdit')
+                        closeEdit.click()
+                        Swal.fire({
+                            position: "center",
+                            icon: "success",
+                            title: "Address Edited!",
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then((result)=>{
+                            $('#reloadaddress').load('/myAccount #reloadaddress');
+                        })
+                    }
+                }catch(error){
+                    console.log(error.message);
                 }
-         
-
+            }
         }
             
 
-        function removeAddress(addressId) {
-            Swal.fire({
+        async function removeAddress(addressId) {
+            const result = await Swal.fire({
                 title: "Are you sure?",
                 text: "Remove this Address",
                 icon: "warning",
@@ -1121,16 +1164,22 @@
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
                 confirmButtonText: "Delete"
-            }).then((result)=>{
-                if(result.isConfirmed){
-                    axios.patch('/removeAddress',{addressId})
-                    .then((response)=> {
-                        if(response.data.success){
-                            $('#reloadaddress').load('/myAccount #reloadaddress');
-                        }
-                    })
-                }
             })
+
+            if(result.isConfirmed){
+                try{
+                    const response = await axios.patch('/removeAddress',{addressId})
+                    
+                    if (response.data.loginRequired) {
+                        window.location.href = '/login';
+                    } else if (response.data.success) {
+                        $('#reloadaddress').load('/myAccount #reloadaddress');
+                    }
+                }catch(error){
+                    console.log(error.message);
+                }
+            }
+            
         }
 
         async function addMoney(){
@@ -1146,24 +1195,29 @@
             document.getElementById('addAmountErr').innerHTML = ""
 
             const response = await axios.patch('/addAmount',{amount})
+            
+            if(response.data.loginRequired){
+                window.location.href = '/login'
+            }else{
 
-            if(response.data.success){
-                const Toast = Swal.mixin({
-                    toast: true,
-                    background : "#000000",
-                    position: "bottom",
-                    showConfirmButton: false,
-                    width : "20vw",
-                    timer: 4000,
-                    timerProgressBar: true,
-                });
+                if(response.data.success){
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        background : "#000000",
+                        position: "bottom",
+                        showConfirmButton: false,
+                        width : "20vw",
+                        timer: 4000,
+                        timerProgressBar: true,
+                    });
 
-                Toast.fire({
-                    icon: "success",
-                    title: "Amount added"
-                });
+                    Toast.fire({
+                        icon: "success",
+                        title: "Amount added"
+                    });
 
-                $('#walletArea').load('/myAccount #walletArea')
+                    $('#walletArea').load('/myAccount #walletArea')
+                }
             }
 
         }

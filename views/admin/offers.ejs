@@ -781,6 +781,7 @@
 
 
                                     <div class="table-responsive" id="reloadDiv">
+                                        <% if(offers.length>1){ %>
                                         <table class="table align-middle table-nowrap">
                                             <thead>
                                                 <tr>
@@ -811,6 +812,9 @@
                                                 <% }) %>
                                             </tbody>
                                         </table>
+                                        <% }else{ %>
+                                            <h3 class="text-center">No offers</h3>
+                                        <% } %>
                                     </div>
 
                                     <!-- Pagination -->
@@ -1032,114 +1036,6 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-        function validateAddOffer(){
-            const offerTitle = document.getElementById('name').value
-            const offerPercentage = document.getElementById('percentage').value
-
-            document.getElementById('nameError').innerHTML = ''
-            document.getElementById('percentageError').innerHTML = ''
-
-            if(offerTitle === ''){
-                document.getElementById('nameError').innerHTML = 'Enter Offer title';
-                return false
-            }
-
-            if(offerPercentage === ''){
-                document.getElementById('descriptionError').innerHTML = 'Enter percentage'
-                return false
-            }
-
-            document.getElementById('nameError').innerHTML = ''
-            document.getElementById('descriptionError').innerHTML = ''
-
-            return true
-            
-        }
-
-        // Function to open the edit modal with existing data
-        async function openEditModal(offerId) {
-
-            document.getElementById('offerid').dataset.offerid = offerId
-
-            // Set the existing data to the form fields
-            const name = document.getElementById('editName')
-            const percentage = document.getElementById('editPercentage')
-
-            try {
-                const response = await axios.post('/admin/editOffer', { offerId });
-                const data = response.data;
-                console.log(data)
-                if (data) {
-                    name.value = response.data.name;
-                    percentage.value = response.data.percentage;
-                }
-
-            } catch (error) {
-                console.log(error.message)
-            }
-
-        }
-
-        async function saveEditOffer () {
-
-            const offerId = document.getElementById('offerid').dataset.offerid
-            const name = document.getElementById('editName').value
-            const percentage = document.getElementById('editPercentage').value
-
-            document.getElementById('editNameError').innerHTML = ''
-            document.getElementById('editPercentageError').innerHTML = ''
-
-            if(name === ''){
-                document.getElementById('editNameError').innerHTML = 'Enter Offer Title';
-                return false
-            }
-
-            if(percentage === ''){
-                document.getElementById('editPercentageError').innerHTML = 'Enter percentage'
-                return false
-            }
-
-            document.getElementById('editNameError').innerHTML = ''
-            document.getElementById('editPercentageError').innerHTML = ''
-
-            Swal.fire({
-                title: "Are you sure?",
-                text: "want to make changes?",
-                icon: "warning",
-                confirmButtonText: "Yes",
-                confirmButtonColor: "#3085d6",
-                showCancelButton: true,
-                cancelButtonColor: "#d33"
-            }).then(async(result)=>{
-                if(result.isConfirmed){
-
-                    const response = await axios.patch('/admin/saveEditoffer', { offerId, name, percentage});
-                    console.log(response.data);
-                    if (response.data.error) {
-                        Swal.fire({
-                            position: "center",
-                            icon: "error",
-                            title: response.data.error,
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    } else if (response.data.success) {
-                        Swal.fire({
-                            position: "center",
-                            icon: "success",
-                            title: "Offer Edited!",
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then((result) => {
-                            $('#reloadDiv').load('/admin/offers #reloadDiv');
-                        });
-                    } else {
-                        console.error("Unexpected response from server:", response.data);
-                    }
-                }
-            })
-        }
-
 
         function deleteOffer (offerId){
 
@@ -1163,15 +1059,19 @@
                     })
                     .then(res => res.json())
                     .then(data => {
-                        if(data.success){
-                            Swal.fire({
-                                position: "center",
-                                icon: "success",
-                                title: "Offer Deleted!",
-                                showConfirmButton: false,
-                                timer: 1500
-                            })
-                            $('#reloadDiv').load('/admin/offers #reloadDiv');
+                        if (data.loginRequired) {
+                            window.location.href = '/admin/login';
+                        }else{
+                            if(data.success){
+                                Swal.fire({
+                                    position: "center",
+                                    icon: "success",
+                                    title: "Offer Deleted!",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                })
+                                $('#reloadDiv').load('/admin/offers #reloadDiv');
+                            }
                         }
                     })
                     .catch(err =>{

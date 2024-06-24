@@ -14405,14 +14405,13 @@ body.body-menu-overlay::before {
   }
 }
 
-.product-wrap .product-content h3.title-blod {
+.product-wrap .product-content h4.title-blod {
   font-weight: 700;
 }
 
 .product-wrap .product-content h3::before {
   position: absolute;
   content: "";
-  background: url(../images/icon-img/circle-simple-right.png);
   width: 61px;
   height: 61px;
   font-family: FontAwesome;

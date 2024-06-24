@@ -469,14 +469,27 @@
                     </div>
                     <div class="d-flex justify-content-center">
                         <% if(deliveredProds.length > 0){ %>
-                            <a href="" class="btn btn-success fw-semibold"><i class="fa fa-print"></i> Get Invoice</a>
+                            <a href="/getinvoice/<%= orders._id %>" class="btn btn-success fw-semibold"><i class="fa fa-print"></i> Get Invoice</a>
                         <% } %>
                     </div>
                 </div>
             </div>
         </div>
-       
         </div>
+        
+        <footer class="footer-area section-padding-1 border-top-3">
+            <div class="container-fluid">
+                <div class="footer-botoom border-top-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="copyright-2 text-center">
+                                <p>© 2024 DripLuxe. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <!-- All JS is here
@@ -507,17 +520,22 @@
 
             if(cancelReason){
                 const response = await axios.post('/cancelOrder',{productId,orderId,price,cancelReason})
-                if(response.data.success){
-                    await Swal.fire({
-                        title:"Success",
-                        text: "Order is cancelled",
-                        icon: "success",
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
-                    window.location.reload()
+
+                if(response.data.loginRequired){
+                    window.location.href = '/login'
+                }else{
+
+                    if(response.data.success){
+                        await Swal.fire({
+                            title:"Success",
+                            text: "Order is cancelled",
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        window.location.reload()
+                    }
                 }
-                
             }
 
         }
@@ -539,15 +557,21 @@
 
             if(returnReason){
                 const response = await axios.post('/returnRequest',{productId,orderId,price,returnReason,totalPrice})
-                if(response.data.success){
-                    await Swal.fire({
-                        title:"Success",
-                        text: "Return requested",
-                        icon: "success",
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
-                    window.location.reload()
+
+                if(response.data.loginRequired){
+                    window.location.href = '/login'
+                }else{
+
+                    if(response.data.success){
+                        await Swal.fire({
+                            title:"Success",
+                            text: "Return requested",
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        window.location.reload()
+                    }
                 }
                 
             }
@@ -556,10 +580,19 @@
 
         async function failedPay(orderId) {
             console.log(orderId);
-            const response = await axios.post('/failedPayment',{orderId})
+            try{
+                const response = await axios.post('/failedPayment',{orderId})
 
-            const redirectUrl = response.data.redirectUrl;
-            window.location.href = redirectUrl;
+                if(response.data.loginRequired){
+                    window.location.href = '/login'
+                }else{
+                    const redirectUrl = response.data.redirectUrl;
+                    window.location.href = redirectUrl;
+                }
+                
+            }catch(error){
+                console.log(error.message);
+            }
         }
         
     </script>

@@ -797,6 +797,7 @@
 
 
                                     <div class="table-responsive" id="reloadDiv">
+                                        <% if(coupons){ %>
                                         <table class="table align-middle table-nowrap">
                                             <thead>
                                                 <tr>
@@ -848,6 +849,9 @@
                                                 <% }) %>
                                             </tbody>
                                         </table>
+                                        <% }else{ %>
+                                            <h3 class="text-center">No coupons</h3>
+                                        <% } %>
                                     </div>
 
                                     <!-- Pagination -->
@@ -1260,30 +1264,35 @@
 
                     const response = await axios.patch('/admin/saveEditCoupons', { couponId, couponName, couponPercentage,couponDescription, couponMinAmount, couponExpiryDate});
                     console.log(response.data);
-                    if (response.data.error) {
-                        Swal.fire({
-                            position: "center",
-                            icon: "error",
-                            title: response.data.error,
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    } else if (response.data.success) {
-                        const closeBtn = document.getElementById('editCloseBtn')
-                        closeBtn.click()
 
-                        Swal.fire({
-                            position: "center",
-                            icon: "success",
-                            title: "Coupon Edited!",
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then((result) => {
-                            
-                            $('#reloadDiv').load('/admin/coupons #reloadDiv');
-                        });
-                    } else {
-                        console.error("Unexpected response from server:", response.data);
+                    if (response.data.loginRequired) {
+                        window.location.href = '/admin/login';
+                    }else{
+                        if (response.data.error) {
+                            Swal.fire({
+                                position: "center",
+                                icon: "error",
+                                title: response.data.error,
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        } else if (response.data.success) {
+                            const closeBtn = document.getElementById('editCloseBtn')
+                            closeBtn.click()
+
+                            Swal.fire({
+                                position: "center",
+                                icon: "success",
+                                title: "Coupon Edited!",
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then((result) => {
+                                
+                                $('#reloadDiv').load('/admin/coupons #reloadDiv');
+                            });
+                        } else {
+                            console.error("Unexpected response from server:", response.data);
+                        }
                     }
                 }
             })
@@ -1312,15 +1321,20 @@
                     })
                     .then(res => res.json())
                     .then(data => {
-                        if(data.success){
-                            Swal.fire({
-                                position: "center",
-                                icon: "success",
-                                title: "Coupon Deleted!",
-                                showConfirmButton: false,
-                                timer: 1500
-                            })
-                            $('#reloadDiv').load('/admin/coupons #reloadDiv');
+
+                        if (data.loginRequired) {
+                            window.location.href = '/admin/login';
+                        }else{
+                            if(data.success){
+                                Swal.fire({
+                                    position: "center",
+                                    icon: "success",
+                                    title: "Coupon Deleted!",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                })
+                                $('#reloadDiv').load('/admin/coupons #reloadDiv');
+                            }
                         }
                     })
                     .catch(err =>{

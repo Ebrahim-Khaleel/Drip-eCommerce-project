@@ -12,7 +12,7 @@ const loadProducts = async (req, res) => {
         const totalProsCount = await product.countDocuments();
         const totalPages = Math.ceil(totalProsCount / limit);
 
-        const productData = await product.find().populate('category').skip(skip).limit(limit);
+        const productData = await product.find().populate('category').skip(skip).limit(limit).sort({_id:-1});
 
         const categories = await category.find()
         res.render('admin/products', { products : productData, categories,totalPages, currentPage :page})
@@ -42,6 +42,7 @@ const addProduct = async (req, res) => {
             images: req.files.map(file => file.filename),
             description: description,
             category: category,
+            offerPrice: price,
             createdAt : Date.now()
         })
         const prodsaved = await newProduct.save()

@@ -66,11 +66,11 @@ const editCategoryDone = async (req, res) => {
         // Check if the new name already exists in another category
         const existingCategory = await category.findOne({ name: { $regex: new RegExp('^' + name + '$', 'i') } });
         if (existingCategory) {
-            return res.status(400).json({ error :'Category already exists.'});
+            res.json({alreadyAdded : true})
+        } else {
+            await category.updateOne({ _id: categoryId }, { name: name, description: description })
+            res.status(200).json({ success: true });
         }
-
-        await category.updateOne({ _id: categoryId }, { name: name, description: description })
-        res.status(200).json({ success: true });
 
     } catch (error) {
         console.log(error.message);

@@ -526,7 +526,7 @@
                                         </div>
                                         <% cartItems.products.forEach((product) =>{ %>
                                             <div class="your-order-middle">
-                                                <% ProductTotal = product.productId.price * product.quantity %>
+                                                <% ProductTotal = product.productId.offerPrice * product.quantity %>
                                                 <% Total += ProductTotal %>
                                                 <ul>        
                                                     <li><%= product.productId.name %> x <%= product.quantity %> <span>$<%= ProductTotal.toFixed(2) %></span></li>
@@ -732,6 +732,20 @@
             </div>
         </div>
         <!-- Edit Address Modal End -->
+
+        <footer class="footer-area section-padding-1 border-top-3">
+            <div class="container-fluid">
+                <div class="footer-botoom border-top-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="copyright-2 text-center">
+                                <p>© 2024 DripLuxe. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
     
 
@@ -807,11 +821,15 @@
 
             const response = await axios.patch('/checkoutAddAddress',{name, mobile, pincode, state, streetAddress, locality, city})
 
-            if(response.data.success){
-                const closeBtn = document.getElementById('closeAdd')
-                closeBtn.click()
-                $('#shippingArea').load('/checkout #shippingArea')
-            }
+            if(response.data.loginRequired){
+                window.location.href = '/login'
+            }else{
+                if(response.data.success){
+                    const closeBtn = document.getElementById('closeAdd')
+                    closeBtn.click()
+                    $('#shippingArea').load('/checkout #shippingArea')
+                }
+            }            
         }
 
         async function editAddress(addressId) {
@@ -903,27 +921,47 @@
                 return false;
             }
 
-            
-            const response = await axios.patch('/saveEditAddress', { addressId, name: name, mobile: mobile, pincode: pincode,
-                state: state, streetAddress: streetAddress, locality: locality,city: city});
+            const result = await Swal.fire({
+                title: "Are you sure?",
+                text: "Make changes in this address",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Confirm"
+            })
 
-                if (response.data.success) {
-                    const closeEdit = document.getElementById('closeEdit')
-                    closeEdit.click()
-                    Swal.fire({
-                        position: "center",
-                        icon: "success",
-                        title: "Address Edited!",
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then((result)=>{
-                        $('#shippingArea').load('/checkout #shippingArea');
-                    })
+            if(result.isConfirmed){
+                try{
+            
+                    const response = await axios.patch('/saveEditAddress', { addressId, name: name, mobile: mobile, pincode: pincode,
+                    state: state, streetAddress: streetAddress, locality: locality,city: city});
+                        
+                    if(response.data.loginRequired){
+                        window.location.href = '/login'
+                    }else{
+                        if (response.data.success) {
+                            const closeEdit = document.getElementById('closeEdit')
+                            closeEdit.click()
+                            Swal.fire({
+                                position: "center",
+                                icon: "success",
+                                title: "Address Edited!",
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then((result)=>{
+                                $('#shippingArea').load('/checkout #shippingArea');
+                            })
+                        }
+                    }
+                }catch(error){
+                    console.log(error.message);
                 }
+            }
         }
 
-        function removeAddress(addressId) {
-            Swal.fire({
+        async function removeAddress(addressId) {
+            const result = await Swal.fire({
                 title: "Are you sure?",
                 text: "Remove this Address",
                 icon: "warning",
@@ -931,16 +969,23 @@
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
                 confirmButtonText: "Delete"
-            }).then((result)=>{
-                if(result.isConfirmed){
-                    axios.patch('/removeAddress',{addressId})
-                    .then((response)=> {
+            })
+            if(result.isConfirmed){
+                try{
+                    const response = await axios.patch('/removeAddress',{addressId})
+
+                    if(response.data.loginRequired){
+                        window.location.href = '/login'
+                    }else{
                         if(response.data.success){
                             $('#shippingArea').load('/checkout #shippingArea');
                         }
-                    })
+                    }
+
+                }catch(error){
+                    console.log(error.message);
                 }
-            })
+            }
         }
 
         async function placeOrder(){
@@ -973,17 +1018,26 @@
 
             if(paymentMethod == "Online Payment"){
                 console.log('enter the function');
-                const response = await axios.post('/paypal',{
-                    paymentMethod,
-                    selectedAddress,
-                    orderAmount,
-                    discountPrice:discountPrice.value,
-                    subTotal:subTotal.value,
-                });
-                console.log('ajkajajajajjaja');
-                const redirectUrl = response.data.redirectUrl;
-                window.location.href = redirectUrl;
-                console.log('after everything')
+                try{
+                    const response = await axios.post('/paypal',{
+                        paymentMethod,
+                        selectedAddress,
+                        orderAmount,
+                        discountPrice:discountPrice.value,
+                        subTotal:subTotal.value,
+                    });
+
+                    if(response.data.loginRequired){
+                        window.location.href = '/login'
+                    }else{
+                        const redirectUrl = response.data.redirectUrl;
+                        window.location.href = redirectUrl;
+                        console.log('after everything')
+                    }
+
+                }catch(error){
+                    console.log(error.message);
+                }
 
             } else if(paymentMethod == "Cash on Delivery"){
 
@@ -991,18 +1045,25 @@
                     document.getElementById('errorPlacing').innerHTML = 'COD only available for orders above $100';
                 } else {
                     const response = await axios.post('/COD',{paymentMethod,selectedAddress,orderAmount,discountPrice:discountPrice.value,subTotal:subTotal.value})
-
-                    if(response.data.success){
-                        window.location.href = '/successMessage'
+                    if(response.data.loginRequired){
+                        window.location.href = '/login'
+                    }else{
+                        if(response.data.success){
+                            window.location.href = '/successMessage'
+                        }
+                        console.log("order amount at place order");
+                        console.log(orderAmount);
                     }
-                    console.log("order amount at place order");
-                    console.log(orderAmount);
                 }
             } else if(paymentMethod == "Wallet"){
                 const response = await axios.post('/COD',{paymentMethod,selectedAddress,orderAmount,discountPrice:discountPrice.value,subTotal:subTotal.value})
 
-                if(response.data.success){
-                    window.location.href = '/successMessage'
+                if(response.data.loginRequired){
+                    window.location.href = '/login'
+                }else{
+                    if(response.data.success){
+                        window.location.href = '/successMessage'
+                    }
                 }
             }
 
@@ -1038,6 +1099,9 @@
 
             const response = await axios.patch('/validateCoupon', { couponCode });
 
+            if(response.data.loginRequired){
+                window.location.href = '/login'
+            }else{
                 if(response.data.expired){
                     couponErr.innerHTML = "Coupon Expired";
                     couponErr.classList.remove('d-none');
@@ -1055,6 +1119,7 @@
                     applyBtn.setAttribute('disabled', 'disabled');
                     applyBtn.classList.add('text-muted');
                 }
+            }
         }
 
 
@@ -1073,45 +1138,49 @@
             console.log(" tot ::: "+grandTotalVal);
             console.log(couponCode.value);
 
-            const response = await axios.patch('/applyCoupon',{grandTotal:grandTotalVal,couponCode:couponCode.value})
+            const response = await axios.patch('/applyCoupon',{grandTotal:parseFloat(grandTotalVal),couponCode:couponCode.value})
 
-            if(response.data.success){
+            if(response.data.loginRequired){
+                window.location.href = '/login'
+            }else{
+                if(response.data.success){
 
-                const Toast = Swal.mixin({
-                    toast: true,
-                    background : "#000000",
-                    position: "bottom",
-                    showConfirmButton: false,
-                    width : "20vw",
-                    timer: 4000,
-                    timerProgressBar: true,
-                });
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        background : "#000000",
+                        position: "bottom",
+                        showConfirmButton: false,
+                        width : "20vw",
+                        timer: 4000,
+                        timerProgressBar: true,
+                    });
 
-                Toast.fire({
-                    icon: "success",
-                    title: "Coupon applied"
-                });
+                    Toast.fire({
+                        icon: "success",
+                        title: "Coupon applied"
+                    });
 
-                // assigning the discounted price to total variable
-                const grandTotal = document.getElementById('grandTotal')
-                grandTotal.innerHTML = "$" + response.data.grandTotaltot.toFixed(2)
+                    // assigning the discounted price to total variable
+                    const grandTotal = document.getElementById('grandTotal')
+                    grandTotal.innerHTML = "$" + response.data.grandTotaltot.toFixed(2)
 
-                let span = document.getElementById('discountPrice')
-                span.textContent =  "- $" + response.data.discountPrice.toFixed(2)
+                    let span = document.getElementById('discountPrice')
+                    span.textContent =  "- $" + response.data.discountPrice.toFixed(2)
 
-                // assigning the discounted price to total hidden variable
-                let grandTotalVal1 = document.getElementById('grandTotalVal')
-                grandTotalVal1.textContent = response.data.grandTotaltot.toFixed(2)
+                    // assigning the discounted price to total hidden variable
+                    let grandTotalVal1 = document.getElementById('grandTotalVal')
+                    grandTotalVal1.textContent = response.data.grandTotaltot.toFixed(2)
 
-                let discountPricee = document.getElementById('DiscountPrice')
-                discountPricee.value = response.data.discountPrice
-                //
-                console.log(" after calculating :: "+grandTotalVal1);
+                    let discountPricee = document.getElementById('DiscountPrice')
+                    discountPricee.value = response.data.discountPrice
+                    //
+                    console.log(" after calculating :: "+grandTotalVal1);
 
-                // changing the attributes
-                const btn =  document.getElementById('applyCouponId')
-                couponCode.readOnly = true
+                    // changing the attributes
+                    const btn =  document.getElementById('applyCouponId')
+                    couponCode.readOnly = true
 
+                }
             }
             
         }
@@ -1125,46 +1194,51 @@
 
             const response = await axios.patch('/removeCoupon')
 
-            if(response.data.success){
+            if(response.data.loginRequired){
+                window.location.href = '/login'
+            }else{
 
-                const Toast = Swal.mixin({
-                    toast: true,
-                    background : "#000000",
-                    position: "bottom",
-                    showConfirmButton: false,
-                    width : "20vw",
-                    timer: 4000,
-                    timerProgressBar: true,
-                });
+                if(response.data.success){
 
-                Toast.fire({
-                    icon: "success",
-                    title: "Coupon removed"
-                });
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        background : "#000000",
+                        position: "bottom",
+                        showConfirmButton: false,
+                        width : "20vw",
+                        timer: 4000,
+                        timerProgressBar: true,
+                    });
 
-                // updating prices
-                const inputBox = document.getElementById('couponInput')
-                let span = document.getElementById('discountPrice')
+                    Toast.fire({
+                        icon: "success",
+                        title: "Coupon removed"
+                    });
 
-                inputBox.value = ""
-                inputBox.readOnly = false
-                span.textContent =  "- $0"
+                    // updating prices
+                    const inputBox = document.getElementById('couponInput')
+                    let span = document.getElementById('discountPrice')
 
-                // assigning the deducted price to total
-                const grandTotal = document.getElementById('grandTotal')
-                const subtotal = document.getElementById('subTotal').value
+                    inputBox.value = ""
+                    inputBox.readOnly = false
+                    span.textContent =  "- $0"
 
-                grandTotal.innerHTML = "$" + subtotal
+                    // assigning the deducted price to total
+                    const grandTotal = document.getElementById('grandTotal')
+                    const subtotal = document.getElementById('subTotal').value
 
-                // assigning the deducted price to hidden total
-                let grandTotalVal1 = document.getElementById('grandTotalVal')
-                grandTotalVal1.textContent = subtotal
+                    grandTotal.innerHTML = "$" + subtotal
 
-                const applyCpnBtn = document.getElementById('applyCouponId')
-                applyBtn.setAttribute('disabled', 'disabled')
-                applyBtn.classList.add('text-muted')
+                    // assigning the deducted price to hidden total
+                    let grandTotalVal1 = document.getElementById('grandTotalVal')
+                    grandTotalVal1.textContent = subtotal
 
-                
+                    const applyCpnBtn = document.getElementById('applyCouponId')
+                    applyBtn.setAttribute('disabled', 'disabled')
+                    applyBtn.classList.add('text-muted')
+
+                    
+                }
             }
         }
         

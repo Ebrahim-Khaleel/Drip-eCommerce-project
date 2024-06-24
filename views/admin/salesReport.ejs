@@ -764,9 +764,9 @@
                                             <a type="button" href="javascript:window.print()" class="btn btn-primary waves-effect waves-light w-sm">
                                                 <i class="mdi mdi-download d-block"></i> PDF
                                             </a>
-                                            <button type="button" class="btn btn-primary waves-effect waves-light w-sm" style="margin-left: 7px;">
-                                                <i class="mdi mdi-download d-block "></i> Excel
-                                            </button>
+                                            <a href="/admin/salesReport/<%= period %>/downloadExcel" type="button" class="btn btn-primary waves-effect waves-light w-sm" style="margin-left: 7px;">
+                                                <i class="mdi mdi-download d-block"></i> Excel
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -969,24 +969,28 @@
                 
                 const response = await axios.patch('/admin/salesReport/custom',{customStartDate,customEndDate})
 
-                if(response.data.report){
-                    const reports = response.data.report
-                    const tbody = document.getElementById('tbodyRe');
-                    tbody.innerHTML = "";
-                    console.log('working');
-                    console.log(reports);
+                if (response.data.loginRequired) {
+                    window.location.href = '/admin/login';
+                }else{
+                    if(response.data.report){
+                        const reports = response.data.report
+                        const tbody = document.getElementById('tbodyRe');
+                        tbody.innerHTML = "";
+                        console.log('working');
+                        console.log(reports);
 
-                    reports.forEach((element, index)=>{
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                        <td>${index+1}</td>
-                        <td>${element._id}</td>
-                        <td>${element?.deliveryAddress?.name}</td>
-                        <td>${new Date(element.orderDate).toLocaleDateString()}</td>
-                        <td>$${element.orderAmount.toFixed(2)}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    })                    
+                        reports.forEach((element, index)=>{
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                            <td>${index+1}</td>
+                            <td>${element._id}</td>
+                            <td>${element?.deliveryAddress?.name}</td>
+                            <td>${new Date(element.orderDate).toLocaleDateString()}</td>
+                            <td>$${element.orderAmount.toFixed(2)}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        })                    
+                    }
                 }
 
             } 

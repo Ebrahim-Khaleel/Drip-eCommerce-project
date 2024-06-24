@@ -1050,10 +1050,14 @@
 
                 const response = await axios.post('/admin/addOffer',{offerDetails})
 
-                if(response.data.alreadyExist){
-                    document.getElementById('titleError').innerHTML = 'Already exists';
-                }else if(response.data.success){
-                    window.location.href = '/admin/offers'
+                if (response.data.loginRequired) {
+                    window.location.href = '/admin/login';
+                }else{
+                    if(response.data.alreadyExist){
+                        document.getElementById('titleError').innerHTML = 'Already exists';
+                    }else if(response.data.success){
+                        window.location.href = '/admin/offers'
+                    }
                 }
 
             }

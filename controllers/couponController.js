@@ -11,7 +11,7 @@ const loadCoupons = async(req,res) =>{
         const totalCoupCount = await coupon.countDocuments()
         const totalPages = Math.ceil( totalCoupCount / limit);
 
-        const coupons = await coupon.find().skip(skip).limit(limit);
+        const coupons = await coupon.find().skip(skip).limit(limit).sort({_id:-1});
 
         res.render('admin/coupons',{coupons, currentPage : page, totalPages})
     }catch(error){
@@ -133,8 +133,9 @@ const validateCoupon = async(req, res) =>{
 const applyCoupon = async(req, res) =>{
     try{
         const {couponCode} = req.body
-        let {grandTotal} = req.body
-        grandTotal = parseInt(grandTotal)
+        const {grandTotal} = req.body
+        // const grandTotall = parseInt(grandTotal)
+        // console.log(" grn  ; "+grandTotall.toFixed(2));
 
         if(req.session.coupon){
             res.json({exist:true})
@@ -145,7 +146,9 @@ const applyCoupon = async(req, res) =>{
             let grandTotaltot = grandTotal - discountPrice
             grandTotaltot.toFixed(2)
             
-            console.log(grandTotaltot.toFixed(2));
+            console.log(" coup  "+grandTotaltot.toFixed(2));
+            console.log(" disc  "+discountPrice);
+
             
             req.session.coupon=foundCoupon._id
 

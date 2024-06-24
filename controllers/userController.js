@@ -21,7 +21,7 @@ const showHome = async (req, res) => {
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
 
         const allproducts = await products
-        .find()
+        .find({isBlocked:false})
         .sort({createdAt : -1})
         .limit(4)
         .populate('category')
@@ -39,19 +39,35 @@ const showShop = async (req, res) => {
         const limit = 8;
         const page = parseInt(req.query.page) || 1
         const skip = (page - 1) * limit;
-        const productsCount = await products.countDocuments();
+        const productsCount = await products.countDocuments({isBlocked:false});
         const totalPages = Math.ceil(productsCount / limit);
-
 
         // loading cart quantity
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         const categories = await category.find({isBlocked:false})
 
-        const showproducts = await products.find().populate('category').populate('offer').skip(skip).limit(limit)
-        res.render('users/shop', { showproducts,cartItems,categories, currentPage : page, totalPages, productsCount})
+        const showproductss = await products.
+        find({isBlocked:false})
+        .populate('category offer')
+        .sort({_id:-1})
+        .skip(skip)
+        .limit(limit)
+
+        res.render('users/shop', { showproducts:showproductss,cartItems,categories, currentPage : page, totalPages,productsCount})
     } catch (error) {
         console.log(error);
+    }
+}
+
+const searchItems = async(req, res) =>{
+    try{
+        const findProduct = req.body.prod
+        const searchedItem = await products.find({ name: { $regex: new RegExp(`.*${findProduct}.*`, 'i') } }).populate('category')
+        res.json(searchedItem)
+
+    }catch(error){
+        console.log(error.message);
     }
 }
 
@@ -60,7 +76,7 @@ const lowToHigh = async (req,res) => {
         const limit = 8;
         const page = parseInt(req.query.page) || 1
         const skip = (page - 1) * limit;
-        const productsCount = await products.countDocuments();
+        const productsCount = await products.countDocuments({isBlocked:false});
         const totalPages = Math.ceil(productsCount / limit);
 
         // loading cart quantity
@@ -68,7 +84,7 @@ const lowToHigh = async (req,res) => {
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         const categories = await category.find({isBlocked:false})
 
-        const lowtohigh = await products.find({}).sort({price : 1}).populate('category').skip(skip).limit(limit)
+        const lowtohigh = await products.find({isBlocked:false}).sort({price : 1}).populate('category').skip(skip).limit(limit)
 
         res.render('users/shop',{showproducts : lowtohigh,cartItems,categories, currentPage : page, totalPages,productsCount})
         
@@ -81,7 +97,7 @@ const HighToLow = async (req,res) => {
         const limit = 8;
         const page = parseInt(req.query.page) || 1
         const skip = (page - 1) * limit;
-        const productsCount = await products.countDocuments();
+        const productsCount = await products.countDocuments({isBlocked:false});
         const totalPages = Math.ceil(productsCount / limit);
 
         // loading cart quantity
@@ -89,7 +105,7 @@ const HighToLow = async (req,res) => {
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         const categories = await category.find({isBlocked:false})
 
-        const hightolow = await products.find({}).sort({price : -1}).populate('category').skip(skip).limit(limit)
+        const hightolow = await products.find({isBlocked:false}).sort({price : -1}).populate('category').skip(skip).limit(limit)
 
         res.render('users/shop',{showproducts : hightolow,cartItems,categories, currentPage : page, totalPages,productsCount})
 
@@ -99,13 +115,52 @@ const HighToLow = async (req,res) => {
 }
 const popularity = async (req,res) => {
     try{
+        const limit = 8;
+        const page = parseInt(req.query.page) || 1
+        const skip = (page - 1) * limit;
+        const productsCount = await products.countDocuments({isBlocked:false});
+        const totalPages = Math.ceil(productsCount / limit);
+
         // loading cart quantity
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         const categories = await category.find({isBlocked:false})
 
-        const showproducts = await products.find().populate('category')
-        res.render('users/shop',{showproducts,cartItems,categories})
+        // const showproducts = await products.find({isBlocked:false}).populate('category')
+        const popularity = await order.aggregate([
+            {
+                $unwind: '$products'
+            },
+            {
+                $group: {
+                    _id: '$products.productId',
+                    totalCount: { $sum: '$products.quantity' }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'productData'
+                }
+            },
+            {
+                $unwind: '$productData'
+            },
+            {
+                $match : { 'productData.isBlocked':false }
+            },
+            {$sort: { totalCount: -1 }},
+            {$skip: skip},
+            {$limit: limit}
+            
+        ]);
+
+        // Check if cartItems and categories are defined
+        const popularProds = popularity.map(item => item.productData)
+
+        res.render('users/shop',{showproducts : popularProds,cartItems,categories, currentPage : page,totalPages,productsCount})
 
     }catch(error){
         console.log(error.message);
@@ -116,7 +171,7 @@ const latest = async (req,res) => {
         const limit = 8;
         const page = parseInt(req.query.page) || 1
         const skip = (page - 1) * limit;
-        const productsCount = await products.countDocuments();
+        const productsCount = await products.countDocuments({isBlocked:false});
         const totalPages = Math.ceil(productsCount / limit);
 
         // loading cart quantity
@@ -124,7 +179,7 @@ const latest = async (req,res) => {
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         const categories = await category.find({isBlocked:false})
 
-        const showproducts = await products.find().sort({createdAt : -1}).populate('category').skip(skip).limit(limit)
+        const showproducts = await products.find({isBlocked:false}).sort({createdAt : -1}).populate('category').skip(skip).limit(limit)
         res.render('users/shop',{showproducts,cartItems,categories, currentPage : page, totalPages,productsCount})
     }catch(error){
         console.log(error.message);
@@ -133,20 +188,28 @@ const latest = async (req,res) => {
 
 const categoryFiltering = async(req,res) =>{
     try{
+        const limit = 8;
+        const page = parseInt(req.query.page) || 1
+        const skip = (page - 1) * limit;
+
+        const categoryName = req.params.name
+
+        const foundCategory = await category.findOne({name : categoryName},{isBlocked: false})
+        if(!foundCategory){
+            res.status(404).send('Category not found')
+        }
+
+        const productsCount = await products.countDocuments({category:foundCategory._id},{isBlocked:false});
+        const totalPages = Math.ceil(productsCount / limit);
+        
         // loading cart quantity
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
         const categories = await category.find({isBlocked:false})
-
-        const categoryName = req.params.name
-        const foundCategoryId = await category.findOne({name : categoryName})
-        if(!foundCategoryId){
-            res.status(404).send('Category not found')
-        }
         
-        const filteredProducts = await products.find({category:foundCategoryId._id}).populate('category')
+        const filteredProducts = await products.find({category:foundCategory._id},{isBlocked:false}).populate('category').skip(skip).limit(limit)
 
-        res.render('users/shop', { showproducts : filteredProducts,cartItems,categories})
+        res.render('users/shop', { showproducts : filteredProducts,cartItems,categories, currentPage : page, totalPages,productsCount})
     }catch(error){
         console.log(error.message);
     }
@@ -535,10 +598,6 @@ const addToWishlist = async(req, res) =>{
         const {productId} = req.body
         console.log(productId);
 
-        if(!userId){
-            res.json({noUser:true})
-        }
-
         const exist = await wishlist.findOne({userId:userId, products:{ $elemMatch :{productId:productId} }})
 
         if(!exist){
@@ -667,6 +726,7 @@ const forgetPassConfirm = async(req ,res) => {
 module.exports = {
     showHome,
     showShop,
+    searchItems,
     lowToHigh,
     popularity,
     HighToLow,

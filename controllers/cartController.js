@@ -23,41 +23,34 @@ const addToCart = async(req,res)=>{
         const userId = req.session.user_id
         const quantity = req.body.quantity || 1
 
-        if(!userId){
-            console.log('no user');
-            res.send({noUser:true})
-        } else {
+        const exist = await cart.findOne({ userId : userId, products: { $elemMatch : { productId : productId } } })
+        if(!exist){
+            
 
-            const exist = await cart.findOne({ userId : userId, products: { $elemMatch : { productId : productId } } })
-            if(!exist){
-                
+            await cart.findOneAndUpdate(
+                { userId : userId},
 
-                await cart.findOneAndUpdate(
-                    { userId : userId},
-    
-                    {
-                        $addToSet : {
-    
-                            products :{
-    
-                                productId : productId,
-                                quantity : quantity
-    
-                            }
-    
+                {
+                    $addToSet : {
+
+                        products :{
+
+                            productId : productId,
+                            quantity : quantity
+
                         }
-                    },
-    
-                    { new : true, upsert : true }
-                );
-    
-                res.send({ success : true })
-                console.log(':::: Product Added successfully ::::');
-            } else {
-                res.send({ exist : true })
-                console.log(':::: Product Already Added ::::');
-            }
 
+                    }
+                },
+
+                { new : true, upsert : true }
+            );
+
+            res.send({ success : true })
+            console.log(':::: Product Added successfully ::::');
+        } else {
+            res.send({ exist : true })
+            console.log(':::: Product Already Added ::::');
         }
 
     }catch(error){
@@ -90,7 +83,7 @@ const removeFromCart = async(req,res) =>{
         const removed = await cart.updateOne({userId : userId},{$pull: {products : { productId : cartId }}})
 
         if(removed){
-            res.send(true)
+            res.json({removed:true})
         }
 
     }catch(error){
@@ -106,7 +99,7 @@ const clearCart = async(req, res) => {
     }catch(error){
         console.log(error.message);
     }
-}
+} 
 
 const loadCheckout = async(req,res) => {
     try{

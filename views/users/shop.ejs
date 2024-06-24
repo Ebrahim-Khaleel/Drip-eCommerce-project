@@ -144,10 +144,10 @@
             <a class="search-close"><i class="dlicon ui-1_simple-remove"></i></a>
             <div class="search-content">
                 <p>Start typing and press Enter to search</p>
-                <form class="search-form" action="#">
-                    <input type="text" placeholder="Search">
-                    <button class="button-search"><i class="dlicon ui-1_zoom"></i></button>
-                </form>
+                <div class="search-form">
+                    <input type="text" id="searchId" placeholder="Search">
+                    <button class="button-search" onclick="search()"><i class="dlicon ui-1_zoom"></i></button>
+                </div>
             </div>
         </div>
         <!-- mini cart start -->
@@ -199,9 +199,9 @@
                 <div class="header-aside-content">
                     <div class="mobile-menu-area">
                         <div class="mobile-search">
-                            <form class="search-form" action="#">
-                                <input type="text" placeholder="Search entire store…">
-                                <button class="button-search"><i class="dlicon ui-1_zoom"></i></button>
+                            <form class="search-form">
+                                <input type="text"  placeholder="Search entire store…">
+                                <button class="button-search" ><i class="dlicon ui-1_zoom"></i></button>
                             </form>
                         </div>
                         <div class="mobile-menu-wrap">
@@ -503,8 +503,7 @@
                     <div id="shop-1" class="tab-pane active">
                         <div class="row">
                             <% showproducts.forEach(product => { %>
-                                <% if(!product.category.isBlocked) { %>
-                                <% if(!product.isBlocked) { %>
+
                             <div class="custom-col-5">
                                 <div class="product-wrap mb-50">
                                     <div class="product-img default-overlay mb-25">
@@ -540,8 +539,6 @@
                                    
                                 </div>
                             </div>
-                            <% } %>
-                            <% } %>
                             <% }) %>
                         </div>
                         <!-- Pagination -->
@@ -749,7 +746,24 @@
 
     <!-- All JS is here
 ============================================ -->
+    <!-- Axios CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+    <script>
+        async function search(){
+            const prod = document.getElementById('searchId').value
+
+            try{
+
+                const response = await axios.put('/search',{prod})
+                console.log(response.data)
+
+                
+            }catch(error){
+                console.log(error.message);
+            }
+        }
+    </script>
     <!-- Modernizer JS -->
     <script src="/user/assets/js/vendor/modernizr-3.11.7.min.js"></script>
     <!-- jquery -->

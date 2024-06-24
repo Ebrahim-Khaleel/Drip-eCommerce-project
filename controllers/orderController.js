@@ -26,7 +26,12 @@ const loadOrderDetails = async(req, res) => {
 
 const loadInvoice = async(req, res) =>{
     try{
-        res.render('users/invoice')
+        const orderId = req.params.id
+        const orderr = await order.findById(orderId).populate('products.productId')
+        console.log(orderr);
+        const products = orderr.products
+
+        res.render('users/invoice',{orderr, products})
     }catch(error){
         console.log(error.message);
     }
@@ -49,7 +54,7 @@ const CODorder = async(req, res) => {
 
 
         const updatedProducts = products.map((product)=>{
-            const discAmount = product.productId.price - discPrice
+            const discAmount = product.productId.offerPrice - discPrice
             return {
                 productId: product.productId._id,
                 quantity: product.quantity,
@@ -227,7 +232,7 @@ const paypalPayment = async(req,res) =>{
             return {
                 name: product.productId.name, // Product name
                 sku: product.productId._id, // Unique identifier for product
-                price: product.productId?.price, // Price per item 
+                price: parseFloat(product.productId?.offerPrice).toFixed(2), // Price per item 
                 currency: "USD", // Currency
                 quantity: product.quantity, // Quantity 
             };
@@ -237,8 +242,8 @@ const paypalPayment = async(req,res) =>{
             currency: "USD", // Currency
             total:orderAmount.toFixed(2),
             details :{
-                subtotal : subTotal,
-                discount:discountPrice
+                subtotal : parseFloat(subTotal),
+                discount:parseFloat(discountPrice).toFixed(2)
             }
         };
 
@@ -350,7 +355,7 @@ const handlePayment = async (req, res) => {
                 let discPrice = discountPrice / products.length;
     
                 const updatedProducts = products.map((product) => {
-                    const discAmount = product.productId.price - discPrice;
+                    const discAmount = product.productId.offerPricerice - discPrice;
                     return {
                         productId: product.productId._id,
                         quantity: product.quantity,
@@ -416,7 +421,7 @@ const handlePayment = async (req, res) => {
                     let discPrice = discountPrice / products.length;
         
                     const updatedProducts = products.map((product) => {
-                        const discAmount = product.productId.price - discPrice;
+                        const discAmount = product.productId.offerPrice - discPrice;
                         return {
                             productId: product.productId._id,
                             quantity: product.quantity,
@@ -502,7 +507,7 @@ const failedPayment = async(req, res) => {
             return {
                 name: product.productId.name, // Product name
                 sku: product.productId._id, // Unique identifier for product
-                price: product.productId?.price.toFixed(2), // Price per item 
+                price: product.productId?.offerPrice.toFixed(2), // Price per item 
                 currency: "USD", // Currency
                 quantity: product.quantity, // Quantity 
             };

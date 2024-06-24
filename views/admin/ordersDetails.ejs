@@ -928,15 +928,50 @@
 
         <!-- JAVASCRIPT -->
 
+        <!-- jQuery CDN -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <!-- Axios CDN -->
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <!-- SweetAlert CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
         <script>
             async function updateStatus(v,orderId,productId){
                 const select = document.getElementById(`status${productId}`)
 
-                await axios.put('/admin/updateOrderStatus',{status : v.value,orderId,productId})
-                
+                const result = await Swal.fire({
+                    title: "Are you sure?",
+                    text: "want to make changes?",
+                    icon: "warning",
+                    confirmButtonText: "Yes",
+                    confirmButtonColor: "#3085d6",
+                    showCancelButton: true,
+                    cancelButtonColor: "#d33"
+                })
+            
+                if(result.isConfirmed){
+                    try{
+                        const response = await axios.put('/admin/updateOrderStatus',{status : v.value,orderId,productId})
+
+                        if (response.data.loginRequired) {
+                            window.location.href = '/admin/login';
+                        }else{
+                            if (response.data.success) {
+                                Swal.fire({
+                                    position: "center",
+                                    icon: "success",
+                                    title: "Status changed!",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then((result) => {
+                                    $('#reloadDiv').load('/admin/orderDetails/:id #reloadDiv');
+                                });
+                            }
+                        }
+                    }catch(error){
+                        console.log(error.message);
+                    }
+                }
             }
         </script>
         <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>

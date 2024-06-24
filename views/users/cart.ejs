@@ -46,7 +46,7 @@
                             <nav>
                                 <ul>
                                     <li class="position-static">
-                                        <a class="" href="/">Home></a>
+                                        <a class="" href="/">Home</a>
                                     </li>
                                     <!-- <li><a href="#">Pages <i class="fa fa-angle-down"></i></a>
                                         <ul class="sub-menu-width">
@@ -433,7 +433,7 @@
                                                         <a href="#"><img width="90px" src="/uploads/<%= product.productId.images[0]  %>" alt=""></a>
                                                     </td>
                                                     <td class="product-name"><a href="#"><h5><%= product.productId.name %></h5></a></td>
-                                                    <td class="product-price"><span id="price" class="amount">$<%= product.productId.price.toFixed(2) %></span></td>
+                                                    <td class="product-price"><span id="price" class="amount">$<%= product.productId.offerPrice.toFixed(2) %></span></td>
                                                     <td class="cart-quality">
                                                         <div class="product-details-quality">
                                                             <div onclick="cartUpdate(this, '<%= product.productId._id %>','<%= cartItems._id %>','<%= product.productId.quantity %>')" class="cart-plus-minus">
@@ -443,7 +443,7 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <% ProductTotal = product.productId.price * product.quantity %>
+                                                    <% ProductTotal = product.productId.offerPrice * product.quantity %>
                                                     <% Total += ProductTotal %>
                                                     <td  class="product-total"><span>$<%= ProductTotal.toFixed(2) %></span></td>
                                                 </tr>
@@ -466,7 +466,7 @@
                                                
                                             <ul>
                                                 <li>Subtotal <span>$<%= Total.toFixed(2) %></span></li> 
-                                                <li>Offer <span class="text-danger">$0.00</span></li>
+                                                <!-- <li>Offer <span class="text-danger">$0.00</span></li> -->
                                                 <li>Total <span>$<%= Total.toFixed(2) %></span></li>
                                             </ul>
                                         </div>
@@ -499,7 +499,20 @@
             </div>
         </div>
         <!-- cart end -->
-        
+
+        <footer class="footer-area section-padding-1 border-top-3">
+            <div class="container-fluid">
+                <div class="footer-botoom border-top-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="copyright-2 text-center">
+                                <p>© 2024 DripLuxe. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <!-- All JS is here
@@ -521,6 +534,27 @@
             // Ensure quantity is within stock limits
             if (updatedQuantity > stock) {
                 updatedQuantity = stock;
+
+                const Toast = Swal.mixin({
+
+                    toast: true,
+                    position: "bottom",
+                    showConfirmButton: false,
+                    timer: 1600,
+                    timerProgressBar: true,
+
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+
+                Toast.fire({
+
+                    icon: "warning",
+                    title: "Exceeded the stock"
+
+                });
             }
             if (updatedQuantity <= 0) {
                 updatedQuantity = 1;
@@ -532,9 +566,12 @@
                 body : JSON.stringify({updtdQuantity :  updatedQuantity, prodId, cartId})
             }).then(res=> res.json())
             .then(data => {
-                if(data.success){
-                    // window.location.href = '/cart'
-                    $('#reloadbox').load('/cart #reloadbox')
+                if(data.loginRequired){
+                    window.location.href = '/login'
+                } else{
+                    if(data.success){
+                        $('#reloadbox').load('/cart #reloadbox')
+                    }
                 }
             }).catch(err=>{
                 console.log(err);
@@ -544,8 +581,9 @@
         }
 
         // delete item function
-        function removeItem(prodId){
-            Swal.fire({
+        async function removeItem(prodId) {
+
+            const result = await Swal.fire({
                 title: "Are you sure?",
                 text: "Remove this Item",
                 icon: "warning",
@@ -553,30 +591,60 @@
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
                 confirmButtonText: "Yes, remove it!"
-            }).then((result) => {
-                if(result.isConfirmed){
-                    Swal.fire({
-                        title: "Removed!",
-                        text: "Item has been removed from Cart",
-                        icon: "success",
-                        showConfirmButton: false,
-                        timer : 1500
-                    }).then(()=>{
-                        fetch(`/removeItem?id=${prodId}`,{ method : 'POST' })
-                        .then(data => {
-                            $('#reloadbox').load('/cart #reloadbox')
-                        })
-                    })    
-                }
+            });
 
-            })
+            if (result.isConfirmed) {
+                try {
+                    fetch(`/removeItem?id=${prodId}`,{
+                        method: 'POST',
+                        headers : { 'Content-Type':'application/json' },
+                        body : JSON.stringify()
+                    }).then(res=> res.json())
+                    .then(data => {
+                        if (data.loginRequired) {
+                            window.location.href = '/login';
+                        } else if (data.removed) {
+                            Swal.fire({
+                                title: "Removed!",
+                                text: "Item has been removed from Cart",
+                                icon: "success",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            $('#reloadbox').load('/cart #reloadbox');
+                        }
+                    })
+                } catch (error) {
+                    console.log('Error removing item: ', error);
+                }
+            }
         }
 
+
         async function clearCart(){
-            const response = await axios.patch('/clearCart')
-            if(response.data.success){
-                $('#reloadbox').load('/cart #reloadbox')
+            const result = await Swal.fire({
+                title: "Are you sure?",
+                text: "Clear cart",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, remove it!"
+            })
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await axios.patch('/clearCart');
+                    if (response.data.loginRequired) {
+                        window.location.href = '/login';
+                    } else if (response.data.success) {
+                        $('#reloadbox').load('/cart #reloadbox');
+                    }
+                } catch (error) {
+                    console.log('Error clearing cart: ', error);
+                }
             }
+            
         }
 
     </script>

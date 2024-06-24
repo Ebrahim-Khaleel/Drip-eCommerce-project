@@ -765,6 +765,7 @@
 
 
                                         <div class="table-responsive" id="reloadDiv">
+                                            <% if(products){ %>
                                             <table class="table align-middle table-nowrap">
                                                 <thead>
                                                     <tr>
@@ -780,7 +781,6 @@
                                                 </thead>
                                                 <tbody>
                                                     <% products.forEach((product,i)=> { %>
-                                                        <% if(!product.category.isBlocked) { %>
                                                         <tr>
                                                             <td><%= i+1 %></td>
                                                             <td><%= product.name %></td>
@@ -802,10 +802,12 @@
                                                                 <% } %>
                                                             </td>
                                                         </tr>
-                                                        <% } %>
                                                     <% }); %>
                                                 </tbody>
                                             </table>
+                                            <% }else{ %>
+                                                <h3 class="text-center">No Products</h3>
+                                            <% } %>
                                         </div>
 
                                         <!-- Pagination -->
@@ -1079,45 +1081,6 @@
             }
         }
 
-        // edit product 
-        async function openEditModal(productId){
-            const name = document.getElementById('editName')
-            const description = document.getElementById('editDescription')
-            const price = document.getElementById('editPrice')
-            const category = document.getElementById('editCategory1')
-            const image1 = document.getElementById('editImage1')
-            const image2 = document.getElementById('editImage2')
-            const image3 = document.getElementById('editImage3')
-            const image4 = document.getElementById('editImage4')
-            const quantity = document.getElementById('editQuantity')
-
-
-            try{
-                const response = await axios.post('/admin/editProduct',{productId});
-                const data = response.data.findingProduct;
-                const data1 = response.data.categories;
-
-                const option = [
-                `<option value="${data.category._id}">${data.category.name}</option>`,
-                ]
-
-                data1.forEach(element => {
-                    option.push(`<option value="${element._id}">${element.name}</option>`)
-                });
-                
-                if(data){
-                    name.value = data.name;
-                    description.value = data.description;
-                    price.value = data.price;
-                    category.innerHTML=option;
-                    image1.value = data.images;
-                    quantity.value = data.quantity;
-                }
-            }catch(error){
-                console.log(error.message);
-            }
-        }
-
 
         // catergory list or unlist
         function UnlistProduct(productId){
@@ -1131,10 +1094,20 @@
             })
             .then(res => res.json())
             .then(data => {
-                if(data.pending){
-                    alert('Product is currently ordered by customers')
-                }else if(data.res){
-                    $('#reloadDiv').load('/admin/products #reloadDiv')
+                if (response.data.loginRequired) {
+                    window.location.href = '/admin/login';
+                } else{
+                    if(data.pending){
+                        Swal.fire({
+                                position: "center",
+                                icon: "warning",
+                                title: "Product is currently ordered by customers!",
+                                showConfirmButton: false,
+                                timer: 2000
+                            })
+                    }else if(data.res){
+                        $('#reloadDiv').load('/admin/products #reloadDiv')
+                    }
                 }
             })
             .catch(err => {
