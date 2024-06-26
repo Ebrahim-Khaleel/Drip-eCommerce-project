@@ -259,8 +259,8 @@ const paypalPayment = async(req,res) =>{
                 payment_method: "paypal"
             },
             redirect_urls: {
-                return_url: "http://localhost:4001/paypalsuccess", // If successful return URL
-                cancel_url: "http://localhost:4001/paypalcancel" // If canceled return URL
+                return_url: "https://dripluxe.shop/paypalsuccess", // If successful return URL
+                cancel_url: "https://dripluxe.shop/paypalcancel" // If canceled return URL
             },
             transactions: [{
                 item_list: {
