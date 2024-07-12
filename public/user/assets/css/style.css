@@ -7690,7 +7690,84 @@ body.body-menu-overlay::before {
 }
 
 .slider-area img {
+  width: 50%;
+  height: 50%;
+  
+}
+
+.overlay-text {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+}
+
+.overlay-text h1 {
+  color: rgb(255, 249, 245);
+  font-family: 'Optima', 'Segoe', "Segoe UI", 'Candara', 'Calibri', 'Arial', 'sans-serif';
+  font-size: 100px;
+  font-weight: lighter;
+  white-space: nowrap; 
+}
+
+.discover-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  color: rgb(154, 76, 33);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+  border-style: solid;
+  border-color:  rgb(154, 76, 33);
+}
+
+.driptxt{
+  color: rgb(255, 249, 245);
+  font-family: 'Optima', 'Segoe', "Segoe UI", 'Candara', 'Calibri', 'Arial', 'sans-serif';
+  font-size: 50px;
+  font-weight: lighter;
+  white-space: nowrap; 
+}
+
+.singleimage img {
   width: 100%;
+  height: auto;
+  object-fit: cover; /* Ensures the image covers the container while maintaining aspect ratio */
+}
+
+.cateShoeban img {
+  width: 100%;
+  height: auto;
+  justify-content: center;
+  object-fit: cover; /* Ensures the image covers the container while maintaining aspect ratio */
+}
+
+.overlay-text-cate {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -140%);
+  color: white;
+}
+
+.overlay-text-cate a {
+  color: rgb(26, 82, 24);
+  font-family: 'Optima', 'Segoe', "Segoe UI", 'Candara', 'Calibri', 'Arial', 'sans-serif';
+  font-size: 65px;
+  font-weight: lighter;
+  white-space: nowrap; 
+}
+
+.catediscover-btn {
+  display: inline-block;
+  padding: 3px 1px;
+  color: rgb(154, 76, 33);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+  border-style: solid;
+  border-color:  rgb(255, 255, 255);
 }
 
 .fullpage-pl-300 {
@@ -16384,7 +16461,7 @@ body.body-menu-overlay::before {
 }
 
 .delay-content {
-  margin-left: -190px;
+
   position: relative;
   z-index: 9;
 }
@@ -26540,9 +26617,9 @@ body.body-menu-overlay::before {
 }
 
 .breadcrumb-bg-3 {
-  background: url("../images/bg/breadcrumb-bg-3.jpg");
+  background: url("../images/bg/tu-tu-QZGQO3NvsLo-unsplash.jpg");
   background-size: cover;
-  background-position: 100% 0%;
+  background-position: 100% 30%;
 }
 
 .breadcrumb-bg-4 {
@@ -26681,15 +26758,15 @@ body.body-menu-overlay::before {
 }
 
 .breadcrumb-content-2 h2 {
-  font-size: 120px;
-  color: #fff;
-  margin: 0 0 0 -50px;
+  font-size: 50px;
+  color: beige;
+  margin: 0 0 0 -230px;
   line-height: 1em;
 }
 
 @media only screen and (min-width: 1366px) and (max-width: 1600px) {
   .breadcrumb-content-2 h2 {
-    font-size: 80px;
+    font-size: 50px;
   }
 }
 

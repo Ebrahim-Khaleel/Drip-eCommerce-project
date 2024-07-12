@@ -9,7 +9,7 @@ const session = require('express-session')
 const userAuth = require('../middlewares/userAuth')
 require('dotenv').config
 const passport = require('passport')
-require('../passport')
+
 
 
 // home page
@@ -33,7 +33,7 @@ userRoute.get('/shop/latest',userController.latest)
 userRoute.get('/shop/category/:name',userController.categoryFiltering)
 userRoute.get('/productDetail/:id', userController.showProductDetail)
 
-userRoute.put('/search',userController.searchItems)
+userRoute.get('/shop/search',userController.searchItems)
 // cart
 userRoute.get('/cart',userAuth.isLogin, cartController.loadCart)
 userRoute.post('/addToCart',userAuth.isLoginn,cartController.addToCart)
@@ -75,6 +75,12 @@ userRoute.get('/getinvoice/:id',userAuth.isLogin, orderController.loadInvoice)
 // wallet
 userRoute.patch('/addAmount',userAuth.isLoginn, userController.addMoneyToWallet)
 
+// about page
+userRoute.get('/aboutUs', userController.loadAbout)
+
+// contact page
+userRoute.get('/contactUs', userController.loadContact)
+
 // google login
 userRoute.use(passport.initialize());
 userRoute.use(passport.session());
@@ -95,21 +101,22 @@ userRoute.get('/auth/google',
 
 userRoute.get('/auth/google/callback',
     passport.authenticate('google', {
-        successRedirect: '/',
+        successRedirect: '/googlesuccess',
         failureRedirect: '/failure'
     })
 );
 
-userRoute.get('/', userController.successGoogleLogin);
+userRoute.get('/googlesuccess', userController.successGoogleLogin);
 userRoute.get('/failure', userController.failureLogin);
 
 // forgot password
-userRoute.get('/forgotPassword',userAuth.isLogin, userController.loadForgotPage)
+userRoute.get('/forgotPassword',userAuth.isLogout, userController.loadForgotPage)
 userRoute.post('/forgotPassword',userAuth.isLogin, userController.forgotPassword)
 userRoute.get('/forgotConfirm',userAuth.isLogin, userController.loadNewPass)
 userRoute.post('/forgotConfirm',userAuth.isLogin, userController.forgetPassConfirm)
 
 // logout
 userRoute.get('/logout',userAuth.isLogin, userController.userLogout)
+
 
 module.exports = userRoute

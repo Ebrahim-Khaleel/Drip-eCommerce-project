@@ -28,7 +28,9 @@ const showHome = async (req, res) => {
 
         console.log(allproducts)
 
-        res.render('users/home',{newArrivals : allproducts,cartItems})
+        const shoe = await category.findOne({name : 'Shoes'})
+
+        res.render('users/home',{newArrivals : allproducts,cartItems, shoe})
     } catch (error) {
         console.log(error.message);
     }
@@ -62,9 +64,29 @@ const showShop = async (req, res) => {
 
 const searchItems = async(req, res) =>{
     try{
-        const findProduct = req.body.prod
-        const searchedItem = await products.find({ name: { $regex: new RegExp(`.*${findProduct}.*`, 'i') } }).populate('category')
-        res.json(searchedItem)
+        const limit = 8;
+        const page = parseInt(req.query.page) || 1
+        const skip = (page - 1) * limit;
+
+        // loading cart quantity
+        const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+        const categories = await category.find({isBlocked:false})
+
+        const findProduct = req.query.searchId
+        console.log(findProduct);
+        const searchedItem = await products.
+        find({ name: { $regex: new RegExp(`.*${findProduct}.*`, 'i') } },{isBlocked:false})
+        .populate('category offer')
+        .sort({_id:-1})
+        .skip(skip)
+        .limit(limit)
+
+        console.log(searchedItem);
+        
+        const totalPages = Math.ceil(searchedItem.length / limit);
+        
+        res.render('users/shop', {showproducts:searchedItem,cartItems,categories, currentPage : page, totalPages})
 
     }catch(error){
         console.log(error.message);
@@ -222,15 +244,47 @@ const showProductDetail = async (req, res) => {
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
 
         const { id } = req.params
-        const product = await products.findById(id)
-        res.render('users/productDetail', {product, cartItems})
+        
+        if(id.length != 24){
+            res.redirect('/error-404')
+        }
+
+        const product = await products.findById(id).populate('category')
+
+        if(product){
+            res.render('users/productDetail', {product, cartItems})
+        }else{
+            res.redirect('/error-404')
+        }
 
     } catch (error) {
         console.log(error);
     }
 }
 
+const loadAbout = async(req, res) => {
+    try{
+        // loading cart quantity
+        const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
 
+        res.render('users/aboutus', {cartItems})
+    }catch(error){
+        console.log(error.message)
+    }
+}
+
+const loadContact = async(req, res) =>{
+    try{
+        // loading cart quantity
+        const userId = req.session.user_id
+        const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
+
+        res.render('users/contactUs', {cartItems})
+    }catch(error){
+        console.log(error.message);
+    }
+}
 
 // Loading Sign Up Page
 const showSignUp = async (req, res) => {
@@ -447,8 +501,34 @@ const showLogin = async (req, res) => {
 
 const successGoogleLogin = async(req,res)=>{
     try{
-        console.log(req.user);
+        const userDets = req.user
+        console.log(" -------- kkkkkkkk ---- ",userDets);
+        const pass = userDets.id
+        const {email, name} = userDets._json
+        const numm = '0000000000';
+        const phone = parseInt(numm)
+
+        const findUser = await User.findOne({email:email})
+
+        if(!findUser){
+            const userr = await User.create({
+                name : name,
+                email : email,
+                phone : phone,
+                password : pass
+            })
+
+            req.session.user_id = userr._id
+
+            await wallet.create({
+                userId : req.session.user_id
+            })
+        }
+
+        req.session.user_id = findUser._id
+
         res.redirect('/')
+
     }catch(error){
         console.log(error.message);
     }
@@ -585,8 +665,9 @@ const loadWishlist = async(req,res) =>{
         const userId = req.session.user_id
         const cartItems = await cart.findOne({userId : userId}).populate('products.productId')
 
+        const prods = await products.find({isBlocked:false}).sort({createdAt : -1}).populate('category').limit(12)
         const wishlists = await wishlist.findOne({userId:userId}).populate('products.productId')
-        res.render('users/wishlist',{wishlists,cartItems})
+        res.render('users/wishlist',{wishlists,cartItems,prods})
     }catch(error){
         console.log(error.message);
     }
@@ -754,5 +835,7 @@ module.exports = {
     loadForgotPage,
     forgotPassword,
     loadNewPass,
-    forgetPassConfirm
+    forgetPassConfirm,
+    loadAbout,
+    loadContact
 }

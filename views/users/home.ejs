@@ -6,12 +6,12 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Toro - Minimal eCommerce HTML Template</title>
+    <title>DripLuxe</title>
     <meta name="robots" content="noindex, follow" />
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="user/assets/images/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" width="5px" href="user/assets/images/logo/logo-no-background.png">
 
     <!-- All CSS is here
 	============================================ -->
@@ -113,23 +113,35 @@
                 <div class="row align-items-center">
                     <div class="col-6">
                         <div class="mobile-logo logo-width">
-                            <a href="index.html">
-                                <img alt="" src="user/assets/images/logo/logo.png">
+                            <a href="/">
+                                <img alt="" src="user/assets/images/logo/logo-no-background.png">
                             </a>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="mobile-header-right-wrap">
                             <div class="header-right-wrap header-right-flex">
-                                <div class="same-style cart-wrap">
-                                    <a href="" class="cart-active">
+                                <div class="same-style header-wishlist">
+                                    <a href="/wishlist"><i class="fa fa-heart-o"></i></a>
+                                </div>
+                                <div class="same-style cart-wrap" id="shoppingCartid">
+                                    <a href="/cart" class="cart ">
                                         <i class="dlicon shopping_bag-20"></i>
-                                        <span class="count-style">02</span>
+                                        <% if(cartItems){ %>
+                                        <span class="count-style">
+                                             <%= cartItems.products.length %>
+                                        </span>
+                                        <% } %>
                                     </a>
                                 </div>
-                                <div class="same-style header-off-canvas">
-                                    <a class="header-aside-button" href="#">
-                                        <i class="dlicon ui-3_menu-left"></i>
+                                <div class="same-style header-search">
+                                    <a class="search-active" href="#">
+                                        <i class="dlicon ui-1_zoom"></i>
+                                    </a>
+                                </div>
+                                <div class="same-style">
+                                    <a class="" href="/login">
+                                        <i class="ri-user-line"></i>
                                     </a>
                                 </div>
                             </div>
@@ -143,8 +155,8 @@
             <a class="search-close"><i class="dlicon ui-1_simple-remove"></i></a>
             <div class="search-content">
                 <p>Start typing and press Enter to search</p>
-                <form class="search-form" action="#">
-                    <input type="text" placeholder="Search">
+                <form class="search-form" action="/shop/search" method="get">
+                    <input type="text" id="" name="searchId" placeholder="Search">
                     <button class="button-search"><i class="dlicon ui-1_zoom"></i></button>
                 </form>
             </div>
@@ -354,9 +366,17 @@
             </div>
         </div>
         <div class="slider-area pt-120 section-padding-1">
-            <div class="container-fluid">
-                <div class="main-slider-active owl-carousel slider-dot-position-1 slider-dot-style-1">
-                    <div class="single-main-slider slider-animated-1" data-dot="01">
+            <div class="container-fluid" style="padding: 0; position: relative;">
+                <div class="singleimage">
+                    <img src="user/assets/images/portrait-handsome-bearded-man-outside_23-2150266914.jpg" style="max-height: 720px; object-fit: cover;" alt="">
+                    <div class="overlay-text">
+                        <h1>NEW COLLECTION</h1>
+                        <a href="/shop" class="discover-btn">DISCOVER NOW</a>
+                    </div>
+                </div>
+                    
+                    
+                    <!-- <div class="single-main-slider slider-animated-1" data-dot="01">
                         <div class="row align-items-center flex-row-reverse">
                             <div class="col-lg-6 col-md-6">
                                 <div class="main-slider-img">
@@ -409,12 +429,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </div> -->
+                
             </div>
         </div>
         <div class="product-area pt-130 pb-130">
-            <div class="container-fluid">
+            <div class="container-fluid bg-black">
                 <div class="section-title-1 mb-70 text-center bg-black p-2">
                     <h2 class="fw-semibold text-white">NEW ARRIVALS</h2>
                 </div>
@@ -428,10 +448,8 @@
                             <img class="hover-img" src="/uploads/<%= product.images[1] %>" alt="">
                         </a>
                         <div class="product-action product-action-position-1">
-                            <a data-bs-toggle="modal" data-bs-target="#exampleModal" href="#"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
-                            <a title="Add to Wishlist" href="#"><i class="fa fa-heart"></i><span>Add to Wishlist</span></a>
-                            <a class="icon-blod" title="Add to Compare" href="#"><i class="dlicon arrows-4_compare"></i><span>Add to Compare</span></a>
-                            <a title="Add to Cart" href="#"><i class="fa fa-shopping-cart"></i><span>Add to Cart</span></a>
+                            <a title="Add to Wishlist" href="/productDetail/<%= product._id %>"><i class="fa fa-heart"></i><span>Add to Wishlist</span></a>
+                            <a title="Add to Cart" href="/productDetail/<%= product._id %>"><i class="fa fa-shopping-cart"></i><span>Add to Cart</span></a>
                         </div>
                     </div>
                     <div class="product-content">
@@ -445,161 +463,19 @@
                 <% }) %>
             </div>
         </div>
-        <!-- <div class="product-area section-padding-2 padding-120-row-col pb-125">
+        <div class="product-area section-padding-2 padding-120-row-col">
             <div class="container-fluid">
-                <div class="section-title-1 mb-70 text-center">
-                    <h2>Must have</h2>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 col-md-6 col-sm-6">
-                        <div class="product-wrap mb-60">
-                            <div class="product-img default-overlay mb-25">
-                                <a href="product-details.html">
-                                    <img class="default-img" src="user/assets/images/product/product-5.jpg" alt="">
-                                    <img class="hover-img" src="user/assets/images/product/product-5-2.jpg" alt="">
-                                    <span class="badge-black badge-left-20 badge-top-20 badge-width-height-2 badge-border-radius-100">sale!</span>
-                                </a>
-                                <div class="product-action product-action-position-1">
-                                    <a data-bs-toggle="modal" data-bs-target="#exampleModal" href="#"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
-                                    <a title="Add to Wishlist" href="#"><i class="fa fa-heart"></i><span>Add to Wishlist</span></a>
-                                    <a class="icon-blod" title="Add to Compare" href="#"><i class="dlicon arrows-4_compare"></i><span>Add to Compare</span></a>
-                                    <a title="Add to Cart" href="#"><i class="fa fa-shopping-cart"></i><span>Add to Cart</span></a>
-                                </div>
-                            </div>
-                            <div class="product-content-2 text-center">
-                                <h3><a href="product-details.html">Double-breasted faux fur coat</a></h3>
-                                <div class="product-price">
-                                    <span class="new-price">$22.00 - $49.00</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6">
-                        <div class="product-wrap mb-60">
-                            <div class="product-img default-overlay mb-25">
-                                <a href="product-details.html">
-                                    <img class="default-img" src="user/assets/images/product/product-6.jpg" alt="">
-                                    <img class="hover-img" src="user/assets/images/product/product-6-2.jpg" alt="">
-                                    <span class="badge-black badge-right-0 badge-top-0 badge-width-height-1">sold uot</span>
-                                </a>
-                                <div class="product-action product-action-position-1">
-                                    <a data-bs-toggle="modal" data-bs-target="#exampleModal" href="#"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
-                                    <a title="Add to Wishlist" href="#"><i class="fa fa-heart"></i><span>Add to Wishlist</span></a>
-                                    <a class="icon-blod" title="Add to Compare" href="#"><i class="dlicon arrows-4_compare"></i><span>Add to Compare</span></a>
-                                    <a title="Add to Cart" href="#"><i class="fa fa-shopping-cart"></i><span>Add to Cart</span></a>
-                                </div>
-                            </div>
-                            <div class="product-content-2 text-center">
-                                <h3><a href="product-details.html">Quilted parka with hood</a></h3>
-                                <div class="product-price">
-                                    <span class="new-price">$49.00</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6">
-                        <div class="product-wrap mb-60">
-                            <div class="product-img default-overlay mb-25">
-                                <a href="product-details.html">
-                                    <img class="default-img" src="user/assets/images/product/product-7.jpg" alt="">
-                                    <img class="hover-img" src="user/assets/images/product/product-7-2.jpg" alt="">
-                                </a>
-                                <div class="product-action product-action-position-1">
-                                    <a data-bs-toggle="modal" data-bs-target="#exampleModal" href="#"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
-                                    <a title="Add to Wishlist" href="#"><i class="fa fa-heart"></i><span>Add to Wishlist</span></a>
-                                    <a class="icon-blod" title="Add to Compare" href="#"><i class="dlicon arrows-4_compare"></i><span>Add to Compare</span></a>
-                                    <a title="Add to Cart" href="#"><i class="fa fa-shopping-cart"></i><span>Add to Cart</span></a>
-                                </div>
-                            </div>
-                            <div class="product-content-2 text-center">
-                                <h3><a href="product-details.html">Contrast faux fur jacket</a></h3>
-                                <div class="product-price">
-                                    <span class="new-price">$50.00</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6">
-                        <div class="product-wrap mb-60">
-                            <div class="product-img default-overlay mb-25">
-                                <a href="product-details.html">
-                                    <img class="default-img" src="user/assets/images/product/product-8.jpg" alt="">
-                                    <img class="hover-img" src="user/assets/images/product/product-8-2.jpg" alt="">
-                                </a>
-                                <div class="product-action product-action-position-1">
-                                    <a data-bs-toggle="modal" data-bs-target="#exampleModal" href="#"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
-                                    <a title="Add to Wishlist" href="#"><i class="fa fa-heart"></i><span>Add to Wishlist</span></a>
-                                    <a class="icon-blod" title="Add to Compare" href="#"><i class="dlicon arrows-4_compare"></i><span>Add to Compare</span></a>
-                                    <a title="Add to Cart" href="#"><i class="fa fa-shopping-cart"></i><span>Add to Cart</span></a>
-                                </div>
-                            </div>
-                            <div class="product-content-2 text-center">
-                                <h3><a href="product-details.html">Bejewelled velvet sandals</a></h3>
-                                <div class="product-price">
-                                    <span class="new-price">$35.00</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6">
-                        <div class="product-wrap mb-60">
-                            <div class="product-img default-overlay mb-25">
-                                <a href="product-details.html">
-                                    <img class="default-img" src="user/assets/images/product/product-9.jpg" alt="">
-                                    <img class="hover-img" src="user/assets/images/product/product-9-2.jpg" alt="">
-                                </a>
-                                <div class="product-action product-action-position-1">
-                                    <a data-bs-toggle="modal" data-bs-target="#exampleModal" href="#"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
-                                    <a title="Add to Wishlist" href="#"><i class="fa fa-heart"></i><span>Add to Wishlist</span></a>
-                                    <a class="icon-blod" title="Add to Compare" href="#"><i class="dlicon arrows-4_compare"></i><span>Add to Compare</span></a>
-                                    <a title="Add to Cart" href="#"><i class="fa fa-shopping-cart"></i><span>Add to Cart</span></a>
-                                </div>
-                            </div>
-                            <div class="product-content-2 text-center">
-                                <h3><a href="product-details.html">Strappy sandals</a></h3>
-                                <div class="product-price">
-                                    <span class="new-price">$85.00</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6">
-                        <div class="product-wrap mb-60">
-                            <div class="product-img default-overlay mb-25">
-                                <a href="product-details.html">
-                                    <img class="default-img" src="user/assets/images/product/product-10.jpg" alt="">
-                                    <img class="hover-img" src="user/assets/images/product/product-10-2.jpg" alt="">
-                                    <span class="badge-black badge-left-20 badge-top-20 badge-width-height-2 badge-border-radius-100">-7.7%</span>
-                                </a>
-                                <div class="product-action product-action-position-1">
-                                    <a data-bs-toggle="modal" data-bs-target="#exampleModal" href="#"><i class="fa fa-eye"></i><span>Quick Shop</span></a>
-                                    <a title="Add to Wishlist" href="#"><i class="fa fa-heart"></i><span>Add to Wishlist</span></a>
-                                    <a class="icon-blod" title="Add to Compare" href="#"><i class="dlicon arrows-4_compare"></i><span>Add to Compare</span></a>
-                                    <a title="Add to Cart" href="#"><i class="fa fa-shopping-cart"></i><span>Add to Cart</span></a>
-                                </div>
-                            </div>
-                            <div class="product-content-2 text-center">
-                                <h3><a href="product-details.html">Down puffer coat with wraparound collar</a></h3>
-                                <div class="product-price">
-                                    <span class="old-price">$80.00</span>
-                                    <span class="new-price">$55.00</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="btn-style-1 text-center">
-                    <a class="btn-border" href="/shop">
-                        <div class="btn-viewmore-normal btn-ptb-1 btn-viewmore-bg-transparent btn-viewmore-common">
-                            <span>View all products</span>
-                        </div>
-                        <div class="btn-viewmore-hover btn-ptb-1 btn-viewmore-common btn-hover-transition">
-                            <span>View all products</span>
+                <div class="col-lg-12 col-md-6 col-sm-6 p-5 cateCont">
+                    <a href="/shop/category/<%= shoe.name %>" class="cateShoeban">
+                        <img class="default-img" src="user/assets/images/505ECDB4-7AD5-47F1-A473-4F3603D00C34_1_201_a.jpeg" alt="" >
+                        <div class="overlay-text-cate">
+                            <a href="/shop/category/<%= shoe.name %>" class="catediscover-btn">DISCOVER MORE SHOES</a>
                         </div>
                     </a>
+                    
                 </div>
             </div>
-        </div> -->
+        </div>
         <div class="delay-area bg-light-pink pt-190 pb-190 res-white-overly-xs">
             <div class="bg-1"></div>
             <div class="container-fluid">
@@ -607,7 +483,8 @@
                     <div class="col-lg-8 ms-auto me-auto">
                         <div class="delay-content text-center">
                             <!-- <span>limit edition shimmiry skitrt</span> -->
-                            <h2 class="text-white">World of Fashion</h2>
+                            <h3 class="driptxt ">DripLuxe • Men's Fashion Heritage</h3>
+                            <h3 class="text-white"></h3>
                             <!-- <h2>off 30%</h2> -->
                             <!-- <div class="timer timer-style-1 mb-50">
                                 <div data-countdown="2024/12/01"></div>
@@ -615,10 +492,10 @@
                             <div class="btn-style-1 text-center">
                                 <a class="btn-border" href="/shop">
                                     <div class="btn-viewmore-normal btn-ptb-2 btn-viewmore-bg-black btn-viewmore-common btn-font-2">
-                                        <span>SHOP NOW</span>
+                                        <span>DISCOVER MORE</span>
                                     </div>
                                     <div class="btn-viewmore-hover btn-ptb-2 btn-viewmore-common btn-font-2">
-                                        <span>SHOP NOW</span>
+                                        <span>DISCOVER MORE</span>
                                     </div>
                                 </a>
                             </div>
@@ -656,7 +533,7 @@
                     <div class="row">
                         <div class="col-lg-3 col-md-3 col-12">
                             <div class="logo logo-res-center">
-                                <a href="index.html">
+                                <a href="/">
                                     <img src="user/assets/images/logo/3644A902-BA60-477D-9367-3BC38FBB0355_4_5005_c.jpeg" width="190px" alt="logo">
                                 </a>
                             </div>
@@ -665,21 +542,11 @@
                             <div class="footer-menu text-center">
                                 <nav>
                                     <ul>
-                                        <li><a href="#">About Us</a></li>
-                                        <li><a href="#">Help Center</a></li>
-                                        <li><a href="#">Our Team</a></li>
-                                        <li><a href="#">Privacy Policy</a></li>
-                                        <li><a href="#">The Blog</a></li>
+                                        <li><a href="/aboutUs">About Us</a></li>
+                                        <li><a href="/contactUs">Help Center</a></li>
+                                        <li><a href="javascript:void(0)">Privacy Policy</a></li>
                                     </ul>
                                 </nav>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-3 col-12">
-                            <div class="social-icon-style-2 social-icon-right">
-                                <a class="facebook" href="#"><i class="fa fa-facebook"></i></a>
-                                <a class="twitter" href="#"><i class="fa fa-twitter"></i></a>
-                                <a class="youtube" href="#"><i class="fa fa-youtube"></i></a>
-                                <a class="dribbble" href="#"><i class="fa fa-dribbble"></i></a>
                             </div>
                         </div>
                     </div>
@@ -764,34 +631,28 @@
         </div>
         <!-- Modal end -->
         <!--news letter popup start-->
-        <div class="newletter-popup">
+        <!-- <div class="newletter-popup">
             <div id="popup2">
                 <span class="b-close"><span><i class="dlicon ui-1_simple-remove"></i></span></span>
             </div>
             <div class="popup-wrapper-all">
                 <div class="popup-subscribe-area">
-                    <span>Man Autumn Winter 2023</span>
                     <h2>Join Our Newsletter & get 20% persale</h2>
                     <div class="subscribe-bottom">
-                        <form action="https://devitems.us11.list-manage.com/subscribe/post?u=6bbb9b6f5827bd842d9640c82&amp;id=05d85f18ef" method="post" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+                        <form action="/">
                             <div class="mc-form">
                                 <input type="email" value="" name="EMAIL" class="email" placeholder="Your email address…" required>
-                                <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
                                 <div class="mc-news" aria-hidden="true"><input type="text" name="b_6bbb9b6f5827bd842d9640c82_05d85f18ef" tabindex="-1" value=""></div>
                                 <div class="clear-2"><input type="submit" value="subscribe" name="subscribe" class="button"></div>
                             </div>
                         </form>
                     </div>
-                    <div class="dont-show mt-15">
-                        <input type="checkbox" id="newsletter-permission">
-                        <label for="newsletter-permission">Do not show popup anymore</label>
-                    </div>
                 </div>
                 <div class="popup-image">
-                    <img src="user/assets/images/banner/newletter-popup.jpg" alt="banner">
+                    <img src="user/assets/images/67086726_56_D5.avif" alt="banner">
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 
     <!-- All JS is here
