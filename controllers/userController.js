@@ -554,7 +554,7 @@ passport.use(
     new googleStrategy({
         clientID : process.env.GOOGLECLIENTID,
         clientSecret : process.env.GOOGLECLIENTSECRET,
-        callbackURL : "dripluxe.shop/auth/google/callback",
+        callbackURL : "https://dripluxe.shop/auth/google/callback",
         passReqToCallback : true
     },
     function (request, accessToken, refreshToken, profile, done){
