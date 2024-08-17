@@ -33,7 +33,7 @@ adminRoute.use(session({
 }))
 
 // Admin routes
-adminRoute.get('/login', adminAuth.isLogout , adminController.loadLogin)
+adminRoute.get('/', adminAuth.isLogout , adminController.loadLogin)
 adminRoute.post('/login', adminAuth.isLogout, adminController.verifyAdmin)
 adminRoute.get('/signup', adminAuth.isLogout, adminController.showSignUp)
 adminRoute.post('/signup', adminAuth.isLogout, adminController.insertAdmin)
