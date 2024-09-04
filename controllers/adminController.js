@@ -290,7 +290,7 @@ const adminLogout = async (req, res) => {
     try {
         req.session.destroy()
         console.log('Admin Logged Out');
-        res.redirect('/admin/login')
+        res.redirect('/admin/')
     } catch (error) {
         console.log(error.message);
     }
